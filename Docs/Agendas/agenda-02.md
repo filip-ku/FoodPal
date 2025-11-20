@@ -4,7 +4,7 @@
 **Time:** 14:45  
 **Chair:** Ivan Gvardeitsev  
 **Minute Taker:** *Batuhan Özkara*  
-**Expected Attendees:** Ivan Gvardeitsev  
+**Expected Attendees:** Ivan Gvardeitsev, Batuhan Özkara, Max ten Broeke, Merlijn Koster, Filip Kurantowicz(online), Seymur Bastin Caglayan
 
 ---
 
