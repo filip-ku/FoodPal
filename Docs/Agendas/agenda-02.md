@@ -3,7 +3,7 @@
 **Date:** 21/11/2025  
 **Time:** 14:45  
 **Chair:** Ivan Gvardeitsev  
-**Minute Taker:** *TBD*  
+**Minute Taker:** *Batuhan Özkara*  
 **Expected Attendees:** Ivan Gvardeitsev  
 
 ---
