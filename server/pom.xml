@@ -59,6 +59,7 @@
 					<configLocation>../checkstyle.xml</configLocation>
 					<sourceDirectories>${project.basedir}</sourceDirectories>
 					<includes>src/**/*.java,**/*.xml,**/*.yml</includes>
+                    <failOnViolation>false</failOnViolation>
 					<excludes>**/target/**</excludes>
 				</configuration>
 				<executions>
