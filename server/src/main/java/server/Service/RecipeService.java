@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import server.Repository.IngredientRepository;
+//import server.Repository.IngredientRepository;
 import server.Repository.RecipeRepository;
 
 import java.util.List;
@@ -66,8 +66,8 @@ public class RecipeService {
 
     /**
      * TODO
-     * @param ingredient
-     * @return
+     * @param ingredient adf
+     * @return nig
      */
     public Ingredient addIngredientToRecipe(Ingredient ingredient) {
         return null;
