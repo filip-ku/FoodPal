@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-//import org.springframework.web.server.ResponseStatusException;
 import server.Service.RecipeService;
 
 import java.util.List;
@@ -41,15 +40,4 @@ public class RecipeController {
         recipeService.removeRecipe(id);
         return ResponseEntity.noContent().build();
     }
-
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Recipe> updateRecipe(@PathVariable long id, @RequestBody Recipe recipe) {
-//        if (recipe.getId() != 0 && recipe.getId() != id) {
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, "Recipe id in path and body do not match");
-//        }
-//
-//        Recipe saved = recipeService.updateRecipe(id, recipe);
-//        return ResponseEntity.ok(saved);
-//    }
 }
