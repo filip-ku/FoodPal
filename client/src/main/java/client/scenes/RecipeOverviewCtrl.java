@@ -16,13 +16,16 @@
 package client.scenes;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import com.google.inject.Inject;
 
 import client.utils.ServerUtils;
-import commons.Quote;
+import commons.Ingredient;
+import commons.Recipe;
+import commons.RecipeIngredient;
+import commons.RecipeStep;
+//import server.RecipeService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -35,22 +38,22 @@ public class RecipeOverviewCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
-    private ObservableList<Quote> data;
+    private ObservableList<Recipe> data;
 
     @FXML
-    private TableView<Quote> tableRecipes;
+    private TableView<Recipe> tableRecipes;
     @FXML
-    private TableColumn<Quote, String> colRecipes;
+    private TableColumn<Recipe, String> colRecipes;
 
     @FXML
-    private TableView<Quote> tableIngredients;
+    private TableView<RecipeIngredient> tableIngredients;
     @FXML
-    private TableColumn<Quote, String> colIngredients;
+    private TableColumn<Ingredient, String> colIngredients;
 
     @FXML
-    private TableView<Quote> tablePreparation;
+    private TableView<RecipeStep> tablePreparation;
     @FXML
-    private TableColumn<Quote, String> colPreparation;
+    private TableColumn<RecipeStep, String> colPreparation;
 
     @FXML
     private Label recipeName;
@@ -71,29 +74,16 @@ public class RecipeOverviewCtrl implements Initializable {
         showMainMenu();
 
         colRecipes.setCellValueFactory(q ->
-                new SimpleStringProperty(q.getValue().person.firstName));
+                new SimpleStringProperty(q.getValue().getTitle()));
 
         tableRecipes.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
-                recipeName.setText(newSel.person.firstName);
+                recipeName.setText(newSel.getTitle());
 
-                tableIngredients.setItems(
-                        FXCollections.observableList(List.of(newSel))
-                );
-
-                colIngredients.setCellValueFactory(q ->
-                        new SimpleStringProperty(q.getValue().person.lastName)
-                );
-
-                tablePreparation.setItems(
-                        FXCollections.observableList(List.of(newSel))
-                );
-
-                colPreparation.setCellValueFactory(q ->
-                        new SimpleStringProperty(q.getValue().quote)
-                );
+//                TODO
+//                Need to implement logic for Ingredients and Preparation tables
 
                 tableIngredients.setVisible(true);
                 tablePreparation.setVisible(true);
@@ -105,12 +95,12 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     public void addRecipe() {
-        mainCtrl.showAdd();
+        mainCtrl.showAddRecipe();
     }
 
     public void refresh() {
-        var quotes = server.getQuotes();
-        data = FXCollections.observableList(quotes);
+        var recipes = server.getRecipes();
+        data = FXCollections.observableList(recipes);
         tableRecipes.setItems(data);
     }
 
@@ -139,14 +129,13 @@ public class RecipeOverviewCtrl implements Initializable {
             editingName = false;
             recipeEditButton.setText("Edit");
 
-            Quote selected = tableRecipes.getSelectionModel().getSelectedItem();
+            Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                selected.person.firstName = newName;
+                selected.setTitle(newName);
             }
 
             // TODO
             // Needs a way to update the database through the server
-            // Method not available yet
 
             tableRecipes.refresh();
 
@@ -161,7 +150,7 @@ public class RecipeOverviewCtrl implements Initializable {
      * Logic for deleting a recipe
      */
     public void deleteRecipe() {
-        Quote selected = tableRecipes.getSelectionModel().getSelectedItem();
+        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
             showError("No recipe selected.");
@@ -180,7 +169,6 @@ public class RecipeOverviewCtrl implements Initializable {
 
         // TODO
         // Needs a way to update the database through the server
-        // Method not available yet
 
         showMainMenu();
 

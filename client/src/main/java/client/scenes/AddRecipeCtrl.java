@@ -13,19 +13,19 @@ import javafx.stage.Modality;
 public class AddRecipeCtrl {
 
     private final ServerUtils server;
-    private final MainController mainController;
+    private final MainCtrl MainCtrl;
 
     @FXML
     private TextField title;
 
     @Inject
-    public AddRecipeCtrl(ServerUtils server, MainController mainController) {
-        this.mainController = mainController;
+    public AddRecipeCtrl(ServerUtils server, MainCtrl MainCtrl) {
+        this.MainCtrl = MainCtrl;
         this.server = server;
     }
     public void cancel() {
         clearFields();
-        mainController.showRecipeOverview();
+        MainCtrl.showRecipeOverview();
     }
 
     public void ok() {
@@ -41,7 +41,7 @@ public class AddRecipeCtrl {
         }
 
         clearFields();
-        mainController.showRecipeOverview();
+        MainCtrl.showRecipeOverview();
     }
 
     private Recipe getRecipe() {
