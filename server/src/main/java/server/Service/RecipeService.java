@@ -19,7 +19,7 @@ public class RecipeService {
 
     public Recipe addRecipe(Recipe recipe) {
         if (isNullOrEmpty(recipe.getTitle())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Recipe title cannot be empty");
         } else {
             return recipeRepository.save(recipe);
         }

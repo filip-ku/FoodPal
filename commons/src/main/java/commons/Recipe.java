@@ -11,6 +11,9 @@ public class Recipe {
     @Column(nullable = false, length = 200)
     private String title;
 
+    /**
+     * public no-args constructor for object mapping
+     */
     public Recipe() {}
 
     public Recipe(String title) {
