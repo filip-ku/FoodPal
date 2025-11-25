@@ -16,6 +16,7 @@
 package client.scenes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import com.google.inject.Inject;
@@ -35,7 +36,6 @@ public class RecipeOverviewCtrl implements Initializable {
     private final MainCtrl mainCtrl;
 
     private ObservableList<Quote> data;
-    private ObservableList<Quote> ingredientData;
 
     @FXML
     private TableView<Quote> tableRecipes;
@@ -46,6 +46,11 @@ public class RecipeOverviewCtrl implements Initializable {
     private TableView<Quote> tableIngredients;
     @FXML
     private TableColumn<Quote, String> colIngredients;
+
+    @FXML
+    private TableView<Quote> tablePreparation;
+    @FXML
+    private TableColumn<Quote, String> colPreparation;
 
     @FXML
     private Label recipeName;
@@ -63,11 +68,10 @@ public class RecipeOverviewCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        showMainMenu();
+
         colRecipes.setCellValueFactory(q ->
                 new SimpleStringProperty(q.getValue().person.firstName));
-
-        colIngredients.setCellValueFactory(q ->
-                new SimpleStringProperty(q.getValue().person.lastName));
 
         tableRecipes.getSelectionModel()
                 .selectedItemProperty()
@@ -75,24 +79,29 @@ public class RecipeOverviewCtrl implements Initializable {
             if (newSel != null) {
                 recipeName.setText(newSel.person.firstName);
 
-                ingredientData = FXCollections.observableArrayList();
+                tableIngredients.setItems(
+                        FXCollections.observableList(List.of(newSel))
+                );
 
-                for (Quote q : data) {
-                    if (q.person.id == newSel.person.id) {
-                        ingredientData.add(q);
-                    }
-                }
+                colIngredients.setCellValueFactory(q ->
+                        new SimpleStringProperty(q.getValue().person.lastName)
+                );
 
-                tableIngredients.setItems(ingredientData);
+                tablePreparation.setItems(
+                        FXCollections.observableList(List.of(newSel))
+                );
+
+                colPreparation.setCellValueFactory(q ->
+                        new SimpleStringProperty(q.getValue().quote)
+                );
 
                 tableIngredients.setVisible(true);
+                tablePreparation.setVisible(true);
 
                 recipeEditButton.setVisible(true);
                 recipeName.setVisible(true);
             }
         });
-
-        showMainMenu();
     }
 
     public void addRecipe() {
@@ -200,5 +209,6 @@ public class RecipeOverviewCtrl implements Initializable {
         recipeEditButton.setVisible(false);
         recipeName.setText("Welcome to FoodPal!");
         tableIngredients.setVisible(false);
+        tablePreparation.setVisible(false);
     }
 }
