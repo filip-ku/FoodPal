@@ -33,6 +33,8 @@ public class Ingredient {
     public void setName(String name) {
         if (name == null) {
             throw new IllegalArgumentException("Ingredient name cannot be null");
+        } else {
+            this.name = name;
         }
     }
 }
