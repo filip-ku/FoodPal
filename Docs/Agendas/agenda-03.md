@@ -1,48 +1,56 @@
-# Meeting Agenda — week 2
+# Meeting Agenda — Week 3
 
-**Date:** 21/11/2025  
+**Date:** 28/11/2025  
 **Time:** 14:45  
-**Chair:** Ivan Gvardeitsev  
-**Minute Taker:** *Batuhan Özkara*  
-**Expected Attendees:** Ivan Gvardeitsev, Batuhan Özkara, Max ten Broeke, Merlijn Koster, Filip Kurantowicz(online), Seymur Bastin Caglayan
+**Chair:** Batuhan Özkara  
+**Minute Taker:** Ivan Gvardeitsev  
+**Expected Attendees:** Ivan Gvardeitsev, Batuhan Özkara, Max ten Broeke, Merlijn Koster, Filip Kurantowicz, Seymur Bastin Caglayan
 
 ---
 
 ## Previous Tasks (10–20 min)
 
 - **Check-in**
-  - How does everyone feel?
-  - Any stress about a particular topic?
-  - Suggestion session (share resources, helpful preparation material)
+  - Was everyone able to finish their assigned work?
+  - Does anybody need help if their work is not finished?
+  - Does everyone feel comfortable in hitting their weekly quota?
+  - Does anybody feel like they don't understand the code in a specific area
 
-- **Self-Study Progress**
-  - How far is everyone?
+- **Checkstyle**
+  - Branches created before MR need to be checked
 
-- **Backlog Overview**
-  - Questions, insights, or confusions about the current task
+- **Basic Requirements**
+  - What parts of the basic requirements are we done with
+  - Which parts of the basic requirements should we focus on now
 
-- **Git Assignment**
-  - Feeling good about Git?
+- **Documentation**
+  - Create issues for the stuff we're working on
+  - Merge requests need to have "Closes #(issue-number)"
 
-- **Code of Conduct**
-  - Finalize remaining points
+- **Merge Request Size**
+  - Should bigger merge requests be ok
+  - First front-end merge request was quite big
+  - Maybe split bigger merge requests into smaller chunks
+    - May make it easier to hit weekly quotas
 
 ---
 
 ## Current Issues for Discussion (10–15 min)
 
-- Finalize Code of Conduct  
-- What tasks need to be completed before coding begins:
-  - Codebase file structure  
-  - User stories  
-- Additional weekly meetings? (yes/no)
+- Switching up teams
+  - Should we continue with teams?
+  - Most tasks need work on multiple areas
+  - Might be more efficient to not split into teams based on frontend/commons/backend
+- Urgent tasks:
+  - RecipeIngredient and RecipeStep need to be finished
+- Meeting again on monday?
 
 ---
 
 ## Demo (5 min)
 
-- App not started — nothing to demo  
-- Share Code of Conduct with TA  
+- Share the new front end with  TA
+- Share the commons and server structure with TA  
 
 ---
 
@@ -54,6 +62,7 @@
 
 ## Closing Remarks (5 min)
 
-- Tasks and goals for next week (to be agreed upon during the meeting)
+- Deciding next chair and minute-taker
+- Is everyone ok with their new responsibilites
 
 ---
