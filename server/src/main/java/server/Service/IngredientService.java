@@ -1,6 +1,8 @@
 package server.Service;
 
 import commons.Ingredient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -10,7 +12,9 @@ import java.util.List;
 
 @Service
 public class IngredientService {
+
     private final IngredientRepository ingredientRepository;
+    private static final Logger log = LoggerFactory.getLogger(IngredientService.class);
 
     @Autowired
     public IngredientService(IngredientRepository ingredientRepository){
@@ -18,6 +22,7 @@ public class IngredientService {
     }
 
     public Ingredient addIngredient(Ingredient ingredient){
+        log.info("Adding ingredient {}",ingredient);
         if (isNullOrEmpty(ingredient.getName())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ingredient name cannot be null or empty");
         }
@@ -27,6 +32,7 @@ public class IngredientService {
     }
 
     public Ingredient getIngredient(long id){
+        log.info("Getting ingredient with id {}",id);
         return ingredientRepository
                 .findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -37,6 +43,7 @@ public class IngredientService {
     }
 
     public void removeIngredient(Long id){
+        log.info("Removing ingredient with id {}",id);
         if (ingredientRepository.existsById(id)) {
             ingredientRepository.deleteById(id);
         }
