@@ -30,7 +30,6 @@ public class RecipeOverviewSceneTest {
 
     @Start
     private void start(Stage stage) throws IOException {
-
         var overview = FXML.load(RecipeOverviewCtrl.class,
                 "client", "scenes", "RecipeOverview.fxml");
 
