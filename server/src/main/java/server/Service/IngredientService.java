@@ -27,6 +27,7 @@ public class IngredientService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ingredient name cannot be null or empty");
         }
         else {
+            log.debug("Adding ingredient with id {}",ingredient.getId());
             return ingredientRepository.save(ingredient);
         }
     }
@@ -57,8 +58,15 @@ public class IngredientService {
         return ingredientRepository.count();
     }
 
+    public Ingredient updateIngredient(long id, Ingredient ingredient){
+        log.info("Updating ingredient with id {}", id);
+        Ingredient existing = getIngredient(id);
+        existing.setName(ingredient.getName());
+        return ingredientRepository.save(existing);
+
+    }
+
     private static boolean isNullOrEmpty(String s){
         return s == null || s.isEmpty();
     }
-
 }

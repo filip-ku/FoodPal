@@ -25,6 +25,7 @@ public class IngredientController {
     @PostMapping("")
     public ResponseEntity<Ingredient> addIngredient(@RequestBody Ingredient ingredient){
         Ingredient saved = ingredientService.addIngredient(ingredient);
+        log.info("Ingredient created with ID {}",  saved.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
@@ -51,5 +52,12 @@ public class IngredientController {
         log.info("deleting ingredient with id {}", id);
         ingredientService.removeIngredient(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Ingredient> updateIngredient(@PathVariable long id, @RequestBody Ingredient ingredient){
+        log.info("updating ingredient {}", id);
+        Ingredient updated = ingredientService.updateIngredient(id, ingredient);
+        return ResponseEntity.ok(updated);
     }
 }
