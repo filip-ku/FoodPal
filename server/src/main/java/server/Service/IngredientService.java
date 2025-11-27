@@ -52,6 +52,11 @@ public class IngredientService {
         }
     }
 
+    public long countIngredients(){
+        log.info("Count all ingredients");
+        return ingredientRepository.count();
+    }
+
     private static boolean isNullOrEmpty(String s){
         return s == null || s.isEmpty();
     }

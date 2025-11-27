@@ -28,6 +28,13 @@ public class IngredientController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> countIngredients(){
+        log.info("Received request to count ingredients");
+        long count = ingredientService.countIngredients();
+        return ResponseEntity.ok(count);
+    }
+
     @GetMapping("")
     public ResponseEntity<List<Ingredient>> getAllIngredients(){
         return ResponseEntity.ok(ingredientService.getAllIngredients());
