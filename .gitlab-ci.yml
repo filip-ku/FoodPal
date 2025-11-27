@@ -4,7 +4,7 @@ build:
   stage: build
   image: maven:3.9.11-amazoncorretto-25
   script:
-    - yum install -y xorg-x11-server-Xvfb libXrender libXtst libXxf86vm libXi
+    - yum install -y xorg-x11-server-Xvfb gtk3 libXtst libXxf86vm
     - Xvfb :99 -ac -screen 0 1024x768x24 &
     - export DISPLAY=:99
     - mvn -B -ntp clean verify
