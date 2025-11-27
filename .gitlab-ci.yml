@@ -13,7 +13,7 @@ test:
   stage: test
   image: maven:3.9.11-amazoncorretto-25
   script:
-    - yum install -y xorg-x11-server-Xvfb libXrender libXtst libXi libXxf86vm
+    - yum install -y xorg-x11-server-Xvfb gtk3 libXtst libXxf86vm
     - Xvfb :99 -ac -screen 0 1024x768x24 &
     - export DISPLAY=:99
-    - mvn test             
+    - mvn -B -ntp verify -Dprism.order=sw -Dprism.text=t2k         
