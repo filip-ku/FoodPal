@@ -1,11 +1,19 @@
 image: maven:3.9.11-amazoncorretto-25
 
 build:
+  stage: build
+  image: maven:3.9.11-amazoncorretto-25
   script:
+    - yum install -y xorg-x11-server-Xvfb libXrender libXtst libXxf86vm libXi
+    - Xvfb :99 -ac -screen 0 1024x768x24 &
+    - export DISPLAY=:99
     - mvn -B -ntp clean verify
 
 test:
   stage: test
+  image: maven:3.9.11-amazoncorretto-25
   script:
-    - apt-get update && apt-get install -y xvfb  
-    - xvfb-run -a mvn test                       
+    - yum install -y xorg-x11-server-Xvfb libXrender libXtst libXi libXxf86vm
+    - Xvfb :99 -ac -screen 0 1024x768x24 &
+    - export DISPLAY=:99
+    - mvn test             
