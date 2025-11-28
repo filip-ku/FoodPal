@@ -11,7 +11,6 @@
     </module>
 
     <module name="TreeWalker">
-        <module name="UnusedImports" />
         <module name="MissingJavadocMethod">
             <property name="severity" value="warning"/>
             <property name="scope" value="public"/>
