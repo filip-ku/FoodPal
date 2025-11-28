@@ -19,10 +19,18 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
+/**
+ * Spring Boot entry point for the server application.
+ */
 @SpringBootApplication
 @EntityScan(basePackages = { "commons", "server" })
 public class Main {
 
+    /**
+     * Starts the Spring application context.
+     *
+     * @param args command‑line arguments (unused)
+     */
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }
