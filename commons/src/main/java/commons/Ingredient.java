@@ -9,7 +9,7 @@ public class Ingredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @Column(nullable = false, length = 200)
     private String name;
@@ -22,7 +22,7 @@ public class Ingredient {
         this.name = name;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

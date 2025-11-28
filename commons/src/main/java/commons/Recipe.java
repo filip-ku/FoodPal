@@ -30,7 +30,7 @@ public class Recipe {
 
     public void setTitle(String title) {
         if (title == null) {
-            throw new IllegalArgumentException("title cannot be null");
+            throw new IllegalArgumentException("Recipe title cannot be null");
         } else {
             this.title = title;
         }

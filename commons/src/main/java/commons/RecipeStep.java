@@ -9,7 +9,7 @@ public class RecipeStep {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    // foreign key → recipe.id
+    // foreign key -> recipe.id
     @Column(nullable = false)
     private Long recipeId;
 

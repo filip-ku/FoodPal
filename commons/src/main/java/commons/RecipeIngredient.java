@@ -9,11 +9,11 @@ public class RecipeIngredient {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    // foreign key → recipe.id
+    // foreign key -> recipe.id
     @Column(nullable = false)
     private Long recipeId;
 
-    // foreign key → ingredient.id
+    // foreign key -> ingredient.id
     @Column(nullable = false)
     private Long ingredientId;
 
@@ -42,9 +42,9 @@ public class RecipeIngredient {
     }
 
     public RecipeIngredient(Long recipeId, Long ingredientId, int position) {
-        setRecipeId(recipeId);
-        setIngredientId(ingredientId);
-        setPosition(position);
+        this.setRecipeId(recipeId);
+        this.setIngredientId(ingredientId);
+        this.setPosition(position);
     }
 
     public Long getId() {
@@ -79,7 +79,7 @@ public class RecipeIngredient {
 
     public void setAmount(Double amount) {
         if (amount != null && amount < 0) {
-            throw new IllegalArgumentException("amount must be >= 0");
+            throw new IllegalArgumentException("amount cannot be negative");
         }
         this.amount = amount;
     }
