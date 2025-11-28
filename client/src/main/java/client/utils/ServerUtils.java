@@ -21,7 +21,9 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.ConnectException;
 import java.util.List;
 
+import commons.Ingredient;
 import commons.Recipe;
+import commons.RecipeIngredient;
 import org.glassfish.jersey.client.ClientConfig;
 
 import jakarta.ws.rs.ProcessingException;
@@ -47,17 +49,34 @@ public class ServerUtils {
 				.post(Entity.entity(recipe, APPLICATION_JSON), Recipe.class);
 	}
 
+    //TODO update the path once the backend is ready
+    public List<Ingredient> getIngredients() {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("") //
+                .request(APPLICATION_JSON) //
+                .get(new GenericType<List<Ingredient>>() {});
+    }
+
+
+    //TODO update the path wonce the backend is ready
+    public List<RecipeIngredient> getIngredientsForRecipe(Long recipeId) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("") //
+                .request(APPLICATION_JSON) //
+                .get(new GenericType<List<RecipeIngredient>>() {});
+    }
+
 	public boolean isServerAvailable() {
-		try {
-			ClientBuilder.newClient(new ClientConfig()) //
-					.target(SERVER) //
-					.request(APPLICATION_JSON) //
-					.get();
-		} catch (ProcessingException e) {
-			if (e.getCause() instanceof ConnectException) {
-				return false;
-			}
-		}
-		return true;
-	}
+        try {
+            ClientBuilder.newClient(new ClientConfig()) //
+                    .target(SERVER) //
+                    .request(APPLICATION_JSON) //
+                    .get();
+        } catch (ProcessingException e) {
+            if (e.getCause() instanceof ConnectException) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

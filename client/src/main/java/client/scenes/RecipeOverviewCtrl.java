@@ -46,9 +46,9 @@ public class RecipeOverviewCtrl implements Initializable {
     private TableColumn<Recipe, String> colRecipes;
 
     @FXML
-    private TableView<RecipeIngredient> tableIngredients;
+    private TableView<RecipeIngredient> tableIngredients; //temporarily a string
     @FXML
-    private TableColumn<Ingredient, String> colIngredients;
+    private TableColumn<RecipeIngredient, String> colIngredients;
 
     @FXML
     private TableView<RecipeStep> tablePreparation;
@@ -62,11 +62,18 @@ public class RecipeOverviewCtrl implements Initializable {
     @FXML
     private Button recipeEditButton;
     private boolean editingName = false;
+    @FXML
+    private Button editStepsButton;
 
     @Inject
     public RecipeOverviewCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.server = server;
         this.mainCtrl = mainCtrl;
+    }
+
+    public void addIngredientToTable(Ingredient ingredient, int quantity, String units, String notes) {
+        RecipeIngredient newIngredient = new RecipeIngredient(ingredient, quantity, units, notes);
+        tableIngredients.getItems().add(newIngredient);
     }
 
     @Override
@@ -75,6 +82,10 @@ public class RecipeOverviewCtrl implements Initializable {
 
         colRecipes.setCellValueFactory(q ->
                 new SimpleStringProperty(q.getValue().getTitle()));
+
+        colIngredients.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().toString())
+        );
 
         tableRecipes.getSelectionModel()
                 .selectedItemProperty()
@@ -97,6 +108,27 @@ public class RecipeOverviewCtrl implements Initializable {
     public void addRecipe() {
         mainCtrl.showAddRecipe();
     }
+    /**
+     * Opens the AddIngredient scene for the selected recipe
+     */
+    public void addIngredient() {
+        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No recipe selected");
+            alert.setHeaderText(null);
+            alert.setContentText("Please select a recipe first.");
+            alert.showAndWait();
+            return;
+        }
+        mainCtrl.getAddIngredientCtrl().setRecipe(selected);
+        mainCtrl.showAddIngredient();
+    }
+
+    public void selectRecipe(Recipe recipe) {
+        if (recipe == null) return;
+        tableRecipes.getSelectionModel().select(recipe);
+    }
 
     public void refresh() {
         var recipes = server.getRecipes();
@@ -109,14 +141,8 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     public void editNameClicked() {
         if (!editingName) {
-            editingName = true;
-            recipeEditButton.setText("Save");
-
+            toggleEditMode(true);
             recipeEditBox.setText(recipeName.getText());
-            recipeEditBox.setDisable(false);
-            recipeEditBox.setVisible(true);
-
-            recipeName.setVisible(false);
         } else {
             String newName = recipeEditBox.getText();
 
@@ -126,9 +152,6 @@ public class RecipeOverviewCtrl implements Initializable {
             }
             recipeName.setText(newName);
 
-            editingName = false;
-            recipeEditButton.setText("Edit");
-
             Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 selected.setTitle(newName);
@@ -137,13 +160,17 @@ public class RecipeOverviewCtrl implements Initializable {
             // TODO
             // Needs a way to update the database through the server
 
-            tableRecipes.refresh();
-
-            recipeEditBox.setDisable(true);
-            recipeEditBox.setVisible(false);
-
-            recipeName.setVisible(true);
+            editingName = false;
+            toggleEditMode(false);
         }
+    }
+
+    public void toggleEditMode(boolean editing) {
+        recipeEditBox.setVisible(editing);
+        recipeEditBox.setDisable(!editing);
+
+        recipeName.setVisible(!editing);
+        recipeEditButton.setText(editing ? "Save" : "Edit");
     }
 
     /**
@@ -173,7 +200,33 @@ public class RecipeOverviewCtrl implements Initializable {
         showMainMenu();
 
         data.remove(selected);
-        tableRecipes.refresh();
+    }
+
+    @FXML
+    private void editSteps() {
+        // TODO: implement later
+        showError("Editing steps is not implemented yet.");
+    }
+
+    @FXML
+    public void deleteIngredient() {
+        RecipeIngredient selected = tableIngredients.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Select an ingredient to delete.");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirm Delete");
+        confirm.setHeaderText("Delete Ingredient?");
+        confirm.setContentText("Are you sure you want to remove this ingredient?");
+
+        var result = confirm.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return;
+        }
+        tableIngredients.getItems().remove(selected);
+
     }
 
     /**

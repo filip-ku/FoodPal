@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import com.google.inject.Injector;
 
 import client.scenes.AddRecipeCtrl;
+import client.scenes.AddIngredientCtrl;
 import client.scenes.MainCtrl;
 import client.scenes.RecipeOverviewCtrl;
 import client.utils.ServerUtils;
@@ -49,9 +50,10 @@ public class Main extends Application {
 		}
 
 		var overview = FXML.load(RecipeOverviewCtrl.class, "client", "scenes", "RecipeOverview.fxml");
-		var add = FXML.load(AddRecipeCtrl.class, "client", "scenes", "AddRecipe.fxml");
+		var addRecipe = FXML.load(AddRecipeCtrl.class, "client", "scenes", "AddRecipe.fxml");
+        var addIngredient = FXML.load(AddIngredientCtrl.class, "client", "scenes", "AddIngredient.fxml");
 
 		var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-		mainCtrl.initialize(primaryStage, overview, add);
+		mainCtrl.initialize(primaryStage, overview, addRecipe, addIngredient);
 	}
 }
