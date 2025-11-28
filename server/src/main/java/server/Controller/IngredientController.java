@@ -1,6 +1,7 @@
 package server.Controller;
 
 import commons.Ingredient;
+import commons.Recipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,13 @@ public class IngredientController {
         log.info("deleting ingredient with id {}", id);
         ingredientService.removeIngredient(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/all")
+    public ResponseEntity<Void>  deleteAllIngredients(){
+        log.info("Deleting all ingredients");
+        ingredientService.deleteAllIngredients();
+        return  ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")

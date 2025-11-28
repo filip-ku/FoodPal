@@ -66,6 +66,11 @@ public class IngredientService {
 
     }
 
+    public void deleteAllIngredients(){
+        log.info("Deleting all ingredients");
+        ingredientRepository.deleteAll();
+    }
+
     private static boolean isNullOrEmpty(String s){
         return s == null || s.isEmpty();
     }
