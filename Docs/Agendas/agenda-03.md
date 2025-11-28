@@ -18,6 +18,7 @@
 
 - **Checkstyle**
   - Branches created before MR need to be checked
+    - Discuss additional rules for checkstyle
 
 - **Basic Requirements**
   - What parts of the basic requirements are we done with
