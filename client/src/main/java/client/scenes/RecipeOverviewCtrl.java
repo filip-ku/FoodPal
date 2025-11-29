@@ -63,12 +63,31 @@ public class RecipeOverviewCtrl implements Initializable {
     private Button recipeEditButton;
     private boolean editingName = false;
 
+    /**
+     * Constructs a {@code RecipeOverviewCtrl}.
+     *
+     * <p>Instances are created via Guice injection. The controller receives a
+     * reference to {@link ServerUtils} for server communication and a
+     * {@link MainCtrl} for navigation.</p>
+     *
+     * @param server  injected {@link ServerUtils}
+     * @param mainCtrl injected {@link MainCtrl}
+     */
     @Inject
     public RecipeOverviewCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.server = server;
         this.mainCtrl = mainCtrl;
     }
 
+    /**
+     * Called by the JavaFX framework after the FXML elements have been injected.
+     *
+     * <p>Initialises UI bindings and listeners, then shows the default
+     * “main menu” view.</p>
+     *
+     * @param location  location of the FXML file (unused)
+     * @param resources resource bundle for internationalisation (unused)
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         showMainMenu();
@@ -79,25 +98,30 @@ public class RecipeOverviewCtrl implements Initializable {
         tableRecipes.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
-            if (newSel != null) {
-                recipeName.setText(newSel.getTitle());
+                    if (newSel != null) {
+                        recipeName.setText(newSel.getTitle());
 
-//                TODO
-//                Need to implement logic for Ingredients and Preparation tables
+//                        TODO
+//                        Need to implement logic for Ingredients and Preparation tables
 
-                tableIngredients.setVisible(true);
-                tablePreparation.setVisible(true);
-
-                recipeEditButton.setVisible(true);
-                recipeName.setVisible(true);
-            }
-        });
+                        tableIngredients.setVisible(true);
+                        tablePreparation.setVisible(true);
+                        recipeEditButton.setVisible(true);
+                        recipeName.setVisible(true);
+                    }
+                });
     }
 
+    /**
+     * Navigates to the “Add Recipe” screen.
+     */
     public void addRecipe() {
         mainCtrl.showAddRecipe();
     }
 
+    /**
+     * Refreshes the recipe list from the server and updates the table view.
+     */
     public void refresh() {
         var recipes = server.getRecipes();
         data = FXCollections.observableList(recipes);
@@ -105,7 +129,10 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
-     * Logic for when the user wants to edit the recipe name
+     * Handles the Edit/Save button click for a recipe name.
+     *
+     * <p>When not in edit mode, switches to an editable {@link TextField}.
+     * When already editing, validates the input and updates the model.</p>
      */
     public void editNameClicked() {
         if (!editingName) {
@@ -147,7 +174,10 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
-     * Logic for deleting a recipe
+     * Deletes the currently selected recipe after user confirmation.
+     *
+     * <p>Shows a confirmation dialog. If confirmed, removes the recipe
+     * from the observable list and updates the table view.</p>
      */
     public void deleteRecipe() {
         Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
