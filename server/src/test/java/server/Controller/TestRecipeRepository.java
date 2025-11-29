@@ -139,6 +139,18 @@ public class TestRecipeRepository implements RecipeRepository {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * Saves a {@link Recipe} instance.
+     *
+     * <p>If the recipe doesn't have a valid id, it will be assigned
+     * a new unique id by {@code idSequence}. <br>
+     * If the recipe already has a valid id, it will overwrite the old recipe
+     * with the new recipe.</p>
+     *
+     * @param entity the {@link Recipe} to be saved
+     * @return the saved {@link Recipe} (with its id set)
+     * @param <S> a subset of {@link Recipe}
+     */
     @Override
     public <S extends Recipe> S save(S entity) {
         calledMethods.add("save");
@@ -159,18 +171,34 @@ public class TestRecipeRepository implements RecipeRepository {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * Retrieve a {@link Recipe} by its id.
+     *
+     * @param id of the Recipe to fetch
+     * @return an optional recipe, if found.
+     */
     @Override
     public Optional<Recipe> findById(Long id) {
         calledMethods.add("findById");
         return recipes.stream().filter(r -> r.getId().equals(id)).findFirst();
     }
 
+    /**
+     * Check if a recipe with a given id exists in the repository.
+     *
+     * @param id of a recipe to be searched for
+     * @return boolean reflecting if there is a recipe with the provided id
+     */
     @Override
     public boolean existsById(Long id) {
         calledMethods.add("existsById");
         return recipes.stream().anyMatch(recipe -> recipe.getId().equals(id));
     }
 
+    /**
+     * return all saved recipes.
+     * @return all saved recipes
+     */
     @Override
     public List<Recipe> findAll() {
         calledMethods.add("findAll");
@@ -191,6 +219,10 @@ public class TestRecipeRepository implements RecipeRepository {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * Deletes a {@link Recipe}  by it id, if the recipe got found.
+     * @param id of the recipe that needs to be deleted
+     */
     @Override
     public void deleteById(Long id) {
         calledMethods.add("deleteById");
