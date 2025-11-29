@@ -38,7 +38,6 @@ public class Ingredient {
      * @return the generated id.
      */
     public Long getId() {
->>>>>>> commons/src/main/java/commons/Ingredient.java
         return id;
     }
 
