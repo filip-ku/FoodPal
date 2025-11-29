@@ -29,29 +29,50 @@ import client.utils.ServerUtils;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+/**
+ * Entry point for the JavaFX client application.
+ *
+ * <p>All heavy lifting (e.g., UI layout, business logic) is delegated to
+ * controllers; {@code Main} merely glues everything together.</p>
+ */
 public class Main extends Application {
 
-	private static final Injector INJECTOR = createInjector(new MyModule());
-	private static final MyFXML FXML = new MyFXML(INJECTOR);
+    private static final Injector INJECTOR = createInjector(new MyModule());
+    private static final MyFXML FXML = new MyFXML(INJECTOR);
 
-	public static void main(String[] args) throws URISyntaxException, IOException {
-		launch();
-	}
+    /**
+     * Launches the JavaFX application.
+     *
+     * @param args args command‑line arguments (ignored)
+     * @throws URISyntaxException if a resource URI is malformed
+     * @throws IOException        if an FXML file cannot be read
+     */
+    public static void main(String[] args) throws URISyntaxException, IOException {
+        launch();
+    }
 
-	@Override
+    /**
+     * Initializes the primary stage and wires together the UI.
+     *
+     * @param primaryStage the primary stage provided by JavaFX
+     * @throws Exception if an unexpected error occurs during initialization
+     */
+    @Override
 	public void start(Stage primaryStage) throws Exception {
 
-		var serverUtils = INJECTOR.getInstance(ServerUtils.class);
-		if (!serverUtils.isServerAvailable()) {
-			var msg = "Server needs to be started before the client, but it does not seem to be available. Shutting down.";
-			System.err.println(msg);
-			return;
-		}
+        var serverUtils = INJECTOR.getInstance(ServerUtils.class);
+        if (!serverUtils.isServerAvailable()) {
+            var msg = "Server needs to be started before the client," +
+                    "but it does not seem to be available. Shutting down.";
+            System.err.println(msg);
+            return;
+        }
 
-		var overview = FXML.load(RecipeOverviewCtrl.class, "client", "scenes", "RecipeOverview.fxml");
-		var add = FXML.load(AddRecipeCtrl.class, "client", "scenes", "AddRecipe.fxml");
+        var overview = FXML.load(RecipeOverviewCtrl.class, "client","scenes",
+                "RecipeOverview.fxml");
+        var add = FXML.load(AddRecipeCtrl.class, "client", "scenes", "AddRecipe.fxml");
 
-		var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-		mainCtrl.initialize(primaryStage, overview, add);
-	}
+        var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
+        mainCtrl.initialize(primaryStage, overview, add);
+    }
 }
