@@ -12,7 +12,7 @@ public class Ingredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @Column(nullable = false, length = 200)
     private String name;
@@ -37,7 +37,7 @@ public class Ingredient {
      * Returns the generated id.
      * @return the generated id.
      */
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
