@@ -46,9 +46,9 @@ public class RecipeOverviewCtrl implements Initializable {
     private TableColumn<Recipe, String> colRecipes;
 
     @FXML
-    private TableView<RecipeIngredient> tableIngredients;
+    private TableView<RecipeIngredient> tableIngredients; //temporarily a string
     @FXML
-    private TableColumn<Ingredient, String> colIngredients;
+    private TableColumn<RecipeIngredient, String> colIngredients;
 
     @FXML
     private TableView<RecipeStep> tablePreparation;
@@ -62,6 +62,8 @@ public class RecipeOverviewCtrl implements Initializable {
     @FXML
     private Button recipeEditButton;
     private boolean editingName = false;
+    @FXML
+    private Button editStepsButton;
 
     /**
      * Constructs a {@code RecipeOverviewCtrl}.
@@ -80,6 +82,21 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
+     * Adds the new ingredient to the table.
+     *
+     * @param ingredient ingredient to add
+     * @param quantity quantity of ingredient
+     * @param units units of measurement
+     * @param notes optional notes about the ingredient
+     */
+    public void addIngredientToTable(Ingredient ingredient, int quantity,
+                                     String units, String notes) {
+        // TODO: change method to use new commons structure
+//        RecipeIngredient newIngredient = new RecipeIngredient(ingredient, quantity, units, notes);
+//        tableIngredients.getItems().add(newIngredient);
+    }
+
+    /**
      * Called by the JavaFX framework after the FXML elements have been injected.
      *
      * <p>Initialises UI bindings and listeners, then shows the default
@@ -95,17 +112,22 @@ public class RecipeOverviewCtrl implements Initializable {
         colRecipes.setCellValueFactory(q ->
                 new SimpleStringProperty(q.getValue().getTitle()));
 
+        colIngredients.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().toString())
+        );
+
         tableRecipes.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
                     if (newSel != null) {
                         recipeName.setText(newSel.getTitle());
 
-//                        TODO
-//                        Need to implement logic for Ingredients and Preparation tables
+        //                TODO
+        //                Need to implement logic for Ingredients and Preparation tables
 
                         tableIngredients.setVisible(true);
                         tablePreparation.setVisible(true);
+
                         recipeEditButton.setVisible(true);
                         recipeName.setVisible(true);
                     }
@@ -117,6 +139,33 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     public void addRecipe() {
         mainCtrl.showAddRecipe();
+    }
+
+    /**
+     * Opens the AddIngredient scene for the selected recipe
+     */
+    public void addIngredient() {
+        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No recipe selected");
+            alert.setHeaderText(null);
+            alert.setContentText("Please select a recipe first.");
+            alert.showAndWait();
+            return;
+        }
+        mainCtrl.getAddIngredientCtrl().setRecipe(selected);
+        mainCtrl.showAddIngredient();
+    }
+
+    /**
+     * Selects the given recipe in the table.
+     *
+     * @param recipe the recipe to select
+     */
+    public void selectRecipe(Recipe recipe) {
+        if (recipe == null) return;
+        tableRecipes.getSelectionModel().select(recipe);
     }
 
     /**
@@ -173,6 +222,7 @@ public class RecipeOverviewCtrl implements Initializable {
         }
     }
 
+
     /**
      * Deletes the currently selected recipe after user confirmation.
      *
@@ -203,7 +253,42 @@ public class RecipeOverviewCtrl implements Initializable {
         showMainMenu();
 
         data.remove(selected);
-        tableRecipes.refresh();
+    }
+
+    /**
+     * Method is not available yet
+     */
+    @FXML
+    private void editSteps() {
+        // TODO: implement later
+        showError("Editing steps is not implemented yet.");
+    }
+
+    /**
+     * Deletes the currently selected ingredient after user confirmation.
+     *
+     * <p>Shows a confirmation dialog. If confirmed, removes the ingredient
+     * from the observable list and updates the table view.</p>
+     */
+    @FXML
+    public void deleteIngredient() {
+        RecipeIngredient selected = tableIngredients.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Select an ingredient to delete.");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirm Delete");
+        confirm.setHeaderText("Delete Ingredient?");
+        confirm.setContentText("Are you sure you want to remove this ingredient?");
+
+        var result = confirm.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return;
+        }
+        tableIngredients.getItems().remove(selected);
+
     }
 
     /**

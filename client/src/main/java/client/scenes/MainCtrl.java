@@ -20,9 +20,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
-/**
- * Main UI controller – owns the primary stage and switches between scenes.
- */
 public class MainCtrl {
 
     private Stage primaryStage;
@@ -33,41 +30,49 @@ public class MainCtrl {
     private AddRecipeCtrl addRecipeCtrl;
     private Scene addRecipe;
 
-    /**
-     * Initializes this controller with the primary stage and the two scenes.
-     *
-     * @param primaryStage   main application window
-     * @param overview       pair of {@link RecipeOverviewCtrl} and its root node
-     * @param add            pair of {@link AddRecipeCtrl} and its root node
-     */
-    public void initialize(Stage primaryStage, Pair<RecipeOverviewCtrl, Parent> overview,
-            Pair<AddRecipeCtrl, Parent> add) {
+    private AddIngredientCtrl addIngredientCtrl;
+    private Scene addIngredient;
+
+    public void initialize(Stage primaryStage,
+                           Pair<RecipeOverviewCtrl, Parent> overview,
+                           Pair<AddRecipeCtrl, Parent> add,
+                           Pair<AddIngredientCtrl, Parent> addIngredient) {
         this.primaryStage = primaryStage;
         this.recipeOverviewCtrl = overview.getKey();
         this.recipeOverview = new Scene(overview.getValue());
 
         this.addRecipeCtrl = add.getKey();
         this.addRecipe = new Scene(add.getValue());
+        this.addIngredientCtrl = addIngredient.getKey();
+        this.addIngredient = new Scene(addIngredient.getValue());
 
         showRecipeOverview();
         primaryStage.show();
     }
 
-    /**
-     * Displays the recipe‑overview scene and refreshes its contents.
-     */
+    public RecipeOverviewCtrl getRecipeOverviewCtrl() {
+        return recipeOverviewCtrl;
+    }
+
     public void showRecipeOverview() {
         primaryStage.setTitle("FoodPal");
         primaryStage.setScene(recipeOverview);
         recipeOverviewCtrl.refresh();
     }
 
-    /**
-     * Switches to the “Add Recipe” scene and forwards key events to its controller.
-     */
     public void showAddRecipe() {
         primaryStage.setTitle("FoodPal: Adding Recipe");
         primaryStage.setScene(addRecipe);
         addRecipe.setOnKeyPressed(e -> addRecipeCtrl.keyPressed(e));
+    }
+
+    public void showAddIngredient() {
+        primaryStage.setTitle("FoodPal: Adding an ingredient");
+        primaryStage.setScene(addIngredient);
+        addIngredient.setOnKeyPressed(e -> addIngredientCtrl.keyPressed(e));
+    }
+
+    public AddIngredientCtrl getAddIngredientCtrl() {
+        return addIngredientCtrl;
     }
 }
