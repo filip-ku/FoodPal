@@ -1,121 +1,55 @@
 package commons;
 
-import jakarta.persistence.*;
-
-@Entity
 public class RecipeIngredient {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Ingredient ingredient;
+    private int quantity;
+    private String units;
+    private String notes;
 
-    // foreign key -> recipe.id
-    @Column(nullable = false)
-    private Long recipeId;
-
-    // foreign key -> ingredient.id
-    @Column(nullable = false)
-    private Long ingredientId;
-
-    // amount of the ingredient (nullable if informal)
-    @Column
-    private Double amount;
-
-    // unit for the amount (nullable if informal)
-    @Column(length = 20)
-    private String unit;
-
-    // informal amount like "a pinch" (nullable if formal)
-    @Column(length = 100)
-    private String informalAmount;
-
-    // order in the recipe ingredient list
-    @Column(nullable = false)
-    private int position;
-
-    // optional text note
-    @Column(length = 200)
-    private String note;
-
-    public RecipeIngredient() {
-        // for object mapping
+    public RecipeIngredient(Ingredient ingredient, int quantity, String units, String notes) {
+        this.ingredient = ingredient;
+        this.quantity = quantity;
+        this.units = units;
+        this.notes = notes;
     }
 
-    public RecipeIngredient(Long recipeId, Long ingredientId, int position) {
-        this.setRecipeId(recipeId);
-        this.setIngredientId(ingredientId);
-        this.setPosition(position);
+    public Ingredient getIngredient() {
+        return ingredient;
     }
 
-    public Long getId() {
-        return id;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public Long getRecipeId() {
-        return recipeId;
+    public String getUnits() {
+        return units;
     }
 
-    public void setRecipeId(Long recipeId) {
-        if (recipeId == null) {
-            throw new IllegalArgumentException("recipeId cannot be null");
-        }
-        this.recipeId = recipeId;
+    public String getNotes() {
+        return notes;
     }
 
-    public Long getIngredientId() {
-        return ingredientId;
+    public void setIngredient(Ingredient ingredient) {
+        this.ingredient = ingredient;
     }
 
-    public void setIngredientId(Long ingredientId) {
-        if (ingredientId == null) {
-            throw new IllegalArgumentException("ingredientId cannot be null");
-        }
-        this.ingredientId = ingredientId;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
-    public Double getAmount() {
-        return amount;
+    public void setUnits(String units) {
+        this.units = units;
     }
 
-    public void setAmount(Double amount) {
-        if (amount != null && amount < 0) {
-            throw new IllegalArgumentException("amount cannot be negative");
-        }
-        this.amount = amount;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public String getInformalAmount() {
-        return informalAmount;
-    }
-
-    public void setInformalAmount(String informalAmount) {
-        this.informalAmount = informalAmount;
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        if (position < 0) {
-            throw new IllegalArgumentException("position cannot be negative");
-        }
-        this.position = position;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
+    @Override
+    public String toString() {
+        return ingredient.getName()
+                + " " + quantity + units
+                + (notes == null || notes.isBlank() ? "" : "  - note: " + notes);
     }
 }
