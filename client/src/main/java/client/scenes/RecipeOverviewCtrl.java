@@ -1,18 +1,3 @@
-/*
- * Copyright 2021 Delft University of Technology
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package client.scenes;
 
 import java.net.URL;
@@ -25,7 +10,6 @@ import commons.Ingredient;
 import commons.Recipe;
 import commons.RecipeIngredient;
 import commons.RecipeStep;
-//import server.RecipeService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -92,8 +76,6 @@ public class RecipeOverviewCtrl implements Initializable {
     public void addIngredientToTable(Ingredient ingredient, int quantity,
                                      String units, String notes) {
         // TODO: change method to use new commons structure
-//        RecipeIngredient newIngredient = new RecipeIngredient(ingredient, quantity, units, notes);
-//        tableIngredients.getItems().add(newIngredient);
     }
 
     /**
