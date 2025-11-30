@@ -91,8 +91,9 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     public void addIngredientToTable(Ingredient ingredient, int quantity,
                                      String units, String notes) {
-        RecipeIngredient newIngredient = new RecipeIngredient(ingredient, quantity, units, notes);
-        tableIngredients.getItems().add(newIngredient);
+        // TODO: change method to use new commons structure
+//        RecipeIngredient newIngredient = new RecipeIngredient(ingredient, quantity, units, notes);
+//        tableIngredients.getItems().add(newIngredient);
     }
 
     /**

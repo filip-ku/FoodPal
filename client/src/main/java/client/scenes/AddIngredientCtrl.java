@@ -4,7 +4,6 @@ import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Ingredient;
 import commons.Recipe;
-import commons.RecipeIngredient;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
@@ -55,7 +54,7 @@ public class AddIngredientCtrl {
         units = getUnitsInput();
         notes = getNotesInput();
 
-        RecipeIngredient newIngredient = new RecipeIngredient(ingredient, quantity, units, notes);
+        // TODO: add ingredient to the database
 
         // add ingredient to the overview table
         MainCtrl.getRecipeOverviewCtrl()
