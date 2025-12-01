@@ -5,10 +5,8 @@ import com.google.inject.Inject;
 import commons.Ingredient;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.stage.Modality;
 
 public class AddIngredientCtrl {
 
@@ -33,7 +31,7 @@ public class AddIngredientCtrl {
     /**
      * Cancels the dialog and returns to the ingredient overview.
      */
-    public void cancel() {
+    public void cancelButton() {
         clearFields();
         mainCtrl.showIngredientsOverview();
     }
@@ -41,14 +39,11 @@ public class AddIngredientCtrl {
     /**
      * Attempts to submit a new ingredient; shows an error alert if it fails.
      */
-    public void ok() {
+    public void okButton() {
         try {
             server.addIngredient(getIngredient());
         } catch (WebApplicationException e) {
-            var alert = new Alert(Alert.AlertType.ERROR);
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
+            mainCtrl.showExceptionErrorPopUp(e);
             return;
         }
 
@@ -77,10 +72,10 @@ public class AddIngredientCtrl {
     public void keyPressed(KeyEvent e) {
         switch (e.getCode()) {
             case ENTER:
-                ok();
+                okButton();
                 break;
             case ESCAPE:
-                cancel();
+                cancelButton();
                 break;
             default:
                 break;

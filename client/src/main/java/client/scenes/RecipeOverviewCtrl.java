@@ -9,6 +9,7 @@ import client.utils.ServerUtils;
 import commons.Recipe;
 import commons.RecipeIngredient;
 import commons.RecipeStep;
+import jakarta.ws.rs.WebApplicationException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -110,22 +111,6 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
-     * Opens the AddIngredient scene for the selected recipe
-     */
-    public void addIngredient() {
-        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("No recipe selected");
-            alert.setHeaderText(null);
-            alert.setContentText("Please select a recipe first.");
-            alert.showAndWait();
-            return;
-        }
-        mainCtrl.showAddIngredient();
-    }
-
-    /**
      * Selects the given recipe in the table.
      *
      * @param recipe the recipe to select
@@ -139,9 +124,13 @@ public class RecipeOverviewCtrl implements Initializable {
      * Refreshes the recipe list from the server and updates the table view.
      */
     public void refresh() {
-        var recipes = server.getRecipes();
-        data = FXCollections.observableList(recipes);
-        tableRecipes.setItems(data);
+        try {
+            var recipes = server.getRecipes();
+            data = FXCollections.observableList(recipes);
+            tableRecipes.setItems(data);
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
+        }
     }
 
     /**
@@ -213,7 +202,12 @@ public class RecipeOverviewCtrl implements Initializable {
             return;
         }
 
-        server.deleteRecipe(selected);
+        try {
+            server.deleteRecipe(selected);
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
+            return;
+        }
         showMainMenu();
 
         data.remove(selected);
@@ -252,7 +246,6 @@ public class RecipeOverviewCtrl implements Initializable {
             return;
         }
         tableIngredients.getItems().remove(selected);
-
     }
 
     /**

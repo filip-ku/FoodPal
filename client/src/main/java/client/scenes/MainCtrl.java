@@ -3,6 +3,7 @@ package client.scenes;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -86,6 +87,13 @@ public class MainCtrl {
         alert.setTitle("Invalid Input");
         alert.setHeaderText("Error");
         alert.setContentText(msg);
+        alert.showAndWait();
+    }
+
+    public void showExceptionErrorPopUp(Exception e) {
+        var alert = new Alert(Alert.AlertType.ERROR);
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.setContentText(e.getMessage());
         alert.showAndWait();
     }
 }

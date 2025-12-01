@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 
 import client.utils.ServerUtils;
 import commons.Ingredient;
+import jakarta.ws.rs.WebApplicationException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +17,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.stage.Modality;
 
 public class IngredientsOverviewCtrl implements Initializable {
 
@@ -68,9 +70,16 @@ public class IngredientsOverviewCtrl implements Initializable {
      * Refreshes the recipe list from the server and updates the table view.
      */
     public void refresh() {
-        var ingredients = server.getIngredients();
-        data = FXCollections.observableList(ingredients);
-        tableIngredients.setItems(data);
+        try {
+            var ingredients = server.getIngredients();
+            data = FXCollections.observableList(ingredients);
+            tableIngredients.setItems(data);
+        } catch (WebApplicationException e) {
+            var alert = new Alert(Alert.AlertType.ERROR);
+            alert.initModality(Modality.APPLICATION_MODAL);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     /**
@@ -104,14 +113,19 @@ public class IngredientsOverviewCtrl implements Initializable {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Delete");
         confirm.setHeaderText("Delete Ingredient?");
-        confirm.setContentText("You sure you wanna delete this ingredient?");
+        confirm.setContentText("Are you sure you want to delete this ingredient?");
 
         var result = confirm.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             return;
         }
 
-        server.deleteIngredient(selected);
+        try {
+            server.deleteIngredient(selected);
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
+            return;
+        }
 
         data.remove(selected);
     }
