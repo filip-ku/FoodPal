@@ -1,6 +1,7 @@
 package commons;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 public class RecipeIngredient {
@@ -9,13 +10,16 @@ public class RecipeIngredient {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    // foreign key -> recipe.id
-    @Column(nullable = false)
-    private Long recipeId;
+    // reference to the owning recipe
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "recipe_id", referencedColumnName = "id", nullable = false)
+    @JsonBackReference
+    private Recipe recipe;
 
-    // foreign key -> ingredient.id
-    @Column(nullable = false)
-    private Long ingredientId;
+    // reference to the ingredient entity
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "ingredient_id", referencedColumnName = "id", nullable = false)
+    private Ingredient ingredient;
 
     // amount of the ingredient (nullable if informal)
     @Column
@@ -41,9 +45,10 @@ public class RecipeIngredient {
         // for object mapping
     }
 
-    public RecipeIngredient(Long recipeId, Long ingredientId, int position) {
-        this.setRecipeId(recipeId);
-        this.setIngredientId(ingredientId);
+    // AI-generated
+    public RecipeIngredient(Recipe recipe, Ingredient ingredient, int position) {
+        this.setRecipe(recipe);
+        this.setIngredient(ingredient);
         this.setPosition(position);
     }
 
@@ -51,26 +56,50 @@ public class RecipeIngredient {
         return id;
     }
 
-    public Long getRecipeId() {
-        return recipeId;
+    // AI-generated
+    /**
+     * Returns the recipe this ingredient belongs to.
+     *
+     * @return the owning recipe.
+     */
+    public Recipe getRecipe() {
+        return recipe;
     }
 
-    public void setRecipeId(Long recipeId) {
-        if (recipeId == null) {
-            throw new IllegalArgumentException("recipeId cannot be null");
+    // AI-generated
+    /**
+     * Sets the recipe this ingredient belongs to.
+     *
+     * @param recipe the owning recipe, must not be null.
+     */
+    public void setRecipe(Recipe recipe) {
+        if (recipe == null) {
+            throw new IllegalArgumentException("recipe cannot be null");
         }
-        this.recipeId = recipeId;
+        this.recipe = recipe;
     }
 
-    public Long getIngredientId() {
-        return ingredientId;
+    // AI-generated
+    /**
+     * Returns the ingredient entity for this recipe ingredient.
+     *
+     * @return the ingredient entity.
+     */
+    public Ingredient getIngredient() {
+        return ingredient;
     }
 
-    public void setIngredientId(Long ingredientId) {
-        if (ingredientId == null) {
-            throw new IllegalArgumentException("ingredientId cannot be null");
+    // AI-generated
+    /**
+     * Sets the ingredient entity for this recipe ingredient.
+     *
+     * @param ingredient the ingredient entity, must not be null.
+     */
+    public void setIngredient(Ingredient ingredient) {
+        if (ingredient == null) {
+            throw new IllegalArgumentException("ingredient cannot be null");
         }
-        this.ingredientId = ingredientId;
+        this.ingredient = ingredient;
     }
 
     public Double getAmount() {
