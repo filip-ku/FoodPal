@@ -16,11 +16,20 @@ public class IngredientService {
     private final IngredientRepository ingredientRepository;
     private static final Logger log = LoggerFactory.getLogger(IngredientService.class);
 
+    /**
+     * Constructs the service with the required repository
+     * @param ingredientRepository the required repository
+     */
     @Autowired
     public IngredientService(IngredientRepository ingredientRepository){
         this.ingredientRepository = ingredientRepository;
     }
 
+    /**
+     * Adds a new ingredient
+     * @param ingredient the ingredient to be added
+     * @return the ingredient with an assigned ID
+     */
     public Ingredient addIngredient(Ingredient ingredient){
         log.info("Adding ingredient {}",ingredient);
         if (isNullOrEmpty(ingredient.getName())){
@@ -32,6 +41,11 @@ public class IngredientService {
         }
     }
 
+    /**
+     * Gets a single ingredient by the ID
+     * @param id the ID of the ingredient
+     * @return the ingredient name if found
+     */
     public Ingredient getIngredient(long id){
         log.info("Getting ingredient with id {}",id);
         return ingredientRepository
@@ -39,10 +53,18 @@ public class IngredientService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
+    /**
+     * Takes all ingredients
+     * @return a list of all ingredients
+     */
     public List<Ingredient> getAllIngredients(){
         return ingredientRepository.findAll();
     }
 
+    /**
+     * Deletes an ingredient by the ID
+     * @param id the ID of the ingredient
+     */
     public void removeIngredient(Long id){
         log.info("Removing ingredient with id {}",id);
         if (ingredientRepository.existsById(id)) {
@@ -53,11 +75,21 @@ public class IngredientService {
         }
     }
 
+    /**
+     * Counts the number of ingredient that are in the system
+     * @return count of all ingredients
+     */
     public long countIngredients(){
         log.info("Count all ingredients");
         return ingredientRepository.count();
     }
 
+    /**
+     * Updates an ingredient name from an ID
+     * @param id the id of the ingredient to be updated
+     * @param ingredient data that will be updated to
+     * @return the updated ingredient
+     */
     public Ingredient updateIngredient(long id, Ingredient ingredient){
         log.info("Updating ingredient with id {}", id);
         Ingredient existing = getIngredient(id);
@@ -66,11 +98,19 @@ public class IngredientService {
 
     }
 
+    /**
+     * Deletes all ingredients
+     */
     public void deleteAllIngredients(){
         log.info("Deleting all ingredients");
         ingredientRepository.deleteAll();
     }
 
+    /**
+     * Utility to check if a string is null or empty
+     * @param s the string to check
+     * @return true if is null or empty, else false
+     */
     private static boolean isNullOrEmpty(String s){
         return s == null || s.isEmpty();
     }
