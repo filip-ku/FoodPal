@@ -2,6 +2,9 @@ package commons;
 
 import jakarta.persistence.*;
 
+/**
+ * JPA entity representing a recipe.
+ */
 @Entity
 public class Recipe {
     @Id
@@ -16,21 +19,41 @@ public class Recipe {
      */
     public Recipe() {}
 
+    /**
+     * Creates a recipe with the given title.
+     *
+     * @param title non‑null title.
+     * @throws IllegalArgumentException if {@code title} is null.
+     */
     public Recipe(String title) {
-        this.title = title;
+        setTitle(title);
     }
 
+    /**
+     * Returns the generated id.
+     * @return the generated id.
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * Returns the recipe’s title.
+     * @return the recipe’s title.
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Sets a new title for this recipe.
+     *
+     * @param title non‑null title.
+     * @throws IllegalArgumentException if {@code title} is null.
+     */
     public void setTitle(String title) {
         if (title == null) {
-            throw new IllegalArgumentException("title cannot be null");
+            throw new IllegalArgumentException("Recipe title cannot be null");
         } else {
             this.title = title;
         }

@@ -23,8 +23,18 @@ import client.scenes.AddRecipeCtrl;
 import client.scenes.MainCtrl;
 import client.scenes.RecipeOverviewCtrl;
 
+/**
+ * Guice module that declares the application’s core controllers.
+ * <p>All bindings are singletons so each controller is instantiated only once
+ * and shared across the UI.</p>
+ */
 public class MyModule implements Module {
 
+    /**
+     * Configures the Guice binder with singleton scopes for the main UI controllers.
+     *
+     * @param binder the Guice binder used during application startup
+     */
     @Override
     public void configure(Binder binder) {
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);

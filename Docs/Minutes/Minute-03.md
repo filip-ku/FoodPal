@@ -12,17 +12,32 @@
 
 - **Check-in**
   - Was everyone able to finish their assigned work?
+    - Everyone finished their assinged task
   - Does anybody need help if their work is not finished?
+    - Ivan to send video for spring in the groupchat again
   - Does everyone feel comfortable in hitting their weekly quota?
+    - Yes
   - Does anybody feel like they don't understand the code in a specific area
+    - Back-end code is consfusing (to uderstand watch youtube playlist)
 
 - **Checkstyle**
   - Branches created before MR need to be checked
-    - Discuss additional rules for checkstyle
+  - Notes
+    - Send checkstyle file on whatsapp
+    - Error
+        - Line length (max 100) 
+        - Indenation
+    - Warning
+        - Cyclomatic complexity(max 6)
 
 - **Basic Requirements**
   - What parts of the basic requirements are we done with
+    - Lots of conflicting branches for everyone(especially for the frontend)
   - Which parts of the basic requirements should we focus on now
+    - Integreate recipeStep and Recipe Ingredient into UI 
+    - A way in front end to distinguish between recipe Ingredient and global ingredient 
+    - Marlijn switch to do both front end and backend 
+    - Have Filip switch to front end to make backend have 3 people and front end have 3 people
 
 - **Documentation**
   - Create issues for the stuff we're working on
@@ -32,7 +47,7 @@
   - Should bigger merge requests be ok
   - First front-end merge request was quite big
   - Maybe split bigger merge requests into smaller chunks
-    - May make it easier to hit weekly quotas
+  - May make it easier to hit weekly quotas
 
 ---
 
@@ -40,11 +55,15 @@
 
 - Switching up teams
   - Should we continue with teams?
+   - switch Filip from backend to frontend
   - Most tasks need work on multiple areas
+    - Create a new sprint for continued basic functionality 
   - Might be more efficient to not split into teams based on frontend/commons/backend
 - Urgent tasks:
   - RecipeIngredient and RecipeStep need to be finished
+    - Also add respective controllers and services
 - Meeting again on monday?
+    - yes 
 
 ---
 

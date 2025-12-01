@@ -29,17 +29,40 @@ import javafx.util.BuilderFactory;
 import javafx.util.Callback;
 import javafx.util.Pair;
 
+/**
+ * Utility class that loads JavaFX FXML files while wiring their controllers
+ * with a {@link Injector} (Guice).
+ */
 public class MyFXML {
 
     private Injector injector;
 
+    /**
+     * Creates a new {@code MyFXML} instance.
+     *
+     * @param injector the Guice injector that will provide controller instances
+     */
     public MyFXML(Injector injector) {
         this.injector = injector;
     }
 
+    /**
+     * Loads an FXML file and returns its controller together with the root node.
+     *
+     * <p>The {@code parts} argument is interpreted as a relative path on the
+     * class‑path.  For example, {@code load(RecipeOverviewCtrl.class, "client","scenes",
+     * "RecipeOverview.fxml")} will look for {@code client/scenes/RecipeOverview.fxml}.
+     *
+     * @param <T>   type of the controller to be returned
+     * @param c     the class object of the controller (used only for typing)
+     * @param parts path segments that form the resource location on the class‑path
+     * @return a {@link Pair} containing the controller instance and its root node
+     * @throws RuntimeException if the FXML file cannot be loaded
+     */
     public <T> Pair<T, Parent> load(Class<T> c, String... parts) {
         try {
-            var loader = new FXMLLoader(getLocation(parts), null, null, new MyFactory(), StandardCharsets.UTF_8);
+            var loader = new FXMLLoader(getLocation(parts), null, null,
+                    new MyFactory(), StandardCharsets.UTF_8);
             Parent parent = loader.load();
             T ctrl = loader.getController();
             return new Pair<>(ctrl, parent);
@@ -48,11 +71,21 @@ public class MyFXML {
         }
     }
 
+    /**
+     * Resolves the class‑path location of an FXML file from path segments.
+     *
+     * @param parts path segments that form the resource location
+     * @return a {@link URL} pointing to the resource, or {@code null} if not found
+     */
     private URL getLocation(String... parts) {
         var path = Path.of("", parts).toString();
         return MyFXML.class.getClassLoader().getResource(path);
     }
 
+    /**
+     * Custom {@link BuilderFactory} and {@link Callback} that delegate object
+     * creation to the Guice injector.
+     */
     private class MyFactory implements BuilderFactory, Callback<Class<?>, Object> {
 
         @Override

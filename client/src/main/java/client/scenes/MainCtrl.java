@@ -30,17 +30,28 @@ public class MainCtrl {
     private AddRecipeCtrl addRecipeCtrl;
     private Scene addRecipe;
 
-    public void initialize(Stage primaryStage, Pair<RecipeOverviewCtrl, Parent> overview,
-            Pair<AddRecipeCtrl, Parent> add) {
+    private AddIngredientCtrl addIngredientCtrl;
+    private Scene addIngredient;
+
+    public void initialize(Stage primaryStage,
+                           Pair<RecipeOverviewCtrl, Parent> overview,
+                           Pair<AddRecipeCtrl, Parent> add,
+                           Pair<AddIngredientCtrl, Parent> addIngredient) {
         this.primaryStage = primaryStage;
         this.recipeOverviewCtrl = overview.getKey();
         this.recipeOverview = new Scene(overview.getValue());
 
         this.addRecipeCtrl = add.getKey();
         this.addRecipe = new Scene(add.getValue());
+        this.addIngredientCtrl = addIngredient.getKey();
+        this.addIngredient = new Scene(addIngredient.getValue());
 
         showRecipeOverview();
         primaryStage.show();
+    }
+
+    public RecipeOverviewCtrl getRecipeOverviewCtrl() {
+        return recipeOverviewCtrl;
     }
 
     public void showRecipeOverview() {
@@ -53,5 +64,15 @@ public class MainCtrl {
         primaryStage.setTitle("FoodPal: Adding Recipe");
         primaryStage.setScene(addRecipe);
         addRecipe.setOnKeyPressed(e -> addRecipeCtrl.keyPressed(e));
+    }
+
+    public void showAddIngredient() {
+        primaryStage.setTitle("FoodPal: Adding an ingredient");
+        primaryStage.setScene(addIngredient);
+        addIngredient.setOnKeyPressed(e -> addIngredientCtrl.keyPressed(e));
+    }
+
+    public AddIngredientCtrl getAddIngredientCtrl() {
+        return addIngredientCtrl;
     }
 }
