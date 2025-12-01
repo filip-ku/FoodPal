@@ -6,7 +6,6 @@ import java.util.ResourceBundle;
 import com.google.inject.Inject;
 
 import client.utils.ServerUtils;
-import commons.Ingredient;
 import commons.Recipe;
 import commons.RecipeIngredient;
 import commons.RecipeStep;
@@ -63,19 +62,6 @@ public class RecipeOverviewCtrl implements Initializable {
     public RecipeOverviewCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.server = server;
         this.mainCtrl = mainCtrl;
-    }
-
-    /**
-     * Adds the new ingredient to the table.
-     *
-     * @param ingredient ingredient to add
-     * @param quantity quantity of ingredient
-     * @param units units of measurement
-     * @param notes optional notes about the ingredient
-     */
-    public void addIngredientToTable(Ingredient ingredient, int quantity,
-                                     String units, String notes) {
-        // TODO: change method to use new commons structure
     }
 
     /**
@@ -136,7 +122,6 @@ public class RecipeOverviewCtrl implements Initializable {
             alert.showAndWait();
             return;
         }
-        mainCtrl.getAddIngredientCtrl().setRecipe(selected);
         mainCtrl.showAddIngredient();
     }
 
@@ -179,7 +164,7 @@ public class RecipeOverviewCtrl implements Initializable {
             String newName = recipeEditBox.getText();
 
             if (newName == null || newName.trim().isEmpty()) {
-                showError("Name cannot be empty.");
+                mainCtrl.showError("Name cannot be empty.");
                 return;
             }
             recipeName.setText(newName);
@@ -204,7 +189,6 @@ public class RecipeOverviewCtrl implements Initializable {
         }
     }
 
-
     /**
      * Deletes the currently selected recipe after user confirmation.
      *
@@ -215,7 +199,7 @@ public class RecipeOverviewCtrl implements Initializable {
         Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
-            showError("No recipe selected.");
+            mainCtrl.showError("No recipe selected.");
             return;
         }
 
@@ -229,9 +213,7 @@ public class RecipeOverviewCtrl implements Initializable {
             return;
         }
 
-        // TODO
-        // Needs a way to update the database through the server
-
+        server.deleteRecipe(selected);
         showMainMenu();
 
         data.remove(selected);
@@ -243,7 +225,7 @@ public class RecipeOverviewCtrl implements Initializable {
     @FXML
     private void editSteps() {
         // TODO: implement later
-        showError("Editing steps is not implemented yet.");
+        mainCtrl.showError("Editing steps is not implemented yet.");
     }
 
     /**
@@ -256,7 +238,7 @@ public class RecipeOverviewCtrl implements Initializable {
     public void deleteIngredient() {
         RecipeIngredient selected = tableIngredients.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showError("Select an ingredient to delete.");
+            mainCtrl.showError("Select an ingredient to delete.");
             return;
         }
 
@@ -274,19 +256,6 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
-     * Logic to have a pop-up error message
-     *
-     * @param msg Contents of the error message
-     */
-    private void showError(String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Invalid Input");
-        alert.setHeaderText("Error");
-        alert.setContentText(msg);
-        alert.showAndWait();
-    }
-
-    /**
      * Makes every component except the label invisible
      * Sets the label text to "Welcome to FoodPal!"
      */
@@ -295,5 +264,12 @@ public class RecipeOverviewCtrl implements Initializable {
         recipeName.setText("Welcome to FoodPal!");
         tableIngredients.setVisible(false);
         tablePreparation.setVisible(false);
+    }
+
+    /**
+     * Opens the Ingredient Overview scene
+     */
+    public void showIngredients() {
+        mainCtrl.showIngredientsOverview();
     }
 }

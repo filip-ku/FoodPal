@@ -4,18 +4,17 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="259.0" prefWidth="470.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.AddIngredientCtrl">
    <children>
       <Button layoutX="424.0" layoutY="207.0" mnemonicParsing="false" onAction="#ok" text="Ok" />
       <Button layoutX="358.0" layoutY="207.0" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
-      <TextField fx:id="ingredientNameInput" layoutX="205.0" layoutY="28.0" prefHeight="26.0" prefWidth="164.0" />
-      <Label alignment="CENTER_RIGHT" layoutX="112.0" layoutY="32.0" prefHeight="18.0" prefWidth="66.0" text="Ingredient:" textAlignment="RIGHT" AnchorPane.rightAnchor="291.6" />
-      <TextField fx:id="quantityInput" layoutX="205.0" layoutY="67.0" prefHeight="26.0" prefWidth="164.0" />
-      <Label alignment="CENTER_RIGHT" layoutX="121.0" layoutY="71.0" prefHeight="18.0" prefWidth="58.0" text="Quantity:" AnchorPane.rightAnchor="290.6" />
-      <TextField fx:id="notesInput" layoutX="205.0" layoutY="138.0" prefHeight="26.0" prefWidth="164.0" />
-      <Label alignment="CENTER_RIGHT" layoutX="149.0" layoutY="142.0" text="Notes:  " textAlignment="RIGHT" AnchorPane.rightAnchor="290.6" />
-      <TextField fx:id="unitsInput" layoutX="205.0" layoutY="103.0" prefHeight="26.0" prefWidth="164.0" />
-      <Label alignment="CENTER_RIGHT" layoutX="149.0" layoutY="107.0" text="Units: " textAlignment="RIGHT" AnchorPane.rightAnchor="290.6" />
+      <HBox layoutX="127.0" layoutY="118.0" prefHeight="22.0" prefWidth="214.0" style="-fx-spacing: 10;">
+         <children>
+            <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="38.0" text="Name: " textAlignment="RIGHT" />
+            <TextField fx:id="ingredientNameInput" prefHeight="26.0" prefWidth="164.0" />
+         </children>
+      </HBox>
    </children>
 </AnchorPane>
