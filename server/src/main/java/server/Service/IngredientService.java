@@ -33,7 +33,8 @@ public class IngredientService {
     public Ingredient addIngredient(Ingredient ingredient){
         log.info("Adding ingredient {}",ingredient);
         if (isNullOrEmpty(ingredient.getName())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ingredient name cannot be null or empty");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Ingredient name cannot be null or empty");
         }
         else {
             log.debug("Adding ingredient with id {}",ingredient.getId());
