@@ -68,9 +68,7 @@ public class AddRecipeIngredientCtrl {
 
         // TODO: add ingredient to the database
 
-        // add ingredient to the overview table
-        mainCtrl.getRecipeOverviewCtrl()
-                .addIngredientToTable(ingredient, quantity, units, notes);
+        // TODO: add ingredient to the overview table
     
         // ensure the recipe is selected so the ingredient table is visible
         mainCtrl.getRecipeOverviewCtrl().selectRecipe(recipe);
