@@ -33,6 +33,7 @@ public class MainCtrl {
     private AddIngredientCtrl addIngredientCtrl;
     private Scene addIngredient;
 
+    //AI-generated javadoc
     /**
      * Initializes the main controller and sets up all application scenes.
      *

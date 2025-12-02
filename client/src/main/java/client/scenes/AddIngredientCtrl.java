@@ -44,6 +44,7 @@ public class AddIngredientCtrl {
         mainCtrl.showRecipeOverview();
     }
 
+    //AI-generated javadoc
     /**
      * Confirms and saves a new ingredient entry.
      * Validates the quantity input, creates an Ingredient object,
@@ -93,6 +94,7 @@ public class AddIngredientCtrl {
         return Integer.parseInt(text);
     }
 
+    //AI-generated javadoc
     /**
      * Creates a new Ingredient instance using the entered ingredient name.
      *

@@ -53,6 +53,7 @@ public class ServerUtils {
     }
 
     //TODO update the path once the backend is ready
+    //AI-generated javadoc
     /**
      * Retrieves all {@link Ingredient} objects from the server.
      *
@@ -67,6 +68,7 @@ public class ServerUtils {
 
 
     //TODO update the path wonce the backend is ready
+    //AI-generated javadoc
     /**
      * Retrieves all {@link RecipeIngredient} entries for a specific recipe.
      *

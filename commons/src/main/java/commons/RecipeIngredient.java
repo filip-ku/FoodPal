@@ -75,6 +75,7 @@ public class RecipeIngredient {
         return recipeId;
     }
 
+    //AI-generated javadoc
     /**
      * Sets the recipe ID for this ingredient.
      *
@@ -97,6 +98,7 @@ public class RecipeIngredient {
         return ingredientId;
     }
 
+    //AI-generated javadoc
     /**
      * Sets the ingredient ID for this entry.
      *
@@ -110,6 +112,7 @@ public class RecipeIngredient {
         this.ingredientId = ingredientId;
     }
 
+    //AI-generated javadoc
     /**
      * Returns the quantity amount of this ingredient.
      *
@@ -119,6 +122,7 @@ public class RecipeIngredient {
         return amount;
     }
 
+    //AI-generated javadoc
     /**
      * Sets the ingredient amount.
      *
@@ -132,6 +136,7 @@ public class RecipeIngredient {
         this.amount = amount;
     }
 
+    //AI-generated javadoc
     /**
      * Returns the unit for the ingredient amount.
      *
@@ -141,6 +146,7 @@ public class RecipeIngredient {
         return unit;
     }
 
+    //AI-generated javadoc
     /**
      * Sets the unit for this ingredient.
      *
@@ -150,6 +156,7 @@ public class RecipeIngredient {
         this.unit = unit;
     }
 
+    //AI-generated javadoc
     /**
      * Returns the informal amount (e.g. "a pinch").
      *
@@ -159,6 +166,7 @@ public class RecipeIngredient {
         return informalAmount;
     }
 
+    //AI-generated javadoc
     /**
      * Sets the informal amount.
      *
@@ -177,6 +185,7 @@ public class RecipeIngredient {
         return position;
     }
 
+    //AI-generated javadoc
     /**
      * Sets the ingredient's order in the recipe list.
      *
@@ -190,6 +199,7 @@ public class RecipeIngredient {
         this.position = position;
     }
 
+    //AI-generated javadoc
     /**
      * Returns the optional note for this ingredient.
      *
@@ -199,6 +209,7 @@ public class RecipeIngredient {
         return note;
     }
 
+    //AI-generated javadoc
     /**
      * Sets an optional note for this ingredient.
      *

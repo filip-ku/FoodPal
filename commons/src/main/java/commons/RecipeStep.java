@@ -28,6 +28,7 @@ public class RecipeStep {
         // for object mapping
     }
 
+    //AI-generated javadoc
     /**
      * Creates a new RecipeStep with the given recipe ID, position, and instruction.
      *
@@ -59,6 +60,7 @@ public class RecipeStep {
         return recipeId;
     }
 
+    //AI-generated javadoc
     /**
      * Sets the recipe ID for this step.
      *
@@ -81,6 +83,7 @@ public class RecipeStep {
         return position;
     }
 
+    //AI-generated javadoc
     /**
      * Sets the position of this step in the recipe.
      *
@@ -103,6 +106,7 @@ public class RecipeStep {
         return instruction;
     }
 
+    //AI-generated javadoc
     /**
      * Sets the instruction text for this step.
      *
