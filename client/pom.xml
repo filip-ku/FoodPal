@@ -91,6 +91,19 @@
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.testfx/testfx-junit -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-core</artifactId>
+            <version>4.0.18</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-junit5</artifactId>
+            <version>4.0.18</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 	<build>
@@ -131,6 +144,19 @@
 					</execution>
 				</executions>
 			</plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-surefire-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <systemPropertyVariables>-->
+<!--                        <testfx.robot>glass</testfx.robot>-->
+<!--                        <testfx.headless>true</testfx.headless>-->
+<!--                        <prism.order>sw</prism.order>-->
+<!--                        <prism.text>t2k</prism.text>-->
+<!--                        <java.awt.headless>true</java.awt.headless>-->
+<!--                    </systemPropertyVariables>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
 		</plugins>
 	</build>
 </project>
