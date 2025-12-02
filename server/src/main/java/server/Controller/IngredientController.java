@@ -1,7 +1,6 @@
 package server.Controller;
 
 import commons.Ingredient;
-import commons.Recipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,7 +99,8 @@ public class IngredientController {
      * @return the changed ingredient
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Ingredient> updateIngredient(@PathVariable long id, @RequestBody Ingredient ingredient){
+    public ResponseEntity<Ingredient> updateIngredient(@PathVariable long id,
+                                                       @RequestBody Ingredient ingredient){
         log.info("updating ingredient {}", id);
         Ingredient updated = ingredientService.updateIngredient(id, ingredient);
         return ResponseEntity.ok(updated);
