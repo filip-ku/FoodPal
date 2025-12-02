@@ -38,6 +38,15 @@ public class Recipe {
     }
 
     /**
+     * Sets a new id for this recipe.
+     * This method should only be used for testing.
+     * Normally the recipe id will be set by the server.
+     *
+     * @param id new id that will be set by this method
+     */
+    public void setId(Long id) {this.id = id;}
+
+    /**
      * Returns the recipe’s title.
      * @return the recipe’s title.
      */
