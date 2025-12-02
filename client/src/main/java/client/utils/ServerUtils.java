@@ -53,6 +53,11 @@ public class ServerUtils {
     }
 
     //TODO update the path once the backend is ready
+    /**
+     * Retrieves all {@link Ingredient} objects from the server.
+     *
+     * @return a list of ingredients; may be empty if none exist
+     */
     public List<Ingredient> getIngredients() {
         return ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("") //
@@ -62,6 +67,12 @@ public class ServerUtils {
 
 
     //TODO update the path wonce the backend is ready
+    /**
+     * Retrieves all {@link RecipeIngredient} entries for a specific recipe.
+     *
+     * @param recipeId the ID of the recipe to fetch ingredients for
+     * @return a list of recipe-ingredient associations;
+     */
     public List<RecipeIngredient> getIngredientsForRecipe(Long recipeId) {
         return ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("") //

@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/recipe")
 public class RecipeController {
-    public final RecipeService recipeService;
+    private final RecipeService recipeService;
 
     /**
      * Creates a new controller instance with the required service.
