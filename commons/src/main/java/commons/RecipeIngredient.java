@@ -3,6 +3,8 @@ package commons;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import java.util.Objects;
+
 @Entity
 public class RecipeIngredient {
 
@@ -146,5 +148,22 @@ public class RecipeIngredient {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        RecipeIngredient that = (RecipeIngredient) o;
+        return position == that.position
+                && Objects.equals(id, that.id)
+                && Objects.equals(amount, that.amount)
+                && Objects.equals(unit, that.unit)
+                && Objects.equals(informalAmount, that.informalAmount)
+                && Objects.equals(note, that.note);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, amount, unit, informalAmount, position, note);
     }
 }

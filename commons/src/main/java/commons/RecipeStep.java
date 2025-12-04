@@ -3,6 +3,8 @@ package commons;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import java.util.Objects;
+
 @Entity
 public class RecipeStep {
 
@@ -82,5 +84,18 @@ public class RecipeStep {
             throw new IllegalArgumentException("instruction cannot be null");
         }
         this.instruction = instruction;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        RecipeStep that = (RecipeStep) o;
+        return position == that.position && Objects.equals(id, that.id)
+                && Objects.equals(instruction, that.instruction);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, position, instruction);
     }
 }
