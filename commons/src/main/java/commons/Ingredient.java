@@ -38,13 +38,19 @@ public class Ingredient {
         // For mapping objects.
     }
 
+
     /**
-     * Creates an ingredient with the given name.
-     * @param name non‑null name.
-     * @throws IllegalArgumentException if {@code name} is null
+     * constructor for ingredient
+     * @param name  name of the ingredient
+     * @param proteinPer100g protein per 100g of ingredient
+     * @param fatPer100g  fat per 100g of ingredient
+     * @param carbsPer100g  carbs per 100g of ingredient
      */
-    public Ingredient(String name) {
+    public Ingredient(String name, Double proteinPer100g, Double fatPer100g, Double carbsPer100g) {
         setName(name);
+        setProteinPer100g(proteinPer100g);
+        setFatPer100g(fatPer100g);
+        setCarbsPer100g(carbsPer100g);
     }
 
     /**

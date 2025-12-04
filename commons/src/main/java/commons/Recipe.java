@@ -3,6 +3,7 @@ package commons;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -19,7 +20,7 @@ public class Recipe {
 
     // total servings
     @Column(precision = 6, scale = 2)
-    private long servings;
+    private BigDecimal servings;
 
     @JsonManagedReference
     @OneToMany(
@@ -49,10 +50,12 @@ public class Recipe {
      * Creates a recipe with the given title.
      *
      * @param title non‑null title.
+     * @param servings amount of servings of the recipe
      * @throws IllegalArgumentException if {@code title} is null.
      */
-    public Recipe(String title) {
+    public Recipe(String title, BigDecimal servings) {
         setTitle(title);
+        setServings(servings);
     }
 
     /**
@@ -102,7 +105,7 @@ public class Recipe {
      *
      * @return the number of servings.
      */
-    public long getServings() {
+    public BigDecimal getServings() {
         return servings;
     }
 
@@ -112,7 +115,7 @@ public class Recipe {
      *
      * @param servings the number of servings.
      */
-    public void setServings(long servings) {
+    public void setServings(BigDecimal servings) {
         this.servings = servings;
     }
 
