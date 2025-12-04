@@ -82,11 +82,16 @@ public class ChooseRecipeIngredientCtrl {
     }
 
     /**
-     * Advances to the details screen with the currently selected ingredient.
-     * Assumes the Next button is enabled only when a selection exists.
+     * Proceeds to the details screen to input recipe-specific data
+     * (amount, unit, informal amount) for the selected ingredient.
+     * Shows an error if no ingredient is selected.
      */
-    public void next() {
-        Ingredient sel = ingredientSelect.getValue();
-        mainCtrl.showAddNewRecipeIngredient(recipe, sel);
+    public void inputRecipeSpecificData() {
+        var selected = ingredientSelect.getValue();
+        if (selected == null) {
+            mainCtrl.showError("Select an ingredient first.");
+            return;
+        }
+        mainCtrl.showAddRecipeIngredientForAdd(recipe, selected);
     }
 }
