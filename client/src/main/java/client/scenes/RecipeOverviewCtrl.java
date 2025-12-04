@@ -265,4 +265,15 @@ public class RecipeOverviewCtrl implements Initializable {
     public void showIngredients() {
         mainCtrl.showIngredientsOverview();
     }
+
+    /**
+     * Opens the ingredient chooser for the currently selected recipe.
+     * Shows an error if no recipe is selected.
+     */
+    @FXML
+    private void openAddRecipeIngredient() {
+        var selected = tableRecipes.getSelectionModel().getSelectedItem();
+        if (selected == null) { mainCtrl.showError("Select a recipe first."); return; }
+        mainCtrl.showChooseRecipeIngredient(selected);
+    }
 }

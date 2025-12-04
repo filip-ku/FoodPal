@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.shape.Line?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.RecipeOverviewCtrl">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.RecipeOverviewCtrl">
    <children>
       <Button fx:id="refreshButton" layoutX="530.0" layoutY="18.0" mnemonicParsing="false" onAction="#refresh" text="Refresh" />
-      <Button fx:id="editStepsButton" layoutX="512.0" layoutY="360.0" mnemonicParsing="false" onAction="#editSteps" text="Edit steps" />
+      <Button fx:id="editStepsButton" layoutX="484.0" layoutY="360.0" mnemonicParsing="false" onAction="#editSteps" text="Edit steps" />
       <TableView fx:id="tableRecipes" layoutX="14.0" layoutY="14.0" prefHeight="338.0" prefWidth="114.0">
         <columns>
           <TableColumn fx:id="colRecipes" minWidth="0.0" prefWidth="113.59999980926514" text="Recipes" />
@@ -35,7 +28,7 @@
          </children>
       </HBox>
       <Line endX="600.0" endY="60.89289855957031" startX="128.4000244140625" startY="60.89289855957031" />
-      <TableView fx:id="tableIngredients" layoutX="128.0" layoutY="61.0" prefHeight="146.0" prefWidth="452.0">
+      <TableView fx:id="tableIngredients" layoutX="128.0" layoutY="61.0" prefHeight="146.0" prefWidth="427.0">
         <columns>
           <TableColumn fx:id="colIngredients" prefWidth="258.3999969482422" text="Ingredients" />
         </columns>
@@ -43,7 +36,7 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <TableView fx:id="tablePreparation" layoutX="128.0" layoutY="207.0" prefHeight="145.0" prefWidth="452.0">
+      <TableView fx:id="tablePreparation" layoutX="128.0" layoutY="207.0" prefHeight="145.0" prefWidth="427.0">
          <columns>
             <TableColumn fx:id="colPreparation" prefWidth="451.1999969482422" text="Preparation" />
          </columns>
@@ -51,11 +44,11 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <Button layoutX="393.0" layoutY="360.0" mnemonicParsing="false" onAction="#showIngredients" text="Show Ingredients" />
-      <HBox layoutX="39.0" layoutY="360.0" prefHeight="22.0" prefWidth="28.0" style="-fx-spacing: 20;">
+      <Button layoutX="364.0" layoutY="360.0" mnemonicParsing="false" onAction="#showIngredients" text="Show Ingredients" />
+      <HBox layoutX="39.0" layoutY="360.0" prefHeight="26.0" prefWidth="70.0" style="-fx-spacing: 20;">
          <children>
-            <Button fx:id="addRecipeButton" mnemonicParsing="false" onAction="#addRecipe" text="+" />
-            <Button fx:id="deleteRecipeButton" mnemonicParsing="false" onAction="#deleteRecipe" text="-" />
+            <Button fx:id="addRecipeButton" maxHeight="26.0" maxWidth="26.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#addRecipe" prefHeight="26.0" prefWidth="26.0" text="+" />
+            <Button fx:id="deleteRecipeButton" maxHeight="26.0" maxWidth="26.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#deleteRecipe" prefHeight="26.0" prefWidth="26.0" text="-" />
          </children>
       </HBox>
       <SplitPane layoutX="-200.0" layoutY="31.0" prefHeight="160.0" prefWidth="200.0">
@@ -63,5 +56,7 @@
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
         </items>
       </SplitPane>
+      <Button fx:id="recipeIngredientSelect" layoutX="565.0" layoutY="91.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeIngredient" text="+" />
+      <Button layoutX="565.0" layoutY="121.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" text="-" />
    </children>
 </AnchorPane>

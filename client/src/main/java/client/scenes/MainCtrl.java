@@ -1,5 +1,6 @@
 package client.scenes;
 
+import commons.Recipe;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -23,11 +24,25 @@ public class MainCtrl {
     private IngredientsOverviewCtrl ingredientsOverviewCtrl;
     private Scene ingredientsOverview;
 
+    private ChooseRecipeIngredientCtrl chooseRecipeIngredientCtrl;
+    private Scene chooseRecipeIngredientScene;
+
+    /**
+     * Initializes the application’s primary stage and loads all scenes.
+     *
+     * @param primaryStage the main application window
+     * @param overview Recipe overview controller + root
+     * @param add Add-recipe controller + root
+     * @param addIngredient Add-ingredient controller + root
+     * @param ingredientsOverview Ingredients overview controller + root
+     * @param chooseRecipeIngredient Choose-recipe-ingredient controller + root
+     */
     public void initialize(Stage primaryStage,
                            Pair<RecipeOverviewCtrl, Parent> overview,
                            Pair<AddRecipeCtrl, Parent> add,
                            Pair<AddIngredientCtrl, Parent> addIngredient,
-                           Pair<IngredientsOverviewCtrl, Parent> ingredientsOverview) {
+                           Pair<IngredientsOverviewCtrl, Parent> ingredientsOverview,
+                           Pair<ChooseRecipeIngredientCtrl, Parent> chooseRecipeIngredient) {
         this.primaryStage = primaryStage;
         this.recipeOverviewCtrl = overview.getKey();
         this.recipeOverview = new Scene(overview.getValue());
@@ -40,6 +55,9 @@ public class MainCtrl {
 
         this.ingredientsOverviewCtrl = ingredientsOverview.getKey();
         this.ingredientsOverview = new Scene(ingredientsOverview.getValue());
+
+        this.chooseRecipeIngredientCtrl  = chooseRecipeIngredient.getKey();
+        this.chooseRecipeIngredientScene = new Scene(chooseRecipeIngredient.getValue());
 
         showRecipeOverview();
         primaryStage.show();
@@ -109,5 +127,16 @@ public class MainCtrl {
         alert.initModality(Modality.APPLICATION_MODAL);
         alert.setContentText(e.getMessage());
         alert.showAndWait();
+    }
+
+    /**
+     * Displays the “Choose Ingredient” screen for the given recipe.
+     *
+     * @param recipe the recipe for which an ingredient will be chosen
+     */
+    public void showChooseRecipeIngredient(Recipe recipe) {
+        chooseRecipeIngredientCtrl.setRecipe(recipe);
+        primaryStage.setTitle("Choose Ingredient");
+        primaryStage.setScene(chooseRecipeIngredientScene);
     }
 }
