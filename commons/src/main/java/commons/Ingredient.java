@@ -137,6 +137,11 @@ public class Ingredient {
         }
     }
 
+    /**
+     * equals method
+     * @param o   the reference object with which to compare.
+     * @return true is equals, else false
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -148,6 +153,10 @@ public class Ingredient {
                 && Objects.equals(carbsPer100g, that.carbsPer100g);
     }
 
+    /**
+     * hashcode for an ingredient
+     * @return hashcode for the ingredient
+     */
     @Override
     public int hashCode() {
         return Objects.hash(id, name, proteinPer100g, fatPer100g, carbsPer100g);

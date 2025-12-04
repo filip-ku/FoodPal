@@ -202,6 +202,11 @@ public class Recipe {
         step.setRecipe(null);
     }
 
+    /**
+     * equals method
+     * @param o   the reference object with which to compare.
+     * @return true is equals, else false
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -211,6 +216,10 @@ public class Recipe {
                 && Objects.equals(title, recipe.title);
     }
 
+    /**
+     * hashcode for recipe
+     * @return hashcode of the recipe
+     */
     @Override
     public int hashCode() {
         return Objects.hash(id, title, servings);
