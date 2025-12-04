@@ -3,8 +3,7 @@ package commons;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * JPA entity representing a recipe.
@@ -22,10 +21,6 @@ public class Recipe {
     @Column(precision = 6, scale = 2)
     private long servings;
 
-    // for recipe language filter
-    @Column(name = "language_code", nullable = false, length = 10)
-    private String languageCode;
-
     @JsonManagedReference
     @OneToMany(
             mappedBy = "recipe",
@@ -33,7 +28,7 @@ public class Recipe {
             orphanRemoval = true
     )
     @OrderBy("position ASC")
-    private List<RecipeIngredient> ingredients = new ArrayList<>();
+    private Set<RecipeIngredient> ingredients = new HashSet<>();
 
     @JsonManagedReference
     @OneToMany(
@@ -112,25 +107,6 @@ public class Recipe {
         this.servings = servings;
     }
 
-    // AI-generated
-    /**
-     * Returns the language code for this recipe.
-     *
-     * @return the language code.
-     */
-    public String getLanguageCode() {
-        return languageCode;
-    }
-
-    // AI-generated
-    /**
-     * Sets the language code for this recipe.
-     *
-     * @param languageCode the language code.
-     */
-    public void setLanguageCode(String languageCode) {
-        this.languageCode = languageCode;
-    }
 
     // AI-generated
     /**
@@ -138,7 +114,7 @@ public class Recipe {
      *
      * @return the ingredients.
      */
-    public List<RecipeIngredient> getIngredients() {
+    public Set<RecipeIngredient> getIngredients() {
         return ingredients;
     }
 
@@ -148,11 +124,11 @@ public class Recipe {
      *
      * @param ingredients the new list of ingredients.
      */
-    public void setIngredients(List<RecipeIngredient> ingredients) {
+    public void setIngredients(Set<RecipeIngredient> ingredients) {
         this.ingredients.clear();
         if (ingredients != null) {
             for (RecipeIngredient ingredient : ingredients) {
-                addIngredient(ingredient);
+                addRecipeIngredient(ingredient);
             }
         }
     }
@@ -163,7 +139,7 @@ public class Recipe {
      *
      * @param ingredient the ingredient to add.
      */
-    public void addIngredient(RecipeIngredient ingredient) {
+    public void addRecipeIngredient(RecipeIngredient ingredient) {
         ingredients.add(ingredient);
         ingredient.setRecipe(this);
     }
@@ -172,11 +148,11 @@ public class Recipe {
     /**
      * Removes a single ingredient from this recipe and clears its back-reference.
      *
-     * @param ingredient the ingredient to remove.
+     * @param recipeIngredient the ingredient to remove.
      */
-    public void removeIngredient(RecipeIngredient ingredient) {
-        ingredients.remove(ingredient);
-        ingredient.setRecipe(null);
+    public void removeIngredient(RecipeIngredient recipeIngredient) {
+        ingredients.remove(recipeIngredient);
+        recipeIngredient.setRecipe(null);
     }
 
     // AI-generated
@@ -224,5 +200,19 @@ public class Recipe {
     public void removeStep(RecipeStep step) {
         steps.remove(step);
         step.setRecipe(null);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Recipe recipe = (Recipe) o;
+        return servings == recipe.servings
+                && Objects.equals(id, recipe.id)
+                && Objects.equals(title, recipe.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, servings);
     }
 }
