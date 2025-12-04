@@ -40,6 +40,15 @@ public class Ingredient {
     }
 
     /**
+     * Sets a new id for this ingredient.
+     * This method should only be used for testing.
+     * Normally the ingredient id will be set by the server.
+     *
+     * @param id new id that will be set by this method
+     */
+    public void setId(long id) {this.id = id;}
+
+    /**
      * Returns the ingredient’s name.
      * @return the ingredient’s name.
      */
