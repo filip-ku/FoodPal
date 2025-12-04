@@ -215,11 +215,15 @@ public class TestIngredientRepository implements IngredientRepository {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * Returns the number of ingredients currently stored in the repository.
+     *
+     * @return the total count of ingredients
+     */
     @Override
     public long count() {
         calledMethods.add("count");
-        return 0;
-        // TODO Auto-generated method stub
+        return ingredients.size();
     }
 
     /**
@@ -250,10 +254,13 @@ public class TestIngredientRepository implements IngredientRepository {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * Deletes all ingredients from the repository.
+     */
     @Override
     public void deleteAll() {
         calledMethods.add("deleteAll");
-        // TODO Auto-generated method stub
+        ingredients.clear();
     }
 
     @Override
