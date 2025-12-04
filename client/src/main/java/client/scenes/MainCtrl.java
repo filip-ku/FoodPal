@@ -45,22 +45,36 @@ public class MainCtrl {
         primaryStage.show();
     }
 
+    /**
+     * Returns the controller for the recipe overview screen.
+     *
+     * @return the recipe overview controller
+     */
     public RecipeOverviewCtrl getRecipeOverviewCtrl() {
         return recipeOverviewCtrl;
     }
 
+    /**
+     * Displays the recipe overview screen.
+     */
     public void showRecipeOverview() {
         primaryStage.setTitle("FoodPal");
         primaryStage.setScene(recipeOverview);
         recipeOverviewCtrl.refresh();
     }
 
+    /**
+     * Displays the "Add Recipe" screen.
+     */
     public void showAddRecipe() {
         primaryStage.setTitle("FoodPal: Adding Recipe");
         primaryStage.setScene(addRecipe);
         addRecipe.setOnKeyPressed(e -> addRecipeCtrl.keyPressed(e));
     }
 
+    /**
+     * Displays the "Add Ingredient" screen.
+     */
     public void showAddIngredient() {
         primaryStage.setTitle("FoodPal: Adding Ingredient");
         primaryStage.setScene(addIngredient);
