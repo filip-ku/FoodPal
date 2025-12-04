@@ -26,7 +26,7 @@ class RecipeStepTest {
         RecipeStep recipeStep = new RecipeStep();
         Exception e = assertThrows(IllegalArgumentException.class,
                 () -> recipeStep.setRecipe(null));
-        assertEquals("recipeId cannot be null", e.getMessage());
+        assertEquals("recipe cannot be null", e.getMessage());
     }
 
     @Test
