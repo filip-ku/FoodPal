@@ -19,7 +19,7 @@ public class Recipe {
     private String title;
 
     // total servings
-    @Column(precision = 6, scale = 2)
+    @Column()
     private BigDecimal servings;
 
     @JsonManagedReference
@@ -56,6 +56,14 @@ public class Recipe {
     public Recipe(String title, BigDecimal servings) {
         setTitle(title);
         setServings(servings);
+    }
+
+    /**
+     * constructor for tests in server
+     * @param title title of a recipe
+     */
+    public Recipe(String title) {
+        setTitle(title);
     }
 
     /**
