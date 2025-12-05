@@ -133,8 +133,8 @@ public class TestRecipeRepository implements RecipeRepository {
     }
 
     @Override
-    public <S extends Recipe, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>,
-            R> queryFunction) {
+    public <S extends Recipe, R> R findBy(Example<S> example,
+                        Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
         calledMethods.add("findBy");
         return null;
         // TODO Auto-generated method stub
