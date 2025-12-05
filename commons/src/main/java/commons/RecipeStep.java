@@ -1,93 +1,109 @@
 package commons;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import java.util.Objects;
+
+/**
+ * Represents a single step in a recipe, including its order and instruction text.
+ */
 @Entity
 public class RecipeStep {
 
+    /**
+     * Surrogate primary key used to uniquely identify this recipe step.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    // foreign key -> recipe.id
-    @Column(nullable = false)
-    private Long recipeId;
+    /**
+     * Reference to the recipe this step belongs to.
+     */
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    @JsonBackReference
+    private Recipe recipe;
 
-    // order in the step list
+    /**
+     * Zero-based index indicating the order of this step within the recipe.
+     */
     @Column(nullable = false)
     private int position;
 
-    // text of the instruction
+    /**
+     * Text description of what should be done in this step.
+     */
     @Column(nullable = false, length = 2000)
     private String instruction;
 
     /**
-     * Default constructor for JPA and object mapping.
+     * Default constructor for JPA and object mapping frameworks.
      */
     public RecipeStep() {
         // for object mapping
     }
 
-    //AI-generated javadoc
     /**
-     * Creates a new RecipeStep with the given recipe ID, position, and instruction.
+     * Creates a new recipe step for the given recipe.
      *
-     * @param recipeId     the ID of the associated recipe
-     * @param position     the order of this step in the recipe
-     * @param instruction  the text describing the step
+     * @param recipe      the recipe this step belongs to, must not be {@code null}
+     * @param position    the zero-based index of this step within the recipe; must be non-negative
+     * @param instruction the instruction text for this step, must not be {@code null}
+     * @throws IllegalArgumentException if {@code recipe} or {@code instruction}
+     * is {@code null}, or if {@code position} is negative
      */
-    public RecipeStep(Long recipeId, int position, String instruction) {
-        setRecipeId(recipeId);
+    public RecipeStep(Recipe recipe, int position, String instruction) {
+        setRecipe(recipe);
         setPosition(position);
         setInstruction(instruction);
     }
 
     /**
-     * Returns the database ID of this recipe step.
+     * Returns the unique identifier of this recipe step.
      *
-     * @return the generated ID
+     * @return the id of this recipe step, or {@code null} if it has not been persisted yet
      */
     public Long getId() {
         return id;
     }
 
     /**
-     * Returns the ID of the recipe this step belongs to.
+     * Returns the recipe this step belongs to.
      *
-     * @return the recipe ID
+     * @return the owning recipe, never {@code null}
      */
-    public Long getRecipeId() {
-        return recipeId;
+    public Recipe getRecipe() {
+        return recipe;
     }
 
-    //AI-generated javadoc
     /**
-     * Sets the recipe ID for this step.
+     * Sets the recipe this step belongs to.
      *
-     * @param recipeId the recipe ID to assign
-     * @throws IllegalArgumentException if {@code recipeId} is null
+     * @param recipe the owning recipe, must not be {@code null}
+     * @throws IllegalArgumentException if {@code recipe} is {@code null}
      */
-    public void setRecipeId(Long recipeId) {
-        if (recipeId == null) {
-            throw new IllegalArgumentException("recipeId cannot be null");
+    public void setRecipe(Recipe recipe) {
+        if (recipe == null) {
+            throw new IllegalArgumentException("recipe cannot be null");
         }
-        this.recipeId = recipeId;
+        this.recipe = recipe;
     }
 
     /**
-     * Returns the position of this step in the recipe.
+     * Returns the zero-based index of this step within the recipe.
      *
-     * @return the step order index
+     * @return the position of this step
      */
     public int getPosition() {
         return position;
     }
 
-    //AI-generated javadoc
     /**
-     * Sets the position of this step in the recipe.
+     * Sets the zero-based index of this step within the recipe.
      *
-     * @param position the step order index (must be non-negative)
+     * @param position the new position, must be non-negative
      * @throws IllegalArgumentException if {@code position} is negative
      */
     public void setPosition(int position) {
@@ -100,23 +116,48 @@ public class RecipeStep {
     /**
      * Returns the instruction text for this step.
      *
-     * @return the instruction string
+     * @return the instruction text, never {@code null}
      */
     public String getInstruction() {
         return instruction;
     }
 
-    //AI-generated javadoc
     /**
      * Sets the instruction text for this step.
      *
-     * @param instruction the step description
-     * @throws IllegalArgumentException if {@code instruction} is null
+     * @param instruction the instruction text, must not be {@code null}
+     * @throws IllegalArgumentException if {@code instruction} is {@code null}
      */
     public void setInstruction(String instruction) {
         if (instruction == null) {
             throw new IllegalArgumentException("instruction cannot be null");
         }
         this.instruction = instruction;
+    }
+
+    /**
+     * Compares this recipe step to another object for equality.
+     * Two recipe steps are considered equal if they have the same id, position, and instruction.
+     *
+     * @param o the object to compare with
+     * @return {@code true} if the given object is
+     * a RecipeStep with the same id, position, and instruction; {@code false} otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        RecipeStep that = (RecipeStep) o;
+        return position == that.position && Objects.equals(id, that.id)
+                && Objects.equals(instruction, that.instruction);
+    }
+
+    /**
+     * Returns a hash code value for this recipe step, consistent with {@link #equals(Object)}.
+     *
+     * @return the hash code of this recipe step
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, position, instruction);
     }
 }

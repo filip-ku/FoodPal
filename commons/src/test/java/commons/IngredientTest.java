@@ -14,7 +14,7 @@ class IngredientTest {
 
     @Test
     void testSetNameThrowsForNull() {
-        Ingredient ingredient = new Ingredient("Tomato");
+        Ingredient ingredient = new Ingredient();
         Exception e = assertThrows(IllegalArgumentException.class,
                 () -> ingredient.setName(null));
         assertEquals("Ingredient name cannot be null", e.getMessage());

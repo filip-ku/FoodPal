@@ -1,6 +1,9 @@
 package commons;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import java.util.Objects;
 
 @Entity
 public class RecipeIngredient {
@@ -9,13 +12,16 @@ public class RecipeIngredient {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    // foreign key -> recipe.id
-    @Column(nullable = false)
-    private Long recipeId;
+    // reference to the owning recipe
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    @JsonBackReference
+    private Recipe recipe;
 
-    // foreign key -> ingredient.id
-    @Column(nullable = false)
-    private Long ingredientId;
+    // reference to the ingredient entity
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private Ingredient ingredient;
 
     // amount of the ingredient (nullable if informal)
     @Column
@@ -38,95 +44,94 @@ public class RecipeIngredient {
     private String note;
 
     /**
-     * Default constructor for JPA and object mapping.
+     * Default constructor for JPA and object mapping frameworks.
      */
     public RecipeIngredient() {
         // for object mapping
     }
 
     /**
-     * Creates a new RecipeIngredient with required fields.
+     * Creates a new recipe ingredient for the given recipe and ingredient.
      *
-     * @param recipeId     the ID of the related recipe
-     * @param ingredientId the ID of the related ingredient
-     * @param position     the ingredient's order in the recipe
+     * @param recipe     the recipe this ingredient belongs to, must not be {@code null}
+     * @param ingredient the ingredient entity, must not be {@code null}
+     * @param position   the zero-based index of this
+     *                   ingredient within the recipe; must be non-negative
+     * @throws IllegalArgumentException if {@code recipe} or {@code ingredient}
+     * is {@code null}, or if {@code position} is negative
      */
-    public RecipeIngredient(Long recipeId, Long ingredientId, int position) {
-        this.setRecipeId(recipeId);
-        this.setIngredientId(ingredientId);
+    public RecipeIngredient(Recipe recipe, Ingredient ingredient, int position) {
+        this.setRecipe(recipe);
+        this.setIngredient(ingredient);
         this.setPosition(position);
     }
 
     /**
-     * Returns the database ID of this RecipeIngredient.
+     * Returns the unique identifier of this recipe ingredient.
      *
-     * @return the generated ID
+     * @return the id of this recipe ingredient, or {@code null} if it has not been persisted yet
      */
     public Long getId() {
         return id;
     }
 
     /**
-     * Returns the ID of the associated recipe.
+     * Returns the recipe this ingredient belongs to.
      *
-     * @return the recipe ID
+     * @return the owning recipe, never {@code null}
      */
-    public Long getRecipeId() {
-        return recipeId;
+    public Recipe getRecipe() {
+        return recipe;
     }
 
-    //AI-generated javadoc
     /**
-     * Sets the recipe ID for this ingredient.
+     * Sets the recipe this ingredient belongs to.
      *
-     * @param recipeId the recipe ID to assign
-     * @throws IllegalArgumentException if {@code recipeId} is null
+     * @param recipe the owning recipe, must not be {@code null}
+     * @throws IllegalArgumentException if {@code recipe} is {@code null}
      */
-    public void setRecipeId(Long recipeId) {
-        if (recipeId == null) {
-            throw new IllegalArgumentException("recipeId cannot be null");
+    public void setRecipe(Recipe recipe) {
+        if (recipe == null) {
+            throw new IllegalArgumentException("recipe cannot be null");
         }
-        this.recipeId = recipeId;
+        this.recipe = recipe;
     }
 
     /**
-     * Returns the ID of the associated ingredient.
+     * Returns the ingredient entity for this recipe ingredient.
      *
-     * @return the ingredient ID
+     * @return the ingredient entity, never {@code null}
      */
-    public Long getIngredientId() {
-        return ingredientId;
+    public Ingredient getIngredient() {
+        return ingredient;
     }
 
-    //AI-generated javadoc
     /**
-     * Sets the ingredient ID for this entry.
+     * Sets the ingredient entity for this recipe ingredient.
      *
-     * @param ingredientId the ingredient ID to assign
-     * @throws IllegalArgumentException if {@code ingredientId} is null
+     * @param ingredient the ingredient entity, must not be {@code null}
+     * @throws IllegalArgumentException if {@code ingredient} is {@code null}
      */
-    public void setIngredientId(Long ingredientId) {
-        if (ingredientId == null) {
-            throw new IllegalArgumentException("ingredientId cannot be null");
+    public void setIngredient(Ingredient ingredient) {
+        if (ingredient == null) {
+            throw new IllegalArgumentException("ingredient cannot be null");
         }
-        this.ingredientId = ingredientId;
+        this.ingredient = ingredient;
     }
 
-    //AI-generated javadoc
     /**
-     * Returns the quantity amount of this ingredient.
+     * Returns the amount of this ingredient, if specified.
      *
-     * @return the amount, or {@code null} if informal
+     * @return the numeric amount, or {@code null} if only an informal amount is used
      */
     public Double getAmount() {
         return amount;
     }
 
-    //AI-generated javadoc
     /**
-     * Sets the ingredient amount.
+     * Sets the numeric amount of this ingredient.
      *
-     * @param amount the quantity value; may be {@code null} for informal entries
+     * @param amount the amount to set; may be {@code null} if an informal amount is used
      * @throws IllegalArgumentException if {@code amount} is negative
      */
     public void setAmount(Double amount) {
@@ -136,60 +141,55 @@ public class RecipeIngredient {
         this.amount = amount;
     }
 
-    //AI-generated javadoc
     /**
-     * Returns the unit for the ingredient amount.
+     * Returns the measurement unit for the numeric amount.
      *
-     * @return the unit, or {@code null} if informal
+     * @return the unit string, or {@code null} if not specified
      */
     public String getUnit() {
         return unit;
     }
 
-    //AI-generated javadoc
     /**
-     * Sets the unit for this ingredient.
+     * Sets the measurement unit for the numeric amount.
      *
-     * @param unit the unit string; may be {@code null} if informal
+     * @param unit the unit string, or {@code null} if not specified
      */
     public void setUnit(String unit) {
         this.unit = unit;
     }
 
-    //AI-generated javadoc
     /**
-     * Returns the informal amount (e.g. "a pinch").
+     * Returns the informal amount description such as "a pinch", if used.
      *
-     * @return the informal amount, or {@code null} if a formal amount is used
+     * @return the informal amount, or {@code null} if a formal amount is used instead
      */
     public String getInformalAmount() {
         return informalAmount;
     }
 
-    //AI-generated javadoc
     /**
-     * Sets the informal amount.
+     * Sets the informal amount description for this ingredient.
      *
-     * @param informalAmount a descriptive quantity (e.g. "a pinch"), or {@code null}
+     * @param informalAmount the informal amount text, or {@code null} if not used
      */
     public void setInformalAmount(String informalAmount) {
         this.informalAmount = informalAmount;
     }
 
     /**
-     * Returns the ingredient's order in the recipe list.
+     * Returns the zero-based index of this ingredient within the recipe.
      *
-     * @return the position index
+     * @return the position of this ingredient
      */
     public int getPosition() {
         return position;
     }
 
-    //AI-generated javadoc
     /**
-     * Sets the ingredient's order in the recipe list.
+     * Sets the zero-based index of this ingredient within the recipe.
      *
-     * @param position the position index (must be non-negative)
+     * @param position the new position, must be non-negative
      * @throws IllegalArgumentException if {@code position} is negative
      */
     public void setPosition(int position) {
@@ -199,9 +199,8 @@ public class RecipeIngredient {
         this.position = position;
     }
 
-    //AI-generated javadoc
     /**
-     * Returns the optional note for this ingredient.
+     * Returns the optional note associated with this ingredient.
      *
      * @return the note text, or {@code null} if not set
      */
@@ -209,13 +208,44 @@ public class RecipeIngredient {
         return note;
     }
 
-    //AI-generated javadoc
     /**
      * Sets an optional note for this ingredient.
      *
-     * @param note additional text note; may be {@code null}
+     * @param note the note text, or {@code null} if no note is needed
      */
     public void setNote(String note) {
         this.note = note;
+    }
+
+    /**
+     * Compares this recipe ingredient to another object for equality.
+     * Two recipe ingredients are considered equal if they have the same id, amount, unit,
+     * informalAmount, position and note.
+     *
+     * @param o the object to compare with
+     * @return {@code true} if the given object is a
+     * RecipeIngredient with the same state; {@code false} otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        RecipeIngredient that = (RecipeIngredient) o;
+        return position == that.position
+                && Objects.equals(id, that.id)
+                && Objects.equals(amount, that.amount)
+                && Objects.equals(unit, that.unit)
+                && Objects.equals(informalAmount, that.informalAmount)
+                && Objects.equals(note, that.note);
+    }
+
+    /**
+     * Returns a hash code value for this recipe
+     * ingredient, consistent with {@link #equals(Object)}.
+     *
+     * @return the hash code of this recipe ingredient
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, amount, unit, informalAmount, position, note);
     }
 }

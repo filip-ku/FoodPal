@@ -14,10 +14,8 @@ class RecipeIngredientTest {
 
     @Test
     void testConstructorInitializesRequiredFieldsAndLeavesOptionalsNull() {
-        RecipeIngredient ri = new RecipeIngredient(1L, 2L, 3);
+        RecipeIngredient ri = new RecipeIngredient(new Recipe(), new Ingredient(), 3);
 
-        assertEquals(1L, ri.getRecipeId());
-        assertEquals(2L, ri.getIngredientId());
         assertEquals(3, ri.getPosition());
 
         assertNull(ri.getAmount());
@@ -30,16 +28,16 @@ class RecipeIngredientTest {
     void testSetRecipeIdThrowsForNull() {
         RecipeIngredient recipeIngredient = new RecipeIngredient();
         Exception e = assertThrows(IllegalArgumentException.class,
-                () -> recipeIngredient.setRecipeId(null));
-        assertEquals("recipeId cannot be null", e.getMessage());
+                () -> recipeIngredient.setRecipe(null));
+        assertEquals("recipe cannot be null", e.getMessage());
     }
 
     @Test
     void testSetIngredientIdThrowsForNull() {
         RecipeIngredient recipeIngredient = new RecipeIngredient();
         Exception e = assertThrows(IllegalArgumentException.class,
-                () -> recipeIngredient.setIngredientId(null));
-        assertEquals("ingredientId cannot be null", e.getMessage());
+                () -> recipeIngredient.setIngredient(null));
+        assertEquals("ingredient cannot be null", e.getMessage());
     }
 
     @Test

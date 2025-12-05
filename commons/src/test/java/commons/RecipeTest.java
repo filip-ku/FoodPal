@@ -14,7 +14,7 @@ class RecipeTest {
 
     @Test
     void testSetNameThrowsForNull() {
-        Recipe recipe = new Recipe("Pasta Carbonara");
+        Recipe recipe = new Recipe();
         Exception e = assertThrows(IllegalArgumentException.class,
                 () -> recipe.setTitle(null));
         assertEquals("Recipe title cannot be null", e.getMessage());

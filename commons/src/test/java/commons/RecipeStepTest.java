@@ -14,9 +14,8 @@ class RecipeStepTest {
 
     @Test
     void testConstructorInitializesRequiredFieldsAndLeavesOptionalsNull() {
-        RecipeStep rs = new RecipeStep(1L, 5, "Preheat the oven");
+        RecipeStep rs = new RecipeStep(new Recipe(), 5, "Preheat the oven");
 
-        assertEquals(1L, rs.getRecipeId());
         assertEquals(5, rs.getPosition());
         assertEquals("Preheat the oven", rs.getInstruction());
 
@@ -26,8 +25,8 @@ class RecipeStepTest {
     void testSetRecipeIdThrowsForNull() {
         RecipeStep recipeStep = new RecipeStep();
         Exception e = assertThrows(IllegalArgumentException.class,
-                () -> recipeStep.setRecipeId(null));
-        assertEquals("recipeId cannot be null", e.getMessage());
+                () -> recipeStep.setRecipe(null));
+        assertEquals("recipe cannot be null", e.getMessage());
     }
 
     @Test
