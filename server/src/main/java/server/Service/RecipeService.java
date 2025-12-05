@@ -1,6 +1,8 @@
 package server.Service;
 
 import commons.Recipe;
+import commons.RecipeIngredient;
+import commons.RecipeStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -94,6 +96,60 @@ public class RecipeService {
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+    }
+
+    /**
+     * creates a copy of a recipe
+     * @param id the id of the recipe to be cloned
+     * @param name new name for the cloned recipe
+     * @return the cloned recipe with a new name
+     */
+    public Recipe cloneRecipe(long id, String name) {
+        Recipe recipe = getRecipe(id);
+        Recipe cloneRecipe = new Recipe();
+        String title;
+
+        if (isNullOrEmpty(name)) {
+            title = recipe.getTitle() + " Copy";
+        }
+        else {
+            title = name;
+        }
+
+        cloneRecipe.setTitle(title);
+        cloneRecipe.setIngredients(recipe.getIngredients());
+        cloneRecipe.setSteps(recipe.getSteps());
+        return recipeRepository.save(cloneRecipe);
+    }
+
+
+    /**
+     * Creates a printable version of a recipe
+     * @param id the id of the recipe to be printed
+     * @return printable text from recipe
+     */
+    public String getPrintableRecipe(long id) {
+        Recipe recipe = getRecipe(id);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(recipe.getTitle()).append("\n");
+
+        sb.append("Ingredients:\n");
+        if (recipe.getIngredients() != null) {
+            for (RecipeIngredient ingredient : recipe.getIngredients()) {
+                sb.append(" - ").append(ingredient).append("\n");
+            }
+        }
+
+        sb.append("Steps:\n");
+        if (recipe.getSteps() != null) {
+            int i = 0;
+            for (RecipeStep recipeStep : recipe.getSteps()) {
+                sb.append(i++).append(". ").append(recipeStep).append("\n");
+            }
+        }
+
+        return sb.toString();
     }
 
     /**

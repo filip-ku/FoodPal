@@ -75,4 +75,28 @@ public class RecipeController {
         recipeService.removeRecipe(id);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * copies a recipe
+     * @param id the id of the recipe to be cloned
+     * @param title optional title for the copied recipe
+     * @return copied recipe
+     */
+    @PostMapping("/{id}/clone")
+    public ResponseEntity<Recipe> cloneRecipe(@PathVariable long id,
+                                              @RequestParam(value = "title", required = false) String title) {
+        Recipe cloned = recipeService.cloneRecipe(id, title);
+        return ResponseEntity.status(HttpStatus.CREATED).body(cloned);
+    }
+
+    /**
+     * creates a printable version of a recipe
+     * @param id the id of the recipe to be printed
+     * @return a printable text of a recipe
+     */
+    @GetMapping("/{id}/print")
+    public ResponseEntity<String> getRecipePrint(@PathVariable long id) {
+        String printable = recipeService.getPrintableRecipe(id);
+        return ResponseEntity.ok(printable);
+    }
 }
