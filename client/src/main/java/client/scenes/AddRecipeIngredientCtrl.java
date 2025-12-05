@@ -24,13 +24,13 @@ public class AddRecipeIngredientCtrl {
     private RecipeIngredient existing;     // non-null only in EDIT mode
 
     @FXML
-    private TextField ingredientNameInput;
+    TextField ingredientNameInput;
     @FXML
-    private TextField quantityInput;
+    TextField quantityInput;
     @FXML
-    private TextField unitsInput;
+    TextField unitsInput;
     @FXML
-    private TextField notesInput;
+    TextField notesInput;
 
     /**
      * Creates a controller with injected dependencies.
@@ -183,33 +183,40 @@ public class AddRecipeIngredientCtrl {
         final String unit = emptyToNull(unitsInput.getText());
         final String informal = emptyToNull(notesInput.getText());
 
+        RecipeIngredient ri;
         if (mode == Mode.ADD) {
-            RecipeIngredient ri = new RecipeIngredient();
+            ri = new RecipeIngredient();
             ri.setRecipe(recipe);
             ri.setIngredient(ingredient);
             ri.setAmount(amount);
             ri.setUnit(unit);
             ri.setInformalAmount(informal);
-            //TODO: UPDATE IN SERVER
-            // server.addRecipeIngredient(ri);
+
+            recipe.addRecipeIngredient(ri);
+
+            // TODO: UPDATE IN SERVER
+            // server.addRecipeIngredient(ri)
         } else {
             existing.setAmount(amount);
             existing.setUnit(unit);
             existing.setInformalAmount(informal);
-            //TODO: UPDATE IN SERVER
-            // server.updateRecipeIngredient(existing.getId(), existing);
         }
 
-        mainCtrl.getRecipeOverviewCtrl().selectRecipe(recipe);
+        if (mainCtrl.getRecipeOverviewCtrl() != null) {
+            mainCtrl.getRecipeOverviewCtrl().selectRecipe(recipe);
+        }
+        if (mainCtrl != null) {
+            mainCtrl.showRecipeOverview();
+        }
+
         clearFields();
-        mainCtrl.showRecipeOverview();
     }
 
     /**
      * Clears all editable input fields.
      * Used when leaving the screen.
      */
-    private void clearFields() {
+    public void clearFields() {
         ingredientNameInput.clear();
         quantityInput.clear();
         unitsInput.clear();
