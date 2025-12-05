@@ -118,7 +118,8 @@ public class RecipeService {
      *
      * @param recipe the recipe to update; must not be {@code null}
      * @return the updated recipe as persisted by the repository
-     * @throws ResponseStatusException if the title is empty or {@code null}, or if the recipe does not exist
+     * @throws ResponseStatusException if the
+     * title is empty or {@code null}, or if the recipe does not exist
      */
     public Recipe updateRecipe(Recipe recipe) {
         if (isNullOrEmpty(recipe.getTitle()) || !recipeRepository.existsById(recipe.getId())) {
@@ -140,7 +141,8 @@ public class RecipeService {
      * @param recipeId         the id of the recipe to which the ingredient is added
      * @param recipeIngredient the recipe ingredient to add; must not be {@code null}
      * @return the updated recipe after the ingredient has been added
-     * @throws ResponseStatusException if the recipe does not exist or the ingredient already exists in the recipe
+     * @throws ResponseStatusException if the recipe
+     * does not exist or the ingredient already exists in the recipe
      */
     public Recipe addIngredientToRecipe(long recipeId, RecipeIngredient recipeIngredient) {
         Recipe recipe = findRecipe(recipeId);
