@@ -54,14 +54,6 @@ public class Ingredient {
     }
 
     /**
-     * constructor for tests
-     * @param name name of an ingredient
-     */
-    public Ingredient(String name) {
-        setName(name);
-    }
-
-    /**
      * Returns the generated id.
      * @return the generated id.
      */
@@ -153,7 +145,7 @@ public class Ingredient {
      * @throws IllegalArgumentException if {@code name} is null.
      */
     public void setName(String name) {
-        if (name == null) {
+        if (isNullOrEmpty(name)) {
             throw new IllegalArgumentException("Ingredient name cannot be null");
         } else {
             this.name = name;
@@ -183,5 +175,14 @@ public class Ingredient {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, proteinPer100g, fatPer100g, carbsPer100g);
+    }
+
+    /**
+     * Utility to check if a string is null or empty
+     * @param s the string to check
+     * @return true if is null or empty, else false
+     */
+    private static boolean isNullOrEmpty(String s){
+        return s == null || s.isEmpty();
     }
 }

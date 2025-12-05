@@ -28,7 +28,7 @@ public class IngredientControllerTest {
     @Test
     void addIngredientSuccess() {
         assertTrue(ingredientRepo.calledMethods.isEmpty());
-        Ingredient ingredient = new Ingredient("Tomato");
+        Ingredient ingredient = new Ingredient("Tomato", 10.0, 20.0, 30.0);
 
         Ingredient savedIngredient = ingredientRepo.save(ingredient);
 
@@ -39,26 +39,9 @@ public class IngredientControllerTest {
     }
 
     @Test
-    void addIngredientEmptyName() {
-        assertTrue(ingredientRepo.calledMethods.isEmpty());
-        Ingredient ingredient = new Ingredient("");
-
-        ResponseStatusException e = assertThrows(
-                ResponseStatusException.class,
-                () -> ingredientService.addIngredient(ingredient)
-        );
-
-        assertEquals(400, e.getStatusCode().value());
-        assertEquals("Ingredient name cannot be null or empty", e.getReason());
-
-        // repo save method should not have been run, as the ingredientService should catch the empty name.
-        assertTrue(ingredientRepo.calledMethods.isEmpty());
-    }
-
-    @Test
     void getIngredientSuccess() {
         assertTrue(ingredientRepo.calledMethods.isEmpty());
-        Ingredient ingredient = new Ingredient("Tomato");
+        Ingredient ingredient = new Ingredient("Tomato", 10.0, 20.0, 30.0);
         ingredientRepo.save(ingredient);
         assertTrue(ingredientRepo.calledMethods.contains("save"));
 
@@ -85,8 +68,8 @@ public class IngredientControllerTest {
         assertEquals(0, ingredients.size());
         assertEquals("findAll", ingredientRepo.calledMethods.get(0));
 
-        Ingredient ingredient1 = ingredientRepo.save(new Ingredient("Tomato"));
-        Ingredient ingredient2 = ingredientRepo.save(new Ingredient("Cheese"));
+        Ingredient ingredient1 = ingredientRepo.save(new Ingredient("Tomato", 10.0, 20.0, 30.0));
+        Ingredient ingredient2 = ingredientRepo.save(new Ingredient("Cheese", 15.0, 25.0, 35.0));
 
         ingredients = ingredientService.getAllIngredients();
 
@@ -99,7 +82,7 @@ public class IngredientControllerTest {
     @Test
     void removeIngredientSuccess() {
         assertTrue(ingredientRepo.calledMethods.isEmpty());
-        Ingredient ingredient = new Ingredient("Tomato");
+        Ingredient ingredient = new Ingredient("Tomato", 10.0, 20.0, 30.0);
         ingredientRepo.save(ingredient);
         assertEquals(1, ingredientRepo.ingredients.size());
 
@@ -132,8 +115,8 @@ public class IngredientControllerTest {
         assertEquals(0, count);
         assertEquals("count", ingredientRepo.calledMethods.get(0));
 
-        ingredientRepo.save(new Ingredient("Tomato"));
-        ingredientRepo.save(new Ingredient("Cheese"));
+        ingredientRepo.save(new Ingredient("Tomato", 10.0, 20.0, 30.0));
+        ingredientRepo.save(new Ingredient("Cheese", 15.0, 25.0, 35.0));
 
         count = ingredientService.countIngredients();
         assertEquals(2, count);
@@ -145,14 +128,18 @@ public class IngredientControllerTest {
     void updateIngredientSuccess() {
         assertTrue(ingredientRepo.calledMethods.isEmpty());
 
-        Ingredient originalIngredient = new Ingredient("Tomato");
+        Ingredient originalIngredient = new Ingredient("Tomato", 10.0, 20.0, 30.0);
         Ingredient savedIngredient = ingredientRepo.save(originalIngredient);
 
-        Ingredient updatedIngredient = new Ingredient("Red Tomato");
+        Ingredient updatedIngredient = new Ingredient("Red Tomato", 55.0, null, 70.0);
         Ingredient result = ingredientService.updateIngredient(savedIngredient.getId(), updatedIngredient);
 
         assertNotNull(result.getId());
         assertEquals("Red Tomato", result.getName());
+        assertEquals(55.0, result.getProteinPer100g());
+        assertNull(result.getFatPer100g());
+        assertEquals(70.0, result.getCarbsPer100g());
+
         assertTrue(ingredientRepo.calledMethods.contains("findById"));
         assertTrue(ingredientRepo.calledMethods.contains("save"));
         // save, findById and save
@@ -165,7 +152,7 @@ public class IngredientControllerTest {
 
         ResponseStatusException e = assertThrows(
                 ResponseStatusException.class,
-                () -> ingredientService.updateIngredient(99L, new Ingredient("New Name"))
+                () -> ingredientService.updateIngredient(99L, new Ingredient("New Name", 34.6, 23.6, 21.7))
         );
 
         assertEquals(404, e.getStatusCode().value());
@@ -177,8 +164,8 @@ public class IngredientControllerTest {
     void deleteAllIngredients() {
         assertTrue(ingredientRepo.calledMethods.isEmpty());
 
-        ingredientRepo.save(new Ingredient("Tomato"));
-        ingredientRepo.save(new Ingredient("Cheese"));
+        ingredientRepo.save(new Ingredient("Tomato", 10.0, 20.0, 30.0));
+        ingredientRepo.save(new Ingredient("Cheese", 15.0, 25.0, 35.0));
         assertEquals(2, ingredientRepo.ingredients.size());
 
         ingredientService.deleteAllIngredients();
