@@ -185,8 +185,8 @@ public class AddRecipeIngredientCtrl {
 
         if (mode == Mode.ADD) {
             RecipeIngredient ri = new RecipeIngredient();
-            ri.setRecipeId(recipe.getId());
-            ri.setIngredientId(ingredient.getId());
+            ri.setRecipe(recipe);
+            ri.setIngredient(ingredient);
             ri.setAmount(amount);
             ri.setUnit(unit);
             ri.setInformalAmount(informal);
