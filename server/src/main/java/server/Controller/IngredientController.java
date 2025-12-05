@@ -111,6 +111,11 @@ public class IngredientController {
         return ResponseEntity.ok(updated);
     }
 
+    /**
+     * searches ingredients by name
+     * @param query input for search
+     * @return list of ingredients containing query
+     */
     @GetMapping("/search")
     public ResponseEntity<List<Ingredient>> searchIngredients(@RequestParam String query){
         return ResponseEntity.ok(ingredientService.searchIngredients(query));

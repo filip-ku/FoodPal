@@ -134,6 +134,11 @@ public class IngredientService {
         ingredientRepository.deleteAll();
     }
 
+    /**
+     * searches for ingredients by name
+     * @param query input for search
+     * @return a list of ingredients based that contains query
+     */
     public List<Ingredient> searchIngredients(String query){
         if (isNullOrEmpty(query)){
             return ingredientRepository.findAll();
