@@ -1,5 +1,6 @@
 package client.scenes;
 
+import commons.*;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -23,11 +24,30 @@ public class MainCtrl {
     private IngredientsOverviewCtrl ingredientsOverviewCtrl;
     private Scene ingredientsOverview;
 
+    private ChooseRecipeIngredientCtrl chooseRecipeIngredientCtrl;
+    private Scene chooseRecipeIngredientScene;
+
+    private AddRecipeIngredientCtrl addRecipeIngredientCtrl;
+    private Scene addRecipeIngredientScene;
+
+    /**
+     * Initializes the application’s primary stage and loads all scenes.
+     *
+     * @param primaryStage the main application window
+     * @param overview Recipe overview pair
+     * @param add Add-recipe pair
+     * @param addIngredient Add-ingredient pair
+     * @param ingredientsOverview Ingredients overview pair
+     * @param chooseRecipeIngredient Choose-recipe-ingredient pair
+     * @param addRecipeIngredient AddRecipeIngredient pair
+     */
     public void initialize(Stage primaryStage,
                            Pair<RecipeOverviewCtrl, Parent> overview,
                            Pair<AddRecipeCtrl, Parent> add,
                            Pair<AddIngredientCtrl, Parent> addIngredient,
-                           Pair<IngredientsOverviewCtrl, Parent> ingredientsOverview) {
+                           Pair<IngredientsOverviewCtrl, Parent> ingredientsOverview,
+                           Pair<ChooseRecipeIngredientCtrl, Parent> chooseRecipeIngredient,
+                           Pair<AddRecipeIngredientCtrl, Parent> addRecipeIngredient) {
         this.primaryStage = primaryStage;
         this.recipeOverviewCtrl = overview.getKey();
         this.recipeOverview = new Scene(overview.getValue());
@@ -40,6 +60,12 @@ public class MainCtrl {
 
         this.ingredientsOverviewCtrl = ingredientsOverview.getKey();
         this.ingredientsOverview = new Scene(ingredientsOverview.getValue());
+
+        this.chooseRecipeIngredientCtrl  = chooseRecipeIngredient.getKey();
+        this.chooseRecipeIngredientScene = new Scene(chooseRecipeIngredient.getValue());
+
+        this.addRecipeIngredientCtrl = addRecipeIngredient.getKey();
+        this.addRecipeIngredientScene = new Scene(addRecipeIngredient.getValue());
 
         showRecipeOverview();
         primaryStage.show();
@@ -110,4 +136,41 @@ public class MainCtrl {
         alert.setContentText(e.getMessage());
         alert.showAndWait();
     }
+
+    /**
+     * Displays the “Choose Ingredient” screen for the given recipe.
+     *
+     * @param recipe the recipe for which an ingredient will be chosen
+     */
+    public void showChooseRecipeIngredient(Recipe recipe) {
+        chooseRecipeIngredientCtrl.setRecipe(recipe);
+        primaryStage.setTitle("Choose Ingredient");
+        primaryStage.setScene(chooseRecipeIngredientScene);
+    }
+
+    /**
+     * Opens the AddRecipeIngredient screen in ADD mode.
+     * @param recipe     parent recipe
+     * @param ingredient chosen global ingredient
+     */
+    public void showAddRecipeIngredientForAdd(Recipe recipe, Ingredient ingredient) {
+        addRecipeIngredientCtrl.setContextForAdd(recipe, ingredient);
+        primaryStage.setTitle("FoodPal: Add Ingredient to Recipe");
+        primaryStage.setScene(addRecipeIngredientScene);
+    }
+
+    /**
+     * Opens the AddRecipeIngredient screen in EDIT mode.
+     * @param recipe     parent recipe
+     * @param ri         existing recipe-ingredient row to edit
+     * @param ingredient global ingredient referenced by the row
+     */
+    public void showAddRecipeIngredientForEdit(Recipe recipe,
+                                               RecipeIngredient ri,
+                                               Ingredient ingredient) {
+        addRecipeIngredientCtrl.setContextForEdit(recipe, ri, ingredient);
+        primaryStage.setTitle("FoodPal: Edit Ingredient in Recipe");
+        primaryStage.setScene(addRecipeIngredientScene);
+    }
+
 }
