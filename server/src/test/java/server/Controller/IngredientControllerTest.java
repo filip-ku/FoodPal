@@ -30,12 +30,32 @@ public class IngredientControllerTest {
         assertTrue(ingredientRepo.calledMethods.isEmpty());
         Ingredient ingredient = new Ingredient("Tomato", 10.0, 20.0, 30.0);
 
-        Ingredient savedIngredient = ingredientRepo.save(ingredient);
+        Ingredient savedIngredient = ingredientService.addIngredient(ingredient);
 
         assertNotNull(savedIngredient.getId());
         assertEquals("Tomato", savedIngredient.getName());
         assertTrue(ingredientRepo.calledMethods.contains("save"));
         assertEquals(1, ingredientRepo.ingredients.size());
+    }
+
+    @Test
+    void addIngredientNullName() {
+        assertTrue(ingredientRepo.calledMethods.isEmpty());
+
+        Ingredient ingredient = new Ingredient();
+
+        ResponseStatusException e = assertThrows(
+                ResponseStatusException.class,
+                () -> ingredientService.addIngredient(ingredient)
+        );
+
+        assertEquals(400, e.getStatusCode().value());
+        assertEquals("Ingredient name cannot be null or empty", e.getReason());
+        // repo save method should not have been run, as the ingredientService should catch that the
+        // name of the ingredient is invalid.
+        assertFalse(ingredientRepo.calledMethods.contains("save"));
+        // save and findById
+        assertEquals(0, ingredientRepo.calledMethods.size());
     }
 
     @Test
@@ -159,6 +179,32 @@ public class IngredientControllerTest {
         assertTrue(ingredientRepo.calledMethods.contains("findById"));
         assertFalse(ingredientRepo.calledMethods.contains("save"));
     }
+
+    @Test
+    void updateIngredientNullName() {
+        assertTrue(ingredientRepo.calledMethods.isEmpty());
+
+        Ingredient originalIngredient = new Ingredient("Tomato", 10.0, 20.0, 30.0);
+        Ingredient savedIngredient = ingredientRepo.save(originalIngredient);
+
+        Ingredient updatedIngredient = new Ingredient();
+        updatedIngredient.setFatPer100g(40.2);
+
+        ResponseStatusException e = assertThrows(
+                ResponseStatusException.class,
+                () -> ingredientService.updateIngredient(savedIngredient.getId(), updatedIngredient)
+        );
+
+        assertTrue(ingredientRepo.calledMethods.contains("findById"));
+        assertEquals(400, e.getStatusCode().value());
+        assertEquals("New ingredient name cannot be null or empty", e.getReason());
+        // repo save method should not have been run, as the ingredientService should catch that the
+        // name of the ingredient is invalid.
+        assertNotEquals("save", ingredientRepo.calledMethods.get(1));
+        // save and findById
+        assertEquals(2, ingredientRepo.calledMethods.size());
+    }
+
 
     @Test
     void deleteAllIngredients() {
