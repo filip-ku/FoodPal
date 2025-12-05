@@ -136,7 +136,7 @@ public class AddRecipeIngredientSceneTest {
     public void emptyUnitAndNotesAreAccepted(FxRobot robot) {
         Recipe recipe = new Recipe("Salad");
         Ingredient ing = new Ingredient("Lettuce");
-        
+
         robot.interact(() -> ctrl.setContextForAdd(recipe, ing));
 
         robot.interact(() -> {
@@ -150,7 +150,8 @@ public class AddRecipeIngredientSceneTest {
         var stream = ingredients.stream();
         var filtered = stream.filter(ri -> ri.getIngredient().equals(ing));
         var optional = filtered.findFirst();
-        RecipeIngredient added = optional.orElseThrow(() -> new AssertionError("Ingredient not added"));
+        RecipeIngredient added = optional
+                .orElseThrow(() -> new AssertionError("Ingredient not added"));
 
         assertEquals(ing, added.getIngredient());
         assertEquals(2.0, added.getAmount());
