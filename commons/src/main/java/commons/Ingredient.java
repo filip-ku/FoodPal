@@ -54,6 +54,14 @@ public class Ingredient {
     }
 
     /**
+     * constructor for tests
+     * @param name name of an ingredient
+     */
+    public Ingredient(String name) {
+        setName(name);
+    }
+
+    /**
      * Returns the generated id.
      * @return the generated id.
      */
