@@ -26,4 +26,32 @@ class RecipeTest {
         assertNull(recipe.getId());
     }
 
+    @Test
+    void testSetAndGetTitle() {
+        Recipe recipe = new Recipe();
+        recipe.setTitle("Chocolate Cake");
+        assertEquals("Chocolate Cake", recipe.getTitle());
+    }
+
+    @Test
+    void testToStringIsNotEmpty() {
+        Recipe recipe = new Recipe();
+        recipe.setTitle("Test Recipe");
+        assertFalse(recipe.toString().isEmpty());
+    }
+
+    @Test
+    void testIngredientsListIsEmptyByDefault() {
+        Recipe recipe = new Recipe();
+        assertNotNull(recipe.getIngredients());
+        assertTrue(recipe.getIngredients().isEmpty());
+    }
+
+    @Test
+    void testStepsListIsEmptyByDefault() {
+        Recipe recipe = new Recipe();
+        assertNotNull(recipe.getSteps());
+        assertTrue(recipe.getSteps().isEmpty());
+    }
+
 }

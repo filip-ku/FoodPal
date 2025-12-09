@@ -9,13 +9,13 @@
    <children>
       <Button layoutX="424.0" layoutY="207.0" mnemonicParsing="false" onAction="#ok" text="Ok" />
       <Button layoutX="358.0" layoutY="207.0" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
-      <TextField fx:id="ingredientNameInput" layoutX="205.0" layoutY="28.0" prefHeight="26.0" prefWidth="164.0" />
+      <TextField fx:id="ingredientNameInput" id="ingredientNameInput" layoutX="205.0" layoutY="28.0" prefHeight="26.0" prefWidth="164.0" />
       <Label alignment="CENTER_RIGHT" layoutX="112.0" layoutY="32.0" prefHeight="18.0" prefWidth="66.0" text="Ingredient:" textAlignment="RIGHT" AnchorPane.rightAnchor="291.6" />
-      <TextField fx:id="quantityInput" layoutX="205.0" layoutY="67.0" prefHeight="26.0" prefWidth="164.0" />
+      <TextField fx:id="quantityInput" id="quantityInput" layoutX="205.0" layoutY="67.0" prefHeight="26.0" prefWidth="164.0" />
       <Label alignment="CENTER_RIGHT" layoutX="121.0" layoutY="71.0" prefHeight="18.0" prefWidth="58.0" text="Quantity:" AnchorPane.rightAnchor="290.6" />
-      <TextField fx:id="notesInput" layoutX="205.0" layoutY="138.0" prefHeight="26.0" prefWidth="164.0" />
+      <TextField fx:id="notesInput" id="notesInput" layoutX="205.0" layoutY="138.0" prefHeight="26.0" prefWidth="164.0" />
       <Label alignment="CENTER_RIGHT" layoutX="149.0" layoutY="142.0" text="Notes:  " textAlignment="RIGHT" AnchorPane.rightAnchor="290.6" />
-      <TextField fx:id="unitsInput" layoutX="205.0" layoutY="103.0" prefHeight="26.0" prefWidth="164.0" />
+      <TextField fx:id="unitsInput" id="unitsInput" layoutX="205.0" layoutY="103.0" prefHeight="26.0" prefWidth="164.0" />
       <Label alignment="CENTER_RIGHT" layoutX="149.0" layoutY="107.0" text="Units: " textAlignment="RIGHT" AnchorPane.rightAnchor="290.6" />
    </children>
 </AnchorPane>
