@@ -148,12 +148,39 @@ public class ServerUtils {
                 .post(Entity.entity(recipeIngredient, APPLICATION_JSON), Recipe.class);
     }
 
+    /**
+     * Removes a {@link RecipeIngredient} instance from the server.
+     *
+     * @param recipe the {@code Recipe} instance to remove RecipeIngredient from;
+     *               must not be {@code null}
+     * @param recipeIngredient the {@code RecipeIngredient} instance to be removed;
+     *               must not be {@code null}
+     * @return the updated recipe object
+     */
     public Recipe deleteRecipeIngredient(Recipe recipe, RecipeIngredient recipeIngredient) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/recipe/" + recipe.getId() +
                         "/ingredients/" + recipeIngredient.getId())
                 .request(APPLICATION_JSON)
                 .delete(Recipe.class);
+    }
+
+    /**
+     * Retrieves all {@link RecipeStep} objects linked to a
+     *      specific recipe from the server.
+     *
+     * @param recipe the {@code Recipe} instance to retrieve ingredients for;
+     *         must not be {@code null}
+     * @return a {@code List<RecipeStep>} containing every step linked to a specific
+     *         recipe stored on the backend. The list is never {@code null}, but may be empty if no
+     *         steps exist.
+     */
+    public List<RecipeStep> getRecipeSteps(Recipe recipe) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/recipe/" + recipe.getId() +
+                        "/steps")
+                .request(APPLICATION_JSON)
+                .get(new GenericType<List<RecipeStep>>() {});
     }
 
     /**
@@ -176,13 +203,14 @@ public class ServerUtils {
      *
      * @param recipe the {@code Recipe} instance to remove RecipeStep from; must not be {@code null}
      * @param recipeStep the {@code RecipeStep} instance to be removed; must not be {@code null}
+     * @return the updated recipe object
      */
-    public void deleteRecipeStep(Recipe recipe, RecipeStep recipeStep) {
-        ClientBuilder.newClient(new ClientConfig())
+    public Recipe deleteRecipeStep(Recipe recipe, RecipeStep recipeStep) {
+        return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/recipe/" + recipe.getId() +
                         "/steps/" + recipeStep.getId())
                 .request(APPLICATION_JSON)
-                .delete();
+                .delete(Recipe.class);
     }
 
     /**
