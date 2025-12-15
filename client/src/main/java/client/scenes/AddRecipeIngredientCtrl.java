@@ -192,10 +192,15 @@ public class AddRecipeIngredientCtrl {
             ri.setUnit(unit);
             ri.setInformalAmount(informal);
 
-            recipe.addRecipeIngredient(ri);
+            if (recipe.getIngredients().contains(ri)) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.initModality(Modality.APPLICATION_MODAL);
+                alert.setContentText("This ingredient is already in the recipe.");
+                alert.showAndWait();
+                return;
+            }
 
-            // TODO: UPDATE IN SERVER
-            // server.addRecipeIngredient(ri)
+            server.addRecipeIngredient(recipe, ri);
         } else {
             existing.setAmount(amount);
             existing.setUnit(unit);
