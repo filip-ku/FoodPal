@@ -336,7 +336,10 @@ public class RecipeOverviewCtrl implements Initializable {
             number = String.valueOf(step.getPosition());
         }
 
-        String text = step.getInstruction() != null ? step.getInstruction() : "";
+        String text = "";
+        if (step.getInstruction() != null) {
+            text = step.getInstruction();
+        }
 
         if (!number.isEmpty()) {
             return (number + ". " + text).trim();
@@ -364,7 +367,8 @@ public class RecipeOverviewCtrl implements Initializable {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Delete");
         confirm.setHeaderText("Delete Step");
-        confirm.setContentText("Are you sure you want to delete step " + selectedStep.getPosition() + "?");
+        confirm.setContentText("Are you sure you want to delete step "
+                + selectedStep.getPosition() + "?");
 
         var result = confirm.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
@@ -377,10 +381,13 @@ public class RecipeOverviewCtrl implements Initializable {
 
             // Fetch remaining steps and shift positions
             List<RecipeStep> steps = server.getStepsForRecipe(selectedRecipe.getId());
-            for (int i = selectedStep.getPosition(); i < steps.size(); i++) {
-                RecipeStep step = steps.get(i);
-                step.setPosition(step.getPosition() - 1);
-                server.updateRecipeStep(selectedRecipe.getId(), step);
+            int deletedPos = selectedStep.getPosition();
+
+            for (RecipeStep step : steps) {
+                if (step.getPosition() > deletedPos) {
+                    step.setPosition(step.getPosition() - 1);
+                    server.updateRecipeStep(selectedRecipe.getId(), step);
+                }
             }
 
             // Reload the step table

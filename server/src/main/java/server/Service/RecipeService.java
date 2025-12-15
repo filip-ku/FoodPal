@@ -218,6 +218,37 @@ public class RecipeService {
         return recipeRepository.save(recipe);
     }
 
+    //AI-generated
+    /**
+     * Updates a single {@link RecipeStep} of a given recipe.
+     *
+     * <p>Finds the target step by {@code stepId} inside the recipe identified by {@code recipeId},
+     * applies the provided changes (position and/or instruction), and persists via the recipe
+     * aggregate so JPA cascading updates the child entity.</p>
+     *
+     * @param recipeId the id of the parent {@link Recipe}
+     * @param stepId   the id of the {@link RecipeStep} to update
+     * @param patch    a {@link RecipeStep} carrying the new values
+     * @return the updated {@link RecipeStep}
+     * @throws org.springframework.web.server.ResponseStatusException
+     *         {@code 404 NOT_FOUND} if the recipe or step cannot be found
+     */
+    public RecipeStep updateStepInRecipe(Long recipeId, Long stepId, RecipeStep patch) {
+        Recipe recipe = getRecipe(recipeId);
+        RecipeStep target = recipe.getSteps().stream()
+                .filter(s -> s.getId() != null && s.getId().equals(stepId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Step not found"));
+
+        if (patch.getInstruction() != null) {
+            target.setInstruction(patch.getInstruction());
+        }
+        target.setPosition(patch.getPosition());
+
+        recipeRepository.save(recipe); // cascade updates the step
+        return target;
+    }
+
     private Recipe findRecipe(long recipeId) {
         return recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));

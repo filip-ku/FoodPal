@@ -147,16 +147,16 @@ public class ServerUtils {
     /**
      * Updates an existing recipe step on the server.
      *
-     * @param recipeId id of the recipe containing the step
-     * @param step updated step data
-     * @return the updated RecipeStep from the server
+     * @param recipeId id of the recipe
+     * @param step     updated step (must have non-null id)
+     * @return the updated step from the server
      */
     public RecipeStep updateRecipeStep(Long recipeId, RecipeStep step) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER)
-                .path("api/recipe/" + recipeId + "/steps")
+                .path("api/recipe/" + recipeId + "/steps/" + step.getId())
                 .request(APPLICATION_JSON)
-                .post(Entity.entity(step, APPLICATION_JSON), RecipeStep.class);
+                .put(Entity.entity(step, APPLICATION_JSON), RecipeStep.class);
     }
 
     /**
