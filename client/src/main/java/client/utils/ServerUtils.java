@@ -6,8 +6,7 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.ConnectException;
 import java.util.List;
 
-import commons.Ingredient;
-import commons.Recipe;
+import commons.*;
 import org.glassfish.jersey.client.ClientConfig;
 
 import jakarta.ws.rs.ProcessingException;
@@ -101,6 +100,63 @@ public class ServerUtils {
                 .target(SERVER).path("api/ingredient/" + ingredient.getId())
                 .request(APPLICATION_JSON)
                 .delete();
+    }
+
+    /**
+     * Adds a new {@link RecipeStep} to a recipe on the server.
+     *
+     * @param recipeId the id of the target recipe
+     * @param step the step payload (position, instruction)
+     * @return the updated {@link Recipe} returned by the server
+     */
+    public Recipe addRecipeStep(Long recipeId, RecipeStep step) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/recipe/" + recipeId + "/steps") //
+                .request(APPLICATION_JSON) //
+                .post(Entity.entity(step, APPLICATION_JSON), Recipe.class);
+    }
+
+    /**
+     * Retrieves all {@link RecipeStep} objects for a specific recipe.
+     *
+     * @param recipeId the id of the recipe whose steps are requested
+     * @return a {@code List<RecipeStep>} containing all steps for the recipe;
+     *         never {@code null}, but may be empty
+     */
+    public List<RecipeStep> getStepsForRecipe(Long recipeId) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/recipe/" + recipeId + "/steps") //
+                .request(APPLICATION_JSON) //
+                .get(new GenericType<List<RecipeStep>>() {});
+    }
+
+    /**
+     * Deletes a recipe step from a recipe on the server.
+     *
+     * @param recipeId the recipe ID
+     * @param stepId the step ID to delete
+     */
+    public void deleteRecipeStep(Long recipeId, Long stepId) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER)
+                .path("api/recipe/" + recipeId + "/steps/" + stepId)
+                .request(APPLICATION_JSON)
+                .delete();
+    }
+
+    /**
+     * Updates an existing recipe step on the server.
+     *
+     * @param recipeId id of the recipe containing the step
+     * @param step updated step data
+     * @return the updated RecipeStep from the server
+     */
+    public RecipeStep updateRecipeStep(Long recipeId, RecipeStep step) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER)
+                .path("api/recipe/" + recipeId + "/steps")
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(step, APPLICATION_JSON), RecipeStep.class);
     }
 
     /**

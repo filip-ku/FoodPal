@@ -58,5 +58,7 @@
       </SplitPane>
       <Button fx:id="recipeIngredientSelect" layoutX="565.0" layoutY="91.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeIngredient" text="+" />
       <Button layoutX="565.0" layoutY="121.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" text="-" />
+      <Button fx:id="addRecipeStep" layoutX="565.0" layoutY="239.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeStep" text="+" />
+      <Button fx:id="removeStep" layoutX="565.0" layoutY="269.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#removeStep" text="-" />
    </children>
 </AnchorPane>

@@ -77,6 +77,8 @@ public class Main extends Application {
                 "client","scenes","ChooseRecipeIngredient.fxml");
         var addRecipeIngredient = FXML.load(AddRecipeIngredientCtrl.class,
                 "client","scenes","AddRecipeIngredient.fxml");
+        var addRecipeStep = FXML.load(AddRecipeStepCtrl.class,
+                "client","scenes","AddRecipeStep.fxml");
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage,
@@ -85,6 +87,7 @@ public class Main extends Application {
                 addIngredient,
                 ingredientOverview,
                 chooseRecipeIngredient,
-                addRecipeIngredient);
+                addRecipeIngredient,
+                addRecipeStep);
     }
 }

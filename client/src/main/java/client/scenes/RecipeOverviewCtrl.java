@@ -1,6 +1,7 @@
 package client.scenes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import com.google.inject.Inject;
@@ -85,6 +86,9 @@ public class RecipeOverviewCtrl implements Initializable {
                 new SimpleStringProperty(cell.getValue().toString())
         );
 
+        colPreparation.setCellValueFactory(cell ->
+                new SimpleStringProperty(formatStepForDisplay(cell.getValue())));
+
         tableRecipes.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
@@ -92,13 +96,15 @@ public class RecipeOverviewCtrl implements Initializable {
                         recipeName.setText(newSel.getTitle());
 
         //                TODO
-        //                Need to implement logic for Ingredients and Preparation tables
+        //                Need to implement logic for Ingredients
 
                         tableIngredients.setVisible(true);
                         tablePreparation.setVisible(true);
 
                         recipeEditButton.setVisible(true);
                         recipeName.setVisible(true);
+
+                        loadStepsForRecipe(newSel);
                     }
                 });
     }
@@ -118,6 +124,7 @@ public class RecipeOverviewCtrl implements Initializable {
     public void selectRecipe(Recipe recipe) {
         if (recipe == null) return;
         tableRecipes.getSelectionModel().select(recipe);
+        loadStepsForRecipe(recipe);
     }
 
     /**
@@ -128,6 +135,27 @@ public class RecipeOverviewCtrl implements Initializable {
             var recipes = server.getRecipes();
             data = FXCollections.observableList(recipes);
             tableRecipes.setItems(data);
+
+            Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                loadStepsForRecipe(selected);
+            }
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
+        }
+    }
+
+    /**
+     * Loads and displays all recipe steps for the specified recipe.
+     *
+     * @param recipe the recipe whose steps should be shown
+     */
+    public void loadStepsForRecipe(Recipe recipe) {
+        try {
+            var steps = server.getStepsForRecipe(recipe.getId());
+            ObservableList<RecipeStep> stepData = FXCollections.observableList(steps);
+            tablePreparation.setItems(stepData);
+            tablePreparation.refresh();
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
         }
@@ -276,4 +304,91 @@ public class RecipeOverviewCtrl implements Initializable {
         if (selected == null) { mainCtrl.showError("Select a recipe first."); return; }
         mainCtrl.showChooseRecipeIngredient(selected);
     }
+
+    /**
+     * Opens the “Add Recipe Step” screen for the selected recipe.
+     * Shows an error if no recipe is selected.
+     */
+    @FXML
+    private void openAddRecipeStep() {
+        var selected = tableRecipes.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            mainCtrl.showError("Select a recipe first.");
+            return;
+        }
+        mainCtrl.showAddRecipeStep(selected);
+    }
+
+    /**
+     * Returns a nicely formatted string representation of a {@link RecipeStep}.
+     * Example: "1. Chop onions" or just "Chop onions" if position is invalid.
+     *
+     * @param step the recipe step to format
+     * @return formatted string for display
+     */
+    private String formatStepForDisplay(RecipeStep step) {
+        if (step == null) {
+            return "";
+        }
+
+        String number = "";
+        if (step.getPosition() >= 0) {
+            number = String.valueOf(step.getPosition());
+        }
+
+        String text = step.getInstruction() != null ? step.getInstruction() : "";
+
+        if (!number.isEmpty()) {
+            return (number + ". " + text).trim();
+        }
+        return text.trim();
+    }
+
+    /**
+     * Deletes the selected step and automatically shifts subsequent steps up by one.
+     */
+    @FXML
+    public void removeStep() {
+        Recipe selectedRecipe = tableRecipes.getSelectionModel().getSelectedItem();
+        if (selectedRecipe == null) {
+            mainCtrl.showError("Select a recipe first.");
+            return;
+        }
+
+        RecipeStep selectedStep = tablePreparation.getSelectionModel().getSelectedItem();
+        if (selectedStep == null) {
+            mainCtrl.showError("Select a step to delete.");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirm Delete");
+        confirm.setHeaderText("Delete Step");
+        confirm.setContentText("Are you sure you want to delete step " + selectedStep.getPosition() + "?");
+
+        var result = confirm.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return;
+        }
+
+        try {
+            // Delete the selected step
+            server.deleteRecipeStep(selectedRecipe.getId(), selectedStep.getId());
+
+            // Fetch remaining steps and shift positions
+            List<RecipeStep> steps = server.getStepsForRecipe(selectedRecipe.getId());
+            for (int i = selectedStep.getPosition(); i < steps.size(); i++) {
+                RecipeStep step = steps.get(i);
+                step.setPosition(step.getPosition() - 1);
+                server.updateRecipeStep(selectedRecipe.getId(), step);
+            }
+
+            // Reload the step table
+            loadStepsForRecipe(selectedRecipe);
+
+        } catch (Exception e) {
+            mainCtrl.showError("Failed to delete step: " + e.getMessage());
+        }
+    }
+
 }

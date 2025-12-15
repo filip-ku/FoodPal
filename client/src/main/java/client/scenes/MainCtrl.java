@@ -30,16 +30,20 @@ public class MainCtrl {
     private AddRecipeIngredientCtrl addRecipeIngredientCtrl;
     private Scene addRecipeIngredientScene;
 
+    private AddRecipeStepCtrl addRecipeStepCtrl;
+    private Scene addRecipeStepScene;
+
     /**
      * Initializes the application’s primary stage and loads all scenes.
      *
-     * @param primaryStage the main application window
-     * @param overview Recipe overview pair
-     * @param add Add-recipe pair
-     * @param addIngredient Add-ingredient pair
-     * @param ingredientsOverview Ingredients overview pair
+     * @param primaryStage           the main application window
+     * @param overview               Recipe overview pair
+     * @param add                    Add-recipe pair
+     * @param addIngredient          Add-ingredient pair
+     * @param ingredientsOverview    Ingredients overview pair
      * @param chooseRecipeIngredient Choose-recipe-ingredient pair
-     * @param addRecipeIngredient AddRecipeIngredient pair
+     * @param addRecipeIngredient    AddRecipeIngredient pair
+     * @param addRecipeStep
      */
     public void initialize(Stage primaryStage,
                            Pair<RecipeOverviewCtrl, Parent> overview,
@@ -47,7 +51,8 @@ public class MainCtrl {
                            Pair<AddIngredientCtrl, Parent> addIngredient,
                            Pair<IngredientsOverviewCtrl, Parent> ingredientsOverview,
                            Pair<ChooseRecipeIngredientCtrl, Parent> chooseRecipeIngredient,
-                           Pair<AddRecipeIngredientCtrl, Parent> addRecipeIngredient) {
+                           Pair<AddRecipeIngredientCtrl, Parent> addRecipeIngredient,
+                           Pair<AddRecipeStepCtrl, Parent> addRecipeStep) {
         this.primaryStage = primaryStage;
         this.recipeOverviewCtrl = overview.getKey();
         this.recipeOverview = new Scene(overview.getValue());
@@ -66,6 +71,9 @@ public class MainCtrl {
 
         this.addRecipeIngredientCtrl = addRecipeIngredient.getKey();
         this.addRecipeIngredientScene = new Scene(addRecipeIngredient.getValue());
+
+        this.addRecipeStepCtrl = addRecipeStep.getKey();
+        this.addRecipeStepScene = new Scene(addRecipeStep.getValue());
 
         showRecipeOverview();
         primaryStage.show();
@@ -176,6 +184,16 @@ public class MainCtrl {
         addRecipeIngredientCtrl.setContextForEdit(recipe, ri, ingredient);
         primaryStage.setTitle("FoodPal: Edit Ingredient in Recipe");
         primaryStage.setScene(addRecipeIngredientScene);
+    }
+
+    /**
+     * Shows the “Add Recipe Step” screen for a given recipe.
+     * @param recipe the recipe to which a new step will be added
+     */
+    public void showAddRecipeStep(Recipe recipe) {
+        addRecipeStepCtrl.setRecipe(recipe);
+        primaryStage.setTitle("FoodPal: Add Step");
+        primaryStage.setScene(addRecipeStepScene);
     }
 
 }
