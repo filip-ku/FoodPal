@@ -238,7 +238,8 @@ public class RecipeService {
         RecipeStep target = recipe.getSteps().stream()
                 .filter(s -> s.getId() != null && s.getId().equals(stepId))
                 .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Step not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Step not found"));
 
         if (patch.getInstruction() != null) {
             target.setInstruction(patch.getInstruction());
