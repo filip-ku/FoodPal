@@ -173,10 +173,7 @@ public class AddRecipeIngredientCtrl {
                 throw new NumberFormatException("Quantity cannot be negative.");
             }
         } catch (NumberFormatException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
+            mainCtrl.showError(e.getMessage());
             return;
         }
 
@@ -192,11 +189,11 @@ public class AddRecipeIngredientCtrl {
             ri.setUnit(unit);
             ri.setInformalAmount(informal);
 
-            if (recipe.getIngredients().contains(ri)) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.initModality(Modality.APPLICATION_MODAL);
-                alert.setContentText("This ingredient is already in the recipe.");
-                alert.showAndWait();
+            boolean riAlreadyExists = recipe.getIngredients().stream()
+                    .anyMatch(existingRi -> existingRi.getIngredient().equals(ingredient));
+
+            if (riAlreadyExists) {
+                mainCtrl.showError("This ingredient is already in the recipe.");
                 return;
             }
 
@@ -226,7 +223,6 @@ public class AddRecipeIngredientCtrl {
         quantityInput.clear();
         unitsInput.clear();
         notesInput.clear();
-
     }
 
 }
