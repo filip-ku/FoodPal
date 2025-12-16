@@ -118,6 +118,19 @@ public class ServerUtils {
     }
 
     /**
+     * Updates a given ingredient on the server.
+     *
+     * @param ingredient the recipe to be updated
+     * @return the new updated version of that ingredient
+     */
+    public Ingredient updateIngredient(Ingredient ingredient) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/" + ingredient.getId())
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(ingredient, APPLICATION_JSON), Ingredient.class);
+    }
+
+    /**
      * Retrieves all {@link RecipeIngredient} objects linked to a
      *      specific recipe from the server.
      *
