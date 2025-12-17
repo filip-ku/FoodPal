@@ -2,6 +2,8 @@ package commons;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class RecipeTest {
@@ -63,20 +65,27 @@ class RecipeTest {
     @Test
     void testEqualsNull() {
         Recipe recipe = new Recipe();
-        assertNotEquals(recipe, null);
+        assertNotEquals(null, recipe);
     }
 
     @Test
     void testEqualsSameAttributes() {
-        Recipe recipe1 = new Recipe("Test Recipe");
-        Recipe recipe2 = new Recipe("Test Recipe");
+        Recipe recipe1 = new Recipe("Test Recipe", new BigDecimal(3.0));
+        Recipe recipe2 = new Recipe("Test Recipe", new BigDecimal(3.0));
         assertEquals(recipe1, recipe2);
     }
 
     @Test
-    void testEqualsDifferentAttributes() {
-        Recipe recipe1 = new Recipe("Test Recipe");
-        Recipe recipe2 = new Recipe("Different Test Recipe");
+    void testEqualsDifferentTitle() {
+        Recipe recipe1 = new Recipe("Test Recipe", new BigDecimal(3.0));
+        Recipe recipe2 = new Recipe("Different Test Recipe", new BigDecimal(3.0));
+        assertNotEquals(recipe1, recipe2);
+    }
+
+    @Test
+    void testEqualsDifferentServings() {
+        Recipe recipe1 = new Recipe("Test Recipe", new BigDecimal(3.0));
+        Recipe recipe2 = new Recipe("Test Recipe", new BigDecimal(4.0));
         assertNotEquals(recipe1, recipe2);
     }
 
