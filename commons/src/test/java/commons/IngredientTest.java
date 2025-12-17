@@ -83,15 +83,46 @@ class IngredientTest {
 
     @Test
     void testEqualsSameAttributes() {
-        Ingredient ingredient1 = new Ingredient("Test Ingredient");
-        Ingredient ingredient2 = new Ingredient("Test Ingredient");
+        Ingredient ingredient1 = new Ingredient(
+                "Test Ingredient", 0.1, 0.2, 0.3);
+        Ingredient ingredient2 = new Ingredient(
+                "Test Ingredient", 0.1, 0.2, 0.3);
         assertEquals(ingredient1, ingredient2);
     }
 
     @Test
-    void testEqualsDifferentAttributes() {
-        Ingredient ingredient1 = new Ingredient("Test Ingredient");
-        Ingredient ingredient2 = new Ingredient("Different Test Ingredient");
+    void testEqualsDifferentName() {
+        Ingredient ingredient1 = new Ingredient(
+                "Test Ingredient", 0.1, 0.2, 0.3);
+        Ingredient ingredient2 = new Ingredient(
+                "Different Test Ingredient", 0.1, 0.2, 0.3);
+        assertNotEquals(ingredient1, ingredient2);
+    }
+
+    @Test
+    void testEqualsDifferentProtein() {
+        Ingredient ingredient1 = new Ingredient(
+                "Test Ingredient", 0.1, 0.2, 0.3);
+        Ingredient ingredient2 = new Ingredient(
+                "Test Ingredient", 0.2, 0.2, 0.3);
+        assertNotEquals(ingredient1, ingredient2);
+    }
+
+    @Test
+    void testEqualsDifferentFat() {
+        Ingredient ingredient1 = new Ingredient(
+                "Test Ingredient", 0.1, 0.3, 0.3);
+        Ingredient ingredient2 = new Ingredient(
+                "Test Ingredient", 0.1, 0.2, 0.3);
+        assertNotEquals(ingredient1, ingredient2);
+    }
+
+    @Test
+    void testEqualsDifferentCarbs() {
+        Ingredient ingredient1 = new Ingredient(
+                "Test Ingredient", 0.1, 0.2, 0.1);
+        Ingredient ingredient2 = new Ingredient(
+                "Test Ingredient", 0.1, 0.2, 0.3);
         assertNotEquals(ingredient1, ingredient2);
     }
 
