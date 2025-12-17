@@ -28,7 +28,6 @@
 
 - What basic parts of the code (if any) still need to be implemented or corrected from the objectives we set in the last meeting?
 - Clarification and explanations from the TA regarding the formative feedback provided.
-- Should we book a room for next Monday afternoon
 - Potential goals for the winter break
 
 ### Questions, insights, or confusions about the current task.
