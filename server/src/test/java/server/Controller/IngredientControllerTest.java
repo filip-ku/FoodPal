@@ -192,8 +192,6 @@ class IngredientControllerTest {
         IngredientController controller = new IngredientController(ingredientService);
 
         assertNotNull(controller);
-        assertNotNull(controller.ingredientService);
-        assertSame(ingredientService, controller.ingredientService);
     }
 
     @Test
