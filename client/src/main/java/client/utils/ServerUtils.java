@@ -125,7 +125,7 @@ public class ServerUtils {
      */
     public Ingredient updateIngredient(Ingredient ingredient) {
         return ClientBuilder.newClient(new ClientConfig())
-                .target(SERVER).path("api/" + ingredient.getId())
+                .target(SERVER).path("api/ingredient/" + ingredient.getId())
                 .request(APPLICATION_JSON)
                 .post(Entity.entity(ingredient, APPLICATION_JSON), Ingredient.class);
     }
