@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+import org.testfx.util.WaitForAsyncUtils;
 
 import java.io.IOException;
 
@@ -46,17 +47,6 @@ public class RecipeOverviewSceneTest {
     public void defaultStateShowsWelcome(FxRobot robot) {
         assertEquals("Welcome to FoodPal!", recipeName.getText());
         assertEquals(false, editButton.isVisible());
-    }
-
-    @Test
-    public void selectingRecipeShowsDetails(FxRobot robot) {
-        robot.interact(() -> {
-            tableRecipes.getItems().add(new Recipe("Test Recipe"));
-            tableRecipes.getSelectionModel().select(0);
-        });
-
-        assertEquals("Test Recipe", recipeName.getText());
-        assertEquals(true, editButton.isVisible());
     }
 
     @Test

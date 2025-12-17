@@ -24,13 +24,13 @@ public class AddRecipeIngredientCtrl {
     private RecipeIngredient existing;     // non-null only in EDIT mode
 
     @FXML
-    TextField ingredientNameInput;
+    private TextField ingredientNameInput;
     @FXML
-    TextField quantityInput;
+    private TextField quantityInput;
     @FXML
-    TextField unitsInput;
+    private TextField unitsInput;
     @FXML
-    TextField notesInput;
+    private TextField notesInput;
 
     /**
      * Creates a controller with injected dependencies.
