@@ -54,4 +54,63 @@ class RecipeTest {
         assertTrue(recipe.getSteps().isEmpty());
     }
 
+    @Test
+    void testEqualsSameObject() {
+        Recipe recipe = new Recipe();
+        assertEquals(recipe, recipe);
+    }
+
+    @Test
+    void testEqualsNull() {
+        Recipe recipe = new Recipe();
+        assertNotEquals(recipe, null);
+    }
+
+    @Test
+    void testEqualsSameAttributes() {
+        Recipe recipe1 = new Recipe("Test Recipe");
+        Recipe recipe2 = new Recipe("Test Recipe");
+        assertEquals(recipe1, recipe2);
+    }
+
+    @Test
+    void testEqualsDifferentAttributes() {
+        Recipe recipe1 = new Recipe("Test Recipe");
+        Recipe recipe2 = new Recipe("Different Test Recipe");
+        assertNotEquals(recipe1, recipe2);
+    }
+
+    @Test
+    void testHashCode() {
+        Recipe recipe1 = new Recipe("Test Recipe");
+        Recipe recipe2 = new Recipe("Test Recipe");
+        assertEquals(recipe1.hashCode(), recipe2.hashCode());
+    }
+
+    @Test
+    void testAddRecipeStepRelationship() {
+        Recipe recipe = new Recipe();
+        RecipeStep step = new RecipeStep();
+
+        recipe.addStep(step);
+        step.setPosition(1);
+
+        assertEquals(recipe, step.getRecipe());
+        assertEquals(1, step.getPosition());
+    }
+
+    @Test
+    void testAddRecipeIngredientRelationship() {
+        Recipe recipe = new Recipe();
+        Ingredient ingredient = new Ingredient();
+        RecipeIngredient recipeIngredient = new RecipeIngredient();
+
+        recipeIngredient.setIngredient(ingredient);
+        recipe.addRecipeIngredient(recipeIngredient);
+        recipeIngredient.setPosition(1);
+
+        assertEquals(recipe, recipeIngredient.getRecipe());
+        assertEquals(ingredient, recipeIngredient.getIngredient());
+        assertEquals(1, recipeIngredient.getPosition());
+    }
 }
