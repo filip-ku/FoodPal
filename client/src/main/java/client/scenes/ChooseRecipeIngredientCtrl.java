@@ -38,7 +38,7 @@ public class ChooseRecipeIngredientCtrl {
      * Disables the Next button until an ingredient is selected.
      */
     @FXML
-    private void initialize() {
+    public void initialize() {
         nextButton.disableProperty()
                 .bind(ingredientSelect.getSelectionModel().selectedItemProperty().isNull());
     }

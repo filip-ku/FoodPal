@@ -24,13 +24,13 @@ public class AddRecipeIngredientCtrl {
     private RecipeIngredient existing;     // non-null only in EDIT mode
 
     @FXML
-    private TextField ingredientNameInput;
+    TextField ingredientNameInput;
     @FXML
-    private TextField quantityInput;
+    TextField quantityInput;
     @FXML
-    private TextField unitsInput;
+    TextField unitsInput;
     @FXML
-    private TextField notesInput;
+    TextField notesInput;
 
     /**
      * Creates a controller with injected dependencies.
@@ -216,7 +216,7 @@ public class AddRecipeIngredientCtrl {
      * Clears all editable input fields.
      * Used when leaving the screen.
      */
-    private void clearFields() {
+    public void clearFields() {
         ingredientNameInput.clear();
         quantityInput.clear();
         unitsInput.clear();

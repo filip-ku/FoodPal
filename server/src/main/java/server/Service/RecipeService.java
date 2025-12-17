@@ -32,6 +32,8 @@ public class RecipeService {
     /**
      * Constructs a new {@code RecipeService}.
      *
+     * <p><em>Note: This Javadoc was AI-generated.</em></p>
+     *
      * @param recipeRepository the JPA repository for recipes
      */
     @Autowired
@@ -109,6 +111,183 @@ public class RecipeService {
         }
     }
 
+
+    /**
+     * Updates an existing {@link Recipe}.
+     *
+     * <p>This method validates that the recipe has a non-empty title and that
+     * it already exists in the database before saving the changes.</p>
+     *
+     * <p><em>Note: This Javadoc was AI-generated.</em></p>
+     *
+     * @param recipe the recipe to update; must not be {@code null}
+     * @return the updated recipe as persisted by the repository
+     * @throws ResponseStatusException if the
+     * title is empty or {@code null}, or if the recipe does not exist
+     */
+    public Recipe updateRecipe(Recipe recipe) {
+        if (isNullOrEmpty(recipe.getTitle()) || !recipeRepository.existsById(recipe.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Recipe title cannot be empty");
+        } else {
+            return recipeRepository.save(recipe);
+        }
+    }
+
+    /**
+     * Adds a {@link RecipeIngredient} to an existing {@link Recipe}.
+     *
+     * <p>If the ingredient is already present in the recipe, a
+     * {@link ResponseStatusException} with HTTP status 400 (Bad Request) is thrown.</p>
+     *
+     * <p><em>Note: This Javadoc was AI-generated.</em></p>
+     *
+     * @param recipeId         the id of the recipe to which the ingredient is added
+     * @param recipeIngredient the recipe ingredient to add; must not be {@code null}
+     * @return the updated recipe after the ingredient has been added
+     * @throws ResponseStatusException if the recipe
+     * does not exist or the ingredient already exists in the recipe
+     */
+    public Recipe addIngredientToRecipe(long recipeId, RecipeIngredient recipeIngredient) {
+        Recipe recipe = findRecipe(recipeId);
+
+        if (recipe.getIngredients().contains(recipeIngredient)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Recipe ingredient already exists");
+        }
+
+        recipeIngredient.setRecipe(recipe);
+        recipe.addRecipeIngredient(recipeIngredient);
+
+        return recipeRepository.save(recipe);
+    }
+
+
+    /**
+     * Adds a {@link RecipeStep} to an existing {@link Recipe}.
+     *
+     * <p>The step is associated with the recipe and appended to its list of steps
+     * before the recipe is saved.</p>
+     *
+     * <p><em>Note: This Javadoc was AI-generated.</em></p>
+     *
+     * @param recipeId   the id of the recipe to which the step is added
+     * @param recipeStep the recipe step to add; must not be {@code null}
+     * @return the updated recipe after the step has been added
+     * @throws ResponseStatusException if the recipe does not exist
+     */
+    public Recipe addStepToRecipe(long recipeId, RecipeStep recipeStep) {
+        Recipe recipe = findRecipe(recipeId);
+
+        recipeStep.setRecipe(recipe);
+        recipe.addStep(recipeStep);
+        return recipeRepository.save(recipe);
+    }
+
+    /**
+     * Removes a specific {@link RecipeIngredient} instance from a recipe.
+     *
+     * <p>The given ingredient is removed from the recipe's ingredient collection
+     * and the updated recipe is persisted.</p>
+     *
+     * <p><em>Note: This Javadoc was AI-generated.</em></p>
+     *
+     * @param recipeId         the id of the recipe from which the ingredient is removed
+     * @param recipeIngredient the ingredient instance to remove; must not be {@code null}
+     * @return the updated recipe after the ingredient has been removed
+     * @throws ResponseStatusException if the recipe does not exist
+     */
+    public Recipe deleteIngredientFromRecipe(long recipeId, RecipeIngredient recipeIngredient) {
+        Recipe recipe = findRecipe(recipeId);
+        recipe.getIngredients().remove(recipeIngredient);
+        return recipeRepository.save(recipe);
+    }
+
+    /**
+     * Removes a specific {@link RecipeStep} instance from a recipe.
+     *
+     * <p>The given step is removed from the recipe's step collection
+     * and the updated recipe is persisted.</p>
+     *
+     * <p><em>Note: This Javadoc was AI-generated.</em></p>
+     *
+     * @param recipeId   the id of the recipe from which the step is removed
+     * @param recipeStep the step instance to remove; must not be {@code null}
+     * @return the updated recipe after the step has been removed
+     * @throws ResponseStatusException if the recipe does not exist
+     */
+    public Recipe deleteStepFromRecipe(long recipeId, RecipeStep recipeStep) {
+        Recipe recipe = findRecipe(recipeId);
+        recipe.getSteps().remove(recipeStep);
+        return recipeRepository.save(recipe);
+    }
+
+    private Recipe findRecipe(long recipeId) {
+        return recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    /**
+     * Returns all recipe ingredients belonging to the given recipe.
+     *
+     * <p><em>Note: This Javadoc was AI-generated.</em></p>
+     *
+     * @param recipeId the id of the recipe
+     * @return a list of recipe ingredients for the recipe
+     * @throws ResponseStatusException if no recipe with the given id exists
+     */
+    public List<RecipeIngredient> getIngredientsForRecipe(long recipeId) {
+        Recipe recipe = getRecipe(recipeId);
+        return new ArrayList<>(recipe.getIngredients());
+    }
+
+    /**
+     * Returns all steps belonging to the given recipe.
+     *
+     * <p><em>Note: This Javadoc was AI-generated.</em></p>
+     *
+     * @param recipeId the id of the recipe
+     * @return a list of recipe steps for the recipe
+     * @throws ResponseStatusException if no recipe with the given id exists
+     */
+    public List<RecipeStep> getStepsForRecipe(long recipeId) {
+        Recipe recipe = getRecipe(recipeId);
+        return new ArrayList<>(recipe.getSteps());
+    }
+
+    /**
+     * Removes a recipe ingredient from a recipe by its id.
+     *
+     * <p><em>Note: This Javadoc was AI-generated.</em></p>
+     *
+     * @param recipeId           the id of the recipe
+     * @param recipeIngredientId the id of the recipe ingredient to remove
+     * @return the updated recipe
+     * @throws ResponseStatusException if no recipe with the given id exists
+     */
+    public Recipe removeIngredientFromRecipe(long recipeId, long recipeIngredientId) {
+        Recipe recipe = getRecipe(recipeId);
+        recipe.getIngredients().removeIf(ingredient ->
+                ingredient.getId() != null && ingredient.getId().equals(recipeIngredientId));
+        return updateRecipe(recipe);
+    }
+
+    /**
+     * Removes a step from a recipe by its id.
+     *
+     * <p><em>Note: This Javadoc was AI-generated.</em></p>
+     *
+     * @param recipeId the id of the recipe
+     * @param stepId   the id of the step to remove
+     * @return the updated recipe
+     * @throws ResponseStatusException if no recipe with the given id exists
+     */
+    public Recipe removeStepFromRecipe(long recipeId, long stepId) {
+        Recipe recipe = getRecipe(recipeId);
+        recipe.getSteps().removeIf(step ->
+                step.getId() != null && step.getId().equals(stepId));
+        return updateRecipe(recipe);
+    }
 
     /**
      * Updates an existing {@link Recipe}.
