@@ -98,7 +98,7 @@ public class RecipeController {
     @PostMapping("/{id}/ingredient")
     public ResponseEntity<Recipe> addRecipeIngredient
     (@RequestBody RecipeIngredient recipeIngredient,
-     @PathVariable Long id) {
+        @PathVariable Long id) {
         Recipe recipe = recipeService.addIngredientToRecipe(id, recipeIngredient);
         return ResponseEntity.ok(recipe);
     }

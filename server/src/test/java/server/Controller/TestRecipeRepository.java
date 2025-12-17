@@ -3,6 +3,7 @@ package server.Controller;
 import commons.Recipe;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
@@ -40,68 +41,69 @@ public class TestRecipeRepository implements RecipeRepository {
     @Override
     public <S extends Recipe> S saveAndFlush(S entity) {
         calledMethods.add("saveAndFlush");
-        return null;
-        // TODO Auto-generated method stub
+        return save(entity);
     }
 
     @Override
     public <S extends Recipe> List<S> saveAllAndFlush(Iterable<S> entities) {
         calledMethods.add("saveAllAndFlush");
-        return List.of();
-        // TODO Auto-generated method stub
+        List<S> saved = new ArrayList<>();
+        for (S entity : entities) {
+            saved.add(save(entity));
+        }
+        return saved;
     }
 
     @Override
     public void deleteAllInBatch(Iterable<Recipe> entities) {
         calledMethods.add("deleteAllInBatch");
-        // TODO Auto-generated method stub
+        for (Recipe entity : entities) {
+            recipes.removeIf(r -> r.getId().equals(entity.getId()));
+        }
     }
 
     @Override
     public void deleteAllByIdInBatch(Iterable<Long> longs) {
         calledMethods.add("deleteAllByIdInBatch");
-        // TODO Auto-generated method stub
+        for (Long id : longs) {
+            recipes.removeIf(r -> r.getId().equals(id));
+        }
     }
 
     @Override
     public void deleteAllInBatch() {
         calledMethods.add("deleteAllInBatch");
-        // TODO Auto-generated method stub
+        recipes.clear();
     }
 
     @Override
     public Recipe getOne(Long aLong) {
         calledMethods.add("getOne");
-        return null;
-        // TODO Auto-generated method stub
+        return findById(aLong).orElse(null);
     }
 
     @Override
     public Recipe getById(Long aLong) {
         calledMethods.add("getById");
-        return null;
-        // TODO Auto-generated method stub
+        return findById(aLong).orElse(null);
     }
 
     @Override
     public Recipe getReferenceById(Long aLong) {
         calledMethods.add("getReferenceById");
-        return null;
-        // TODO Auto-generated method stub
+        return findById(aLong).orElse(null);
     }
 
     @Override
     public <S extends Recipe> Optional<S> findOne(Example<S> example) {
         calledMethods.add("findOne");
         return Optional.empty();
-        // TODO Auto-generated method stub
     }
 
     @Override
     public <S extends Recipe> List<S> findAll(Example<S> example) {
         calledMethods.add("findAll");
         return List.of();
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -133,7 +135,9 @@ public class TestRecipeRepository implements RecipeRepository {
     }
 
     @Override
-    public <S extends Recipe, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
+    public <S extends Recipe, R> R
+        findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
+
         calledMethods.add("findBy");
         return null;
         // TODO Auto-generated method stub
@@ -167,8 +171,11 @@ public class TestRecipeRepository implements RecipeRepository {
     @Override
     public <S extends Recipe> List<S> saveAll(Iterable<S> entities) {
         calledMethods.add("saveAll");
-        return List.of();
-        // TODO Auto-generated method stub
+        List<S> saved = new ArrayList<>();
+        for (S entity : entities) {
+            saved.add(save(entity));
+        }
+        return saved;
     }
 
     /**
@@ -206,17 +213,19 @@ public class TestRecipeRepository implements RecipeRepository {
     }
 
     @Override
-    public List<Recipe> findAllById(Iterable<Long> id) {
+    public List<Recipe> findAllById(Iterable<Long> ids) {
         calledMethods.add("findAllById");
-        return List.of();
-        // TODO Auto-generated method stub
+        List<Recipe> result = new ArrayList<>();
+        for (Long id : ids) {
+            findById(id).ifPresent(result::add);
+        }
+        return result;
     }
 
     @Override
     public long count() {
         calledMethods.add("count");
-        return 0;
-        // TODO Auto-generated method stub
+        return recipes.size();
     }
 
     /**
@@ -232,25 +241,33 @@ public class TestRecipeRepository implements RecipeRepository {
     @Override
     public void delete(Recipe recipe) {
         calledMethods.add("delete");
-        // TODO Auto-generated method stub
+        if (recipe != null && recipe.getId() != null) {
+            recipes.removeIf(r -> r.getId().equals(recipe.getId()));
+        }
     }
 
     @Override
-    public void deleteAllById(Iterable<? extends Long> id) {
+    public void deleteAllById(Iterable<? extends Long> ids) {
         calledMethods.add("deleteAllById");
-        // TODO Auto-generated method stub
+        for (Long id : ids) {
+            recipes.removeIf(r -> r.getId().equals(id));
+        }
     }
 
     @Override
     public void deleteAll(Iterable<? extends Recipe> entities) {
         calledMethods.add("deleteAll");
-        // TODO Auto-generated method stub
+        for (Recipe entity : entities) {
+            if (entity != null && entity.getId() != null) {
+                recipes.removeIf(r -> r.getId().equals(entity.getId()));
+            }
+        }
     }
 
     @Override
     public void deleteAll() {
         calledMethods.add("deleteAll");
-        // TODO Auto-generated method stub
+        recipes.clear();
     }
 
     @Override
@@ -263,7 +280,18 @@ public class TestRecipeRepository implements RecipeRepository {
     @Override
     public Page<Recipe> findAll(Pageable pageable) {
         calledMethods.add("findAll");
-        return null;
-        // TODO Auto-generated method stub
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+
+        List<Recipe> pageContent;
+        if (startItem >= recipes.size()) {
+            pageContent = List.of();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, recipes.size());
+            pageContent = new ArrayList<>(recipes.subList(startItem, toIndex));
+        }
+
+        return new PageImpl<>(pageContent, pageable, recipes.size());
     }
 }
