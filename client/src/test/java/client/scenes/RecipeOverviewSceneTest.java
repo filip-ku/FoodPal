@@ -17,7 +17,7 @@ import org.testfx.framework.junit5.Start;
 import java.io.IOException;
 
 import static com.google.inject.Guice.createInjector;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(ApplicationExtension.class)
 public class RecipeOverviewSceneTest {
@@ -57,5 +57,45 @@ public class RecipeOverviewSceneTest {
 
         assertEquals("Test Recipe", recipeName.getText());
         assertEquals(true, editButton.isVisible());
+    }
+
+    @Test
+    public void sanityCheckUIElementsExist() {
+        assertNotNull(tableRecipes, "Table should exist");
+        assertNotNull(recipeName, "Label should exist");
+        assertNotNull(editButton, "Button should exist");
+    }
+
+    @Test
+    public void tableStartsEmpty() {
+        assertTrue(tableRecipes.getItems().isEmpty(), "Table should have 0 items initially");
+        assertEquals(0, tableRecipes.getItems().size());
+    }
+
+    @Test
+    public void testJavaFXLabelSetterWorks(FxRobot robot) {
+        robot.interact(() -> recipeName.setText("Forced Text"));
+        assertEquals("Forced Text", recipeName.getText());
+    }
+
+    @Test
+    public void clickingBackgroundDoesNotCrash(FxRobot robot) {
+        String initialText = recipeName.getText();
+        robot.clickOn(tableRecipes);
+        assertEquals(initialText, recipeName.getText());
+    }
+    @Test
+    public void canAddAndRemoveItemsFromTable(FxRobot robot) {
+        Recipe r = new Recipe("Temporary");
+
+        robot.interact(() -> {
+            tableRecipes.getItems().add(r);
+        });
+        assertEquals(1, tableRecipes.getItems().size());
+
+        robot.interact(() -> {
+            tableRecipes.getItems().remove(r);
+        });
+        assertEquals(0, tableRecipes.getItems().size());
     }
 }

@@ -84,9 +84,14 @@ public class MainCtrl {
      * Displays the recipe overview screen.
      */
     public void showRecipeOverview() {
-        primaryStage.setTitle("FoodPal");
-        primaryStage.setScene(recipeOverview);
-        recipeOverviewCtrl.refresh();
+        if (primaryStage != null) {
+            primaryStage.setTitle("FoodPal");
+            primaryStage.setScene(recipeOverview);
+        }
+        if (recipeOverviewCtrl != null) {
+            recipeOverviewCtrl.refresh();
+        }
+
     }
 
     /**
