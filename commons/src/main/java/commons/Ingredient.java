@@ -70,6 +70,15 @@ public class Ingredient {
     }
 
     /**
+     * Sets a new id for this ingredient.
+     * This method should only be used for testing.
+     * Normally the ingredient id will be set by the server.
+     *
+     * @param id new id that will be set by this method
+     */
+    public void setId(long id) {this.id = id;}
+
+    /**
      * Returns the ingredient’s name.
      * @return the ingredient’s name.
      */
@@ -144,7 +153,7 @@ public class Ingredient {
      * @throws IllegalArgumentException if {@code name} is null.
      */
     public void setName(String name) {
-        if (name == null) {
+        if (isNullOrEmpty(name)) {
             throw new IllegalArgumentException("Ingredient name cannot be null");
         } else {
             this.name = name;
@@ -174,5 +183,14 @@ public class Ingredient {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, proteinPer100g, fatPer100g, carbsPer100g);
+    }
+
+    /**
+     * Utility to check if a string is null or empty
+     * @param s the string to check
+     * @return true if is null or empty, else false
+     */
+    private static boolean isNullOrEmpty(String s){
+        return s == null || s.isEmpty();
     }
 }

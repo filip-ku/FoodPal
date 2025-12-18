@@ -2,7 +2,6 @@ package client.utils;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
-
 import java.net.ConnectException;
 import java.util.List;
 
@@ -63,6 +62,19 @@ public class ServerUtils {
     }
 
     /**
+     * Updates a given recipe on the server.
+     *
+     * @param recipe the recipe to be updated
+     * @return the new updated version of that recipe
+     */
+    public Recipe updateRecipe(Recipe recipe) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/recipe/edit")
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(recipe, APPLICATION_JSON), Recipe.class);
+    }
+
+    /**
      * Retrieves all {@link Ingredient} objects from the server.
      *
      * @return a {@code List<Ingredient>} containing every ingredient stored on the
@@ -100,6 +112,67 @@ public class ServerUtils {
                 .target(SERVER).path("api/ingredient/" + ingredient.getId())
                 .request(APPLICATION_JSON)
                 .delete();
+    }
+
+    /**
+     * Updates a given ingredient on the server.
+     *
+     * @param ingredient the recipe to be updated
+     * @return the new updated version of that ingredient
+     */
+    public Ingredient updateIngredient(Ingredient ingredient) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/ingredient/" + ingredient.getId())
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(ingredient, APPLICATION_JSON), Ingredient.class);
+    }
+
+    /**
+     * Retrieves all {@link RecipeIngredient} objects linked to a
+     *      specific recipe from the server.
+     *
+     * @param recipe the {@code Recipe} instance to retrieve ingredients for;
+     *         must not be {@code null}
+     * @return a {@code List<RecipeIngredient>} containing every ingredient linked to a specific
+     *         recipe stored on the backend. The list is never {@code null}, but may be empty if no
+     *         ingredients exist.
+     */
+    public List<RecipeIngredient> getRecipeIngredients(Recipe recipe) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/recipe/" + recipe.getId() + "/ingredients")
+                .request(APPLICATION_JSON)
+                .get(new GenericType<List<RecipeIngredient>>() {});
+    }
+
+    /**
+     * Creates a new {@link RecipeIngredient} linked to a specific recipe.
+     *
+     * @param recipe the recipe to link the recipeIngredient to
+     * @param recipeIngredient the recipeIngredient to be added
+     * @return the updated recipe object
+     */
+    public Recipe addRecipeIngredient(Recipe recipe, RecipeIngredient recipeIngredient) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/recipe/" + recipe.getId() + "/ingredient")
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(recipeIngredient, APPLICATION_JSON), Recipe.class);
+    }
+
+    /**
+     * Removes a {@link RecipeIngredient} instance from the server.
+     *
+     * @param recipe the {@code Recipe} instance to remove RecipeIngredient from;
+     *               must not be {@code null}
+     * @param recipeIngredient the {@code RecipeIngredient} instance to be removed;
+     *               must not be {@code null}
+     * @return the updated recipe object
+     */
+    public Recipe deleteRecipeIngredient(Recipe recipe, RecipeIngredient recipeIngredient) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/recipe/" + recipe.getId() +
+                        "/ingredients/" + recipeIngredient.getId())
+                .request(APPLICATION_JSON)
+                .delete(Recipe.class);
     }
 
     /**

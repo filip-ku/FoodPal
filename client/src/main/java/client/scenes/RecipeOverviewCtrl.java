@@ -31,9 +31,13 @@ public class RecipeOverviewCtrl implements Initializable {
     private TableColumn<Recipe, String> colRecipes;
 
     @FXML
-    private TableView<RecipeIngredient> tableIngredients; //temporarily a string
+    private TableView<RecipeIngredient> tableIngredients;
     @FXML
     private TableColumn<RecipeIngredient, String> colIngredients;
+    @FXML
+    private TableColumn<RecipeIngredient, String> colQuantityAndUnits;
+    @FXML
+    private TableColumn<RecipeIngredient, String> colNotes;
 
     @FXML
     private TableView<RecipeStep> tablePreparation;
@@ -49,6 +53,11 @@ public class RecipeOverviewCtrl implements Initializable {
     private boolean editingName = false;
     @FXML
     private Button editStepsButton;
+
+    @FXML
+    private Button recipeIngredientAdd;
+    @FXML
+    private Button recipeIngredientDelete;
 
     /**
      * Constructs a {@code RecipeOverviewCtrl}.
@@ -79,12 +88,19 @@ public class RecipeOverviewCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         showMainMenu();
 
-        colRecipes.setCellValueFactory(q ->
-                new SimpleStringProperty(q.getValue().getTitle()));
+        colRecipes.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().getTitle()));
 
         colIngredients.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().toString())
+                new SimpleStringProperty(cell.getValue().getIngredient().getName())
         );
+
+        colQuantityAndUnits.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().getAmount() + " "
+                        + cell.getValue().getUnit()));
+
+        colNotes.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().getInformalAmount()));
 
         colPreparation.setCellValueFactory(cell ->
                 new SimpleStringProperty(formatStepForDisplay(cell.getValue())));
@@ -96,13 +112,22 @@ public class RecipeOverviewCtrl implements Initializable {
                         recipeName.setText(newSel.getTitle());
 
         //                TODO
-        //                Need to implement logic for Ingredients
+        //                Need to implement logic for Ingredients and Preparation tables
+                        if (newSel.getIngredients() != null) {
+                            tableIngredients.setItems(
+                                    FXCollections.observableArrayList(newSel.getIngredients()));
+                        } else {
+                            tableIngredients.getItems().clear();
+                        }
 
                         tableIngredients.setVisible(true);
                         tablePreparation.setVisible(true);
 
                         recipeEditButton.setVisible(true);
                         recipeName.setVisible(true);
+
+                        recipeIngredientAdd.setVisible(true);
+                        recipeIngredientDelete.setVisible(true);
 
                         loadStepsForRecipe(newSel);
                     }
@@ -194,8 +219,12 @@ public class RecipeOverviewCtrl implements Initializable {
                 selected.setTitle(newName);
             }
 
-            // TODO
-            // Needs a way to update the database through the server
+            try {
+                server.updateRecipe(selected);
+            } catch (WebApplicationException e) {
+                mainCtrl.showExceptionErrorPopUp(e);
+                return;
+            }
 
             tableRecipes.refresh();
 
@@ -236,6 +265,7 @@ public class RecipeOverviewCtrl implements Initializable {
             mainCtrl.showExceptionErrorPopUp(e);
             return;
         }
+
         showMainMenu();
 
         data.remove(selected);
@@ -258,8 +288,10 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     @FXML
     public void deleteIngredient() {
-        RecipeIngredient selected = tableIngredients.getSelectionModel().getSelectedItem();
-        if (selected == null) {
+        Recipe selectedRecipe = tableRecipes.getSelectionModel().getSelectedItem();
+        RecipeIngredient selectedRecipeIngredient =
+                tableIngredients.getSelectionModel().getSelectedItem();
+        if (selectedRecipeIngredient == null) {
             mainCtrl.showError("Select an ingredient to delete.");
             return;
         }
@@ -273,7 +305,23 @@ public class RecipeOverviewCtrl implements Initializable {
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             return;
         }
-        tableIngredients.getItems().remove(selected);
+
+        try {
+            Recipe updatedRecipe =
+                    server.deleteRecipeIngredient(selectedRecipe, selectedRecipeIngredient);
+            int index = data.indexOf(selectedRecipe);
+            if (index != -1) {
+                data.set(index, updatedRecipe);
+            }
+            selectRecipe(updatedRecipe);
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
+        }
+
+        server.deleteRecipeIngredient(
+                selectedRecipeIngredient.getRecipe(), selectedRecipeIngredient
+        );
+        tableIngredients.getItems().remove(selectedRecipeIngredient);
     }
 
     /**
@@ -285,6 +333,8 @@ public class RecipeOverviewCtrl implements Initializable {
         recipeName.setText("Welcome to FoodPal!");
         tableIngredients.setVisible(false);
         tablePreparation.setVisible(false);
+        recipeIngredientAdd.setVisible(false);
+        recipeIngredientDelete.setVisible(false);
     }
 
     /**

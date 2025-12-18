@@ -6,9 +6,8 @@ import commons.Ingredient;
 import commons.Recipe;
 import commons.RecipeIngredient;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
-import javafx.stage.Modality;
+
 
 public class AddRecipeIngredientCtrl {
 
@@ -173,10 +172,7 @@ public class AddRecipeIngredientCtrl {
                 throw new NumberFormatException("Quantity cannot be negative.");
             }
         } catch (NumberFormatException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
+            mainCtrl.showError(e.getMessage());
             return;
         }
 
@@ -192,10 +188,15 @@ public class AddRecipeIngredientCtrl {
             ri.setUnit(unit);
             ri.setInformalAmount(informal);
 
-            recipe.addRecipeIngredient(ri);
+            boolean riAlreadyExists = recipe.getIngredients().stream()
+                    .anyMatch(existingRi -> existingRi.getIngredient().equals(ingredient));
 
-            // TODO: UPDATE IN SERVER
-            // server.addRecipeIngredient(ri)
+            if (riAlreadyExists) {
+                mainCtrl.showError("This ingredient is already in the recipe.");
+                return;
+            }
+
+            server.addRecipeIngredient(recipe, ri);
         } else {
             existing.setAmount(amount);
             existing.setUnit(unit);
@@ -221,7 +222,6 @@ public class AddRecipeIngredientCtrl {
         quantityInput.clear();
         unitsInput.clear();
         notesInput.clear();
-
     }
 
 }
