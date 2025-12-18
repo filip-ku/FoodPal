@@ -4,7 +4,9 @@
 **Time:** 14:45  
 **Chair:** Filip Kurantowicz  
 **Minute Taker:** Seymur Bastin Caglayan
-**Expected Attendees:** Seymur Bastin Caglayan, Ivan Gvardeitsev, Batuhan Özkara, Max ten Broeke, Merlijn Koster, Filip Kurantowicz
+**Expected Attendees:**
+ONLINE: Seymur Bastin Caglayan, Ivan Gvardeitsev, Merlijn Koster, Filip Kurantowicz
+IN PERSON: Batuhan Özkara, Max ten Broeke
 
 
 ## TA Announcements (5 min)
