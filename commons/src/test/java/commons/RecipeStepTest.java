@@ -51,4 +51,31 @@ class RecipeStepTest {
         assertEquals("instruction cannot be null", e.getMessage());
     }
 
+    @Test
+    void testSetAndGetPosition() {
+        RecipeStep rs = new RecipeStep();
+        rs.setPosition(10);
+        assertEquals(10, rs.getPosition());
+    }
+
+    @Test
+    void testSetAndGetInstruction() {
+        RecipeStep rs = new RecipeStep();
+        rs.setInstruction("Mix ingredients");
+        assertEquals("Mix ingredients", rs.getInstruction());
+    }
+
+    @Test
+    void testSetAndGetRecipe() {
+        RecipeStep rs = new RecipeStep();
+        Recipe recipe = new Recipe();
+        rs.setRecipe(recipe);
+        assertEquals(recipe, rs.getRecipe());
+    }
+
+    @Test
+    void testToStringIsNotEmpty() {
+        RecipeStep rs = new RecipeStep(new Recipe(), 1, "Bake it");
+        assertFalse(rs.toString().isEmpty());
+    }
 }

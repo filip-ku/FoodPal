@@ -124,6 +124,20 @@ public class IngredientService {
         existing.setFatPer100g(ingredient.getFatPer100g());
         return ingredientRepository.save(existing);
 
+        // This will throw NOT_FOUND exception if ingredient doesn't exist
+        Ingredient existing = getIngredient(id);
+
+        if (isNullOrEmpty(ingredient.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "New ingredient name cannot be null or empty");
+        }
+
+        existing.setName(ingredient.getName());
+        existing.setCarbsPer100g(ingredient.getCarbsPer100g());
+        existing.setFatPer100g(ingredient.getFatPer100g());
+        existing.setProteinPer100g(ingredient.getProteinPer100g());
+
+        return ingredientRepository.save(existing);
     }
 
     /**

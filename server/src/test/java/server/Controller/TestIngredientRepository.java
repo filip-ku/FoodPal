@@ -1,11 +1,13 @@
 package server.Controller;
 
+import commons.Ingredient;
 import commons.Recipe;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
+import server.Repository.IngredientRepository;
 import server.Repository.RecipeRepository;
 
 import java.util.ArrayList;
@@ -15,8 +17,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
 /**
- * An in‑memory implementation of {@link RecipeRepository} that is used only
- * for unit tests. It keeps all {@link Recipe} objects in a {@code List}
+ * An in‑memory implementation of {@link IngredientRepository} that is used only
+ * for unit tests. It keeps all {@link Ingredient} objects in a {@code List}
  * and records the names of methods that were called so that test cases can
  * assert on repository usage.
  *
@@ -24,9 +26,9 @@ import java.util.function.Function;
  * many methods are left with stubbed behaviour.
  * They exist only to satisfy the compiler </p>>
  */
-public class TestRecipeRepository implements RecipeRepository {
+public class TestIngredientRepository implements IngredientRepository {
 
-    public final List<Recipe> recipes = new ArrayList<>();
+    public final List<Ingredient> ingredients = new ArrayList<>();
     public final List<String> calledMethods = new ArrayList<>();
 
     private final AtomicLong idSequence = new AtomicLong(1); // Will be used set the recipe ids.
@@ -38,21 +40,21 @@ public class TestRecipeRepository implements RecipeRepository {
     }
 
     @Override
-    public <S extends Recipe> S saveAndFlush(S entity) {
+    public <S extends Ingredient> S saveAndFlush(S entity) {
         calledMethods.add("saveAndFlush");
         return null;
         // TODO Auto-generated method stub
     }
 
     @Override
-    public <S extends Recipe> List<S> saveAllAndFlush(Iterable<S> entities) {
+    public <S extends Ingredient> List<S> saveAllAndFlush(Iterable<S> entities) {
         calledMethods.add("saveAllAndFlush");
         return List.of();
         // TODO Auto-generated method stub
     }
 
     @Override
-    public void deleteAllInBatch(Iterable<Recipe> entities) {
+    public void deleteAllInBatch(Iterable<Ingredient> entities) {
         calledMethods.add("deleteAllInBatch");
         // TODO Auto-generated method stub
     }
@@ -70,199 +72,206 @@ public class TestRecipeRepository implements RecipeRepository {
     }
 
     @Override
-    public Recipe getOne(Long aLong) {
+    public Ingredient getOne(Long aLong) {
         calledMethods.add("getOne");
         return null;
         // TODO Auto-generated method stub
     }
 
     @Override
-    public Recipe getById(Long aLong) {
+    public Ingredient getById(Long aLong) {
         calledMethods.add("getById");
         return null;
         // TODO Auto-generated method stub
     }
 
     @Override
-    public Recipe getReferenceById(Long aLong) {
+    public Ingredient getReferenceById(Long aLong) {
         calledMethods.add("getReferenceById");
         return null;
         // TODO Auto-generated method stub
     }
 
     @Override
-    public <S extends Recipe> Optional<S> findOne(Example<S> example) {
+    public <S extends Ingredient> Optional<S> findOne(Example<S> example) {
         calledMethods.add("findOne");
         return Optional.empty();
         // TODO Auto-generated method stub
     }
 
     @Override
-    public <S extends Recipe> List<S> findAll(Example<S> example) {
+    public <S extends Ingredient> List<S> findAll(Example<S> example) {
         calledMethods.add("findAll");
         return List.of();
         // TODO Auto-generated method stub
     }
 
     @Override
-    public <S extends Recipe> List<S> findAll(Example<S> example, Sort sort) {
+    public <S extends Ingredient> List<S> findAll(Example<S> example, Sort sort) {
         calledMethods.add("findAll");
         return List.of();
         // TODO Auto-generated method stub
     }
 
     @Override
-    public <S extends Recipe> Page<S> findAll(Example<S> example, Pageable pageable) {
+    public <S extends Ingredient> Page<S> findAll(Example<S> example, Pageable pageable) {
         calledMethods.add("findAll");
         return null;
         // TODO Auto-generated method stub
     }
 
     @Override
-    public <S extends Recipe> long count(Example<S> example) {
+    public <S extends Ingredient> long count(Example<S> example) {
         calledMethods.add("count");
         return 0;
         // TODO Auto-generated method stub
     }
 
     @Override
-    public <S extends Recipe> boolean exists(Example<S> example) {
+    public <S extends Ingredient> boolean exists(Example<S> example) {
         calledMethods.add("exists");
         return false;
         // TODO Auto-generated method stub
     }
 
     @Override
-    public <S extends Recipe, R> R findBy(Example<S> example,
-                        Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
+    public <S extends Ingredient, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
         calledMethods.add("findBy");
         return null;
         // TODO Auto-generated method stub
     }
 
     /**
-     * Saves a {@link Recipe} instance.
+     * Saves a {@link Ingredient} instance.
      *
-     * <p>If the recipe doesn't have a valid id, it will be assigned
+     * <p>If the ingredient doesn't have a valid id, it will be assigned
      * a new unique id by {@code idSequence}. <br>
-     * If the recipe already has a valid id, it will overwrite the old recipe
-     * with the new recipe.</p>
+     * If the ingredient already has a valid id, it will overwrite the old ingredient
+     * with the new ingredient.</p>
      *
-     * @param entity the {@link Recipe} to be saved
-     * @return the saved {@link Recipe} (with its id set)
-     * @param <S> a subset of {@link Recipe}
+     * @param entity the ingredient to be saved
+     * @return the saved ingredient (with its id set)
+     * @param <S> a subset of ingredient
      */
     @Override
-    public <S extends Recipe> S save(S entity) {
+    public <S extends Ingredient> S save(S entity) {
         calledMethods.add("save");
-        if (entity.getId() == null || entity.getId() <= 0) {
+        if (entity.getId() == null || entity.getId() <=0 ) {
             entity.setId(idSequence.getAndIncrement());
         } else {
-            recipes.removeIf(recipe -> recipe.getId().equals(entity.getId()));
+            ingredients.removeIf(ingredient -> ingredient.getId().equals(entity.getId()));
         }
 
-        recipes.add(entity);
+        ingredients.add(entity);
         return entity;
     }
 
     @Override
-    public <S extends Recipe> List<S> saveAll(Iterable<S> entities) {
+    public <S extends Ingredient> List<S> saveAll(Iterable<S> entities) {
         calledMethods.add("saveAll");
         return List.of();
         // TODO Auto-generated method stub
     }
 
     /**
-     * Retrieve a {@link Recipe} by its id.
+     * Retrieve a {@link Ingredient} by its id.
      *
-     * @param id of the Recipe to fetch
-     * @return an optional recipe, if found.
+     * @param id of the ingredient to fetch
+     * @return an optional ingredient, if found.
      */
     @Override
-    public Optional<Recipe> findById(Long id) {
+    public Optional<Ingredient> findById(Long id) {
         calledMethods.add("findById");
-        return recipes.stream().filter(r -> r.getId().equals(id)).findFirst();
+        return ingredients.stream().filter(ingredient -> ingredient.getId().equals(id)).findFirst();
     }
 
     /**
-     * Check if a recipe with a given id exists in the repository.
+     * Check if an ingredient with a given id exists in the repository.
      *
-     * @param id of a recipe to be searched for
-     * @return boolean reflecting if there is a recipe with the provided id
+     * @param id of a ingredient to be searched for
+     * @return boolean reflecting if there is a ingredient with the provided id
      */
     @Override
     public boolean existsById(Long id) {
         calledMethods.add("existsById");
-        return recipes.stream().anyMatch(recipe -> recipe.getId().equals(id));
+        return ingredients.stream().anyMatch(ingredient -> ingredient.getId().equals(id));
     }
 
     /**
-     * return all saved recipes.
-     * @return all saved recipes
+     * return all saved {@link Ingredient} saved in the repository.
+     *
+     * @return all saved ingredients
      */
     @Override
-    public List<Recipe> findAll() {
+    public List<Ingredient> findAll() {
         calledMethods.add("findAll");
-        return new ArrayList<>(recipes);
+        return new ArrayList<>(ingredients);
     }
 
     @Override
-    public List<Recipe> findAllById(Iterable<Long> id) {
+    public List<Ingredient> findAllById(Iterable<Long> longs) {
         calledMethods.add("findAllById");
         return List.of();
         // TODO Auto-generated method stub
     }
 
+    /**
+     * Returns the number of ingredients currently stored in the repository.
+     *
+     * @return the total count of ingredients
+     */
     @Override
     public long count() {
         calledMethods.add("count");
-        return 0;
-        // TODO Auto-generated method stub
+        return ingredients.size();
     }
 
     /**
-     * Deletes a {@link Recipe}  by it id, if the recipe got found.
-     * @param id of the recipe that needs to be deleted
+     * Deletes a {@link Ingredient} by its id, if the ingredient got found.
+     * @param id of the ingredient that needs to be deleted
      */
     @Override
     public void deleteById(Long id) {
         calledMethods.add("deleteById");
-        recipes.removeIf(recipe -> recipe.getId().equals(id));
+        ingredients.removeIf(ingredient -> ingredient.getId().equals(id));
     }
 
     @Override
-    public void delete(Recipe recipe) {
+    public void delete(Ingredient entity) {
         calledMethods.add("delete");
         // TODO Auto-generated method stub
     }
 
     @Override
-    public void deleteAllById(Iterable<? extends Long> id) {
+    public void deleteAllById(Iterable<? extends Long> longs) {
         calledMethods.add("deleteAllById");
         // TODO Auto-generated method stub
     }
 
     @Override
-    public void deleteAll(Iterable<? extends Recipe> entities) {
+    public void deleteAll(Iterable<? extends Ingredient> entities) {
         calledMethods.add("deleteAll");
         // TODO Auto-generated method stub
     }
 
+    /**
+     * Deletes all ingredients from the repository.
+     */
     @Override
     public void deleteAll() {
         calledMethods.add("deleteAll");
-        // TODO Auto-generated method stub
+        ingredients.clear();
     }
 
     @Override
-    public List<Recipe> findAll(Sort sort) {
+    public List<Ingredient> findAll(Sort sort) {
         calledMethods.add("findAll");
         return List.of();
         // TODO Auto-generated method stub
     }
 
     @Override
-    public Page<Recipe> findAll(Pageable pageable) {
+    public Page<Ingredient> findAll(Pageable pageable) {
         calledMethods.add("findAll");
         return null;
         // TODO Auto-generated method stub

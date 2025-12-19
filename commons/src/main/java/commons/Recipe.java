@@ -231,7 +231,7 @@ public class Recipe {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Recipe recipe = (Recipe) o;
-        return servings == recipe.servings
+        return Objects.equals(servings, recipe.servings)
                 && Objects.equals(id, recipe.id)
                 && Objects.equals(title, recipe.title);
     }

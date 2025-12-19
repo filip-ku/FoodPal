@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/api/ingredient")
 public class IngredientController {
 
-    public final IngredientService ingredientService;
+    private final IngredientService ingredientService;
     private static final Logger log = LoggerFactory.getLogger(IngredientController.class);
 
     /**
