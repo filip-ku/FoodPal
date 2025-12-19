@@ -31,7 +31,7 @@ public class TestIngredientRepository implements IngredientRepository {
     public final List<Ingredient> ingredients = new ArrayList<>();
     public final List<String> calledMethods = new ArrayList<>();
 
-    private final AtomicLong idSequence = new AtomicLong(1);
+    private final AtomicLong idSequence = new AtomicLong(1); // Will be used set the recipe ids.
 
     @Override
     public void flush() {
