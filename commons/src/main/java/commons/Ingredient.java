@@ -76,7 +76,7 @@ public class Ingredient {
      *
      * @param id new id that will be set by this method
      */
-    public void setId(long id) {this.id = id;}
+    public void setId(Long id) {this.id = id;}
 
     /**
      * Returns the ingredient’s name.

@@ -167,5 +167,21 @@ public class RecipeController {
         return ResponseEntity.ok(updated);
     }
 
+    /**
+     * Updates a single step of a recipe (position/instruction).
+     *
+     * @param id recipe id
+     * @param stepId step id to update
+     * @param updated payload with new fields
+     * @return 200 OK with the updated step
+     */
+    @PutMapping("/{id}/steps/{stepId}")
+    public ResponseEntity<RecipeStep> updateRecipeStep(@PathVariable long id,
+                                                       @PathVariable long stepId,
+                                                       @RequestBody RecipeStep updated) {
+        RecipeStep saved = recipeService.updateStepInRecipe(id, stepId, updated);
+        return ResponseEntity.ok(saved);
+    }
+
 
 }

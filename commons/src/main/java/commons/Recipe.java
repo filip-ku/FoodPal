@@ -28,7 +28,6 @@ public class Recipe {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @OrderBy("position ASC")
     private Set<RecipeIngredient> ingredients = new HashSet<>();
 
     @JsonManagedReference
@@ -172,7 +171,6 @@ public class Recipe {
      */
     public void removeIngredient(RecipeIngredient recipeIngredient) {
         ingredients.remove(recipeIngredient);
-        recipeIngredient.setRecipe(null);
     }
 
     // AI-generated
@@ -219,7 +217,6 @@ public class Recipe {
      */
     public void removeStep(RecipeStep step) {
         steps.remove(step);
-        step.setRecipe(null);
     }
 
     /**

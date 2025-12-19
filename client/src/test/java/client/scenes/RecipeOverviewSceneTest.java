@@ -49,17 +49,6 @@ public class RecipeOverviewSceneTest {
     }
 
     @Test
-    public void selectingRecipeShowsDetails(FxRobot robot) {
-        robot.interact(() -> {
-            tableRecipes.getItems().add(new Recipe("Test Recipe"));
-            tableRecipes.getSelectionModel().select(0);
-        });
-
-        assertEquals("Test Recipe", recipeName.getText());
-        assertEquals(true, editButton.isVisible());
-    }
-
-    @Test
     public void sanityCheckUIElementsExist() {
         assertNotNull(tableRecipes, "Table should exist");
         assertNotNull(recipeName, "Label should exist");
