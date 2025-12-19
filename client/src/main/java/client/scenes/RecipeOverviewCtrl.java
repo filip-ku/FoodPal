@@ -1,9 +1,13 @@
 package client.scenes;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.nio.file.Files;
 import java.util.ResourceBundle;
 
+import client.utils.RecipeFormatter;
 import com.google.inject.Inject;
 
 import client.utils.ServerUtils;
@@ -17,6 +21,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 
 public class RecipeOverviewCtrl implements Initializable {
 
@@ -445,6 +450,47 @@ public class RecipeOverviewCtrl implements Initializable {
 
         } catch (Exception e) {
             mainCtrl.showError("Failed to delete step: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Downloads the recipe as a file. This file is in markdown.
+     * It will first open a file explorer so the user can set a name and location of the file.
+     */
+    @FXML
+    private void downloadRecipe() {
+        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            mainCtrl.showError("Select a recipe first.");
+            return;
+        }
+
+        String content = RecipeFormatter.format(selected);
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save Recipe");
+
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Markdown file (*.md)", "*.md")
+        );
+
+        chooser.setInitialFileName(
+                selected.getTitle().replaceAll("\\s+", "_") + ".md"
+        );
+
+        File file = chooser.showSaveDialog(
+                tableRecipes.getScene().getWindow()
+        );
+
+        if (file == null) {
+            return; // user cancelled
+        }
+
+        try {
+            Files.writeString(file.toPath(), content);
+        } catch (IOException e) {
+            mainCtrl.showError("Failed to save recipe.");
         }
     }
 
