@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="260" prefWidth="480" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.AddRecipeStepCtrl">
+    <children>
+        <Label layoutX="20" layoutY="20" text="Add a new step">
+            <font><Font size="16" /></font>
+        </Label>
+
+        <Label layoutX="20" layoutY="66" text="Position:" />
+        <TextField fx:id="positionInput" layoutX="90" layoutY="62" prefWidth="80" promptText="auto" />
+
+        <Label layoutX="20" layoutY="102" text="Instruction:" />
+        <TextArea fx:id="instructionInput" layoutX="90" layoutY="98" prefHeight="100" prefWidth="360" promptText="Describe what to do in this step..." />
+
+        <Button defaultButton="true" layoutX="415.0" layoutY="210.0" onAction="#ok" text="OK" />
+        <Button cancelButton="true" layoutX="352.0" layoutY="210.0" onAction="#cancel" text="Cancel" />
+    </children>
+</AnchorPane>
