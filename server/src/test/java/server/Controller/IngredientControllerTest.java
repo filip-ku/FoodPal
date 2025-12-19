@@ -5,10 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 import server.Service.IngredientService;
+import server.Repository.RecipeRepository;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * A class which is used to test {@link IngredientController}
@@ -19,10 +21,14 @@ public class IngredientControllerTest {
 
     private IngredientService ingredientService;
 
+    private RecipeRepository recipeRepo;
+
     @BeforeEach
     public void setUp() {
         ingredientRepo = new TestIngredientRepository();
-        ingredientService = new IngredientService(ingredientRepo);
+        ingredientService = new IngredientService(ingredientRepo,recipeRepo);
+        recipeRepo = mock(RecipeRepository.class);
+
     }
 
     @Test
@@ -152,7 +158,8 @@ public class IngredientControllerTest {
         Ingredient savedIngredient = ingredientRepo.save(originalIngredient);
 
         Ingredient updatedIngredient = new Ingredient("Red Tomato", 55.0, null, 70.0);
-        Ingredient result = ingredientService.updateIngredient(savedIngredient.getId(), updatedIngredient);
+        Ingredient result = ingredientService.updateIngredient(savedIngredient.getId(),
+                updatedIngredient);
 
         assertNotNull(result.getId());
         assertEquals("Red Tomato", result.getName());

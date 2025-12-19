@@ -49,6 +49,11 @@ public class IngredientController {
         return ResponseEntity.ok(count);
     }
 
+    public ResponseEntity<Long> getIngredientUsage(@PathVariable Long id){
+        long usage = ingredientService.countUsageOfIngredient(id);
+        return ResponseEntity.ok(usage);
+    }
+
     /**
      * Takes all ingredients
      * @return a list of all ingredients
@@ -104,5 +109,15 @@ public class IngredientController {
         log.info("updating ingredient {}", id);
         Ingredient updated = ingredientService.updateIngredient(id, ingredient);
         return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * searches ingredients by name
+     * @param query input for search
+     * @return list of ingredients containing query
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<Ingredient>> searchIngredients(@RequestParam String query){
+        return ResponseEntity.ok(ingredientService.searchIngredients(query));
     }
 }

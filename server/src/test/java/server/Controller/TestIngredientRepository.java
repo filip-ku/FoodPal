@@ -135,7 +135,8 @@ public class TestIngredientRepository implements IngredientRepository {
     }
 
     @Override
-    public <S extends Ingredient, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
+    public <S extends Ingredient, R> R findBy(Example<S> example, Function<FluentQuery
+            .FetchableFluentQuery<S>, R> queryFunction) {
         calledMethods.add("findBy");
         return null;
         // TODO Auto-generated method stub
@@ -213,6 +214,32 @@ public class TestIngredientRepository implements IngredientRepository {
         calledMethods.add("findAllById");
         return List.of();
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public List<Ingredient> findByNameContainingIgnoreCase(String name) {
+        calledMethods.add("findByNameContainingIgnoreCase");
+
+        if(name == null) {
+            return List.of();
+        }
+
+        String needle = name.toLowerCase();
+        return ingredients.stream()
+                .filter(i -> i.getName() != null && i.getName().toLowerCase().contains(needle))
+                .toList();
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        calledMethods.add("existsByName");
+
+        if(name == null) {
+            return false;
+        }
+
+        return ingredients.stream().anyMatch(i -> i.getName()
+                != null && i.getName().toLowerCase().contains(name));
     }
 
     /**
