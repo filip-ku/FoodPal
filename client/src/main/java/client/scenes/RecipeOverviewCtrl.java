@@ -456,6 +456,7 @@ public class RecipeOverviewCtrl implements Initializable {
     /**
      * Downloads the recipe as a file. This file is in markdown.
      * It will first open a file explorer so the user can set a name and location of the file.
+     * When no recipe is selected, an error window will pop up.
      */
     @FXML
     private void downloadRecipe() {
