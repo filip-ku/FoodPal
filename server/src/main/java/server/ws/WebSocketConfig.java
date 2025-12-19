@@ -25,7 +25,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     * Register STOMP endpoints that clients use to establish a WebSocket (or SockJS) connection.
     *
     * <p>Clients connect to {@code /ws}. Allowed origins are configured via
-    * {@link org.springframework.web.socket.config.annotation.StompWebSocketEndpointRegistration#setAllowedOriginPatterns(String...)}.
+    * {@link org.springframework.web.socket.config.annotation.StompWebSocketEndpointRegistration
+     * #setAllowedOriginPatterns(String...)}.
     *
     * @param registry the STOMP endpoint registry
     */
