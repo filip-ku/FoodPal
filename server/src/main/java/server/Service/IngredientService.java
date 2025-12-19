@@ -102,7 +102,8 @@ public class IngredientService {
                 .flatMap(recipe -> recipe.getIngredients().stream())
                 .filter(ri -> {
                     Ingredient ing = ri.getIngredient();
-                    return ing != null && ing.getId() != null && ing.getId().equals(ingredient.getId());
+                    return ing != null && ing.getId() != null
+                            && ing.getId().equals(ingredient.getId());
                 }).count();
     }
 

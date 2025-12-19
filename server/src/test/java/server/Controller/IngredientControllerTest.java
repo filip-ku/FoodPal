@@ -158,7 +158,8 @@ public class IngredientControllerTest {
         Ingredient savedIngredient = ingredientRepo.save(originalIngredient);
 
         Ingredient updatedIngredient = new Ingredient("Red Tomato", 55.0, null, 70.0);
-        Ingredient result = ingredientService.updateIngredient(savedIngredient.getId(), updatedIngredient);
+        Ingredient result = ingredientService.updateIngredient(savedIngredient.getId(),
+                updatedIngredient);
 
         assertNotNull(result.getId());
         assertEquals("Red Tomato", result.getName());
