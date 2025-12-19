@@ -115,12 +115,15 @@ public class IngredientService {
      */
     public Ingredient updateIngredient(long id, Ingredient ingredient){
         log.info("Updating ingredient with id {}", id);
-        if (ingredient == null){
+
+        Ingredient existing = findIngredient(id);
+
+        if (ingredient == null || ingredient.getName() == null || ingredient.getName().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Ingredient name cannot be null");
+                    "New ingredient name cannot be null or empty");
         }
         validateIngredient(ingredient);
-        Ingredient existing = findIngredient(id);
+
         existing.setName(ingredient.getName());
         existing.setCarbsPer100g(ingredient.getCarbsPer100g());
         existing.setProteinPer100g(ingredient.getProteinPer100g());
