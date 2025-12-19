@@ -22,9 +22,11 @@ public class IngredientService {
     /**
      * Constructs the service with the required repository
      * @param ingredientRepository the required repository
+     * @param recipeRepository the repository of recipe
      */
     @Autowired
-    public IngredientService(IngredientRepository ingredientRepository, RecipeRepository recipeRepository){
+    public IngredientService(IngredientRepository ingredientRepository,
+                             RecipeRepository recipeRepository){
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
     }
@@ -124,20 +126,6 @@ public class IngredientService {
         existing.setFatPer100g(ingredient.getFatPer100g());
         return ingredientRepository.save(existing);
 
-        // This will throw NOT_FOUND exception if ingredient doesn't exist
-        Ingredient existing = getIngredient(id);
-
-        if (isNullOrEmpty(ingredient.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "New ingredient name cannot be null or empty");
-        }
-
-        existing.setName(ingredient.getName());
-        existing.setCarbsPer100g(ingredient.getCarbsPer100g());
-        existing.setFatPer100g(ingredient.getFatPer100g());
-        existing.setProteinPer100g(ingredient.getProteinPer100g());
-
-        return ingredientRepository.save(existing);
     }
 
     /**
