@@ -142,6 +142,55 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
+     * clones an existing recipe (making a copy)
+     */
+    @FXML
+    public void cloneRecipe() {
+
+        Recipe original = tableRecipes.getSelectionModel().getSelectedItem();
+        if(original == null){
+            mainCtrl.showError("Select recipe first!");
+            return;
+        }
+
+        Recipe clone;
+        if(original.getServings() != null){
+            clone = new Recipe(original.getTitle() + " (copy)", original.getServings());
+        }
+        else{
+            clone = new Recipe(original.getTitle() + " (copy)");
+        }
+
+        for(RecipeIngredient ri : original.getIngredients()){
+            RecipeIngredient riClone =
+                    new RecipeIngredient(clone, ri.getIngredient(), ri.getPosition());
+
+            riClone.setAmount(ri.getAmount());
+            riClone.setUnit(ri.getUnit());
+            riClone.setInformalAmount(ri.getInformalAmount());
+            riClone.setNote(ri.getNote());
+
+            clone.addRecipeIngredient(riClone);
+        }
+
+        for (RecipeStep step : original.getSteps()){
+            RecipeStep stepClone = new RecipeStep(clone, step.getPosition(), step.getInstruction());
+
+            clone.addStep(stepClone);
+        }
+
+        try{
+            server.addRecipe(clone);
+        }
+        catch (WebApplicationException e){
+            mainCtrl.showError(e.getMessage());
+            return;
+        }
+
+        refresh();
+    }
+
+    /**
      * Selects the given recipe in the table.
      *
      * @param recipe the recipe to select
