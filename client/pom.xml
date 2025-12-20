@@ -14,6 +14,7 @@
 		<version.mockito>5.8.0</version.mockito>
 		<version.jersey>3.1.9</version.jersey>
 		<version.jfx>25.0.1</version.jfx>
+		<version.spring>6.1.14</version.spring>
 	</properties>
 
 	<dependencies>
@@ -64,6 +65,23 @@
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-web</artifactId>
 			<version>${version.jfx}</version>
+		</dependency>
+
+		<!-- WebSocket/STOMP client -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-messaging</artifactId>
+			<version>${version.spring}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-websocket</artifactId>
+			<version>${version.spring}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${version.spring}</version>
 		</dependency>
 
 		<!-- test -->
