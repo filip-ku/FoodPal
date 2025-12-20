@@ -5,10 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import server.Service.IngredientService;
+import server.Repository.RecipeRepository;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * Unit tests for {@link IngredientController}.
@@ -21,10 +23,14 @@ class IngredientControllerTest {
     private IngredientService ingredientService;
     private IngredientController ingredientController;
 
+    private RecipeRepository recipeRepo;
+
     @BeforeEach
     void setUp() {
         ingredientRepo = new TestIngredientRepository();
-        ingredientService = new IngredientService(ingredientRepo);
+        recipeRepo = mock(RecipeRepository.class);
+
+        ingredientService = new IngredientService(ingredientRepo, recipeRepo);
         ingredientController = new IngredientController(ingredientService);
     }
 
@@ -157,13 +163,15 @@ class IngredientControllerTest {
 
         assertEquals(3, ingredientRepo.ingredients.size());
 
-        ResponseEntity<Void> response = ingredientController.deleteAllIngredients();
+        ResponseEntity<Void> response =
+                ingredientController.deleteAllIngredients();
 
         assertEquals(204, response.getStatusCodeValue());
         assertNull(response.getBody());
         assertEquals(0, ingredientRepo.ingredients.size());
         assertTrue(ingredientRepo.calledMethods.contains("deleteAll"));
     }
+
 
     @Test
     void testUpdateIngredientSuccess() {
