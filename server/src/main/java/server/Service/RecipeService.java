@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import server.Repository.RecipeRepository;
+import server.ws.WebSocketService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.List;
 @Service
 public class RecipeService {
     private final RecipeRepository recipeRepository;
+    private final WebSocketService webSocketService;
 
     /**
      * Constructs a new {@code RecipeService}.
@@ -35,10 +37,12 @@ public class RecipeService {
      * <p><em>Note: This Javadoc was AI-generated.</em></p>
      *
      * @param recipeRepository the JPA repository for recipes
+     * @param webSocketService the WebSocket service for publishing events
      */
     @Autowired
-    public RecipeService(RecipeRepository recipeRepository) {
+    public RecipeService(RecipeRepository recipeRepository, WebSocketService webSocketService) {
         this.recipeRepository = recipeRepository;
+        this.webSocketService = webSocketService;
     }
 
     /**
@@ -61,7 +65,10 @@ public class RecipeService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Recipe title cannot be empty");
         } else {
-            return recipeRepository.save(recipe);
+            Recipe saved = recipeRepository.save(recipe);
+            webSocketService.publishRecipeListChange(saved.getId());
+            webSocketService.publishRecipeChanged("Create", saved.getId(), saved.getTitle());
+            return saved;
         }
     }
 
@@ -103,6 +110,8 @@ public class RecipeService {
     public void removeRecipe(Long id) {
         if (recipeRepository.existsById(id)) {
             recipeRepository.deleteById(id);
+            webSocketService.publishRecipeListChange(id);
+            webSocketService.publishRecipeChanged("Deleted", id, null);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -126,7 +135,9 @@ public class RecipeService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Recipe title cannot be empty");
         } else {
-            return recipeRepository.save(recipe);
+            Recipe saved = recipeRepository.save(recipe);
+            webSocketService.publishRecipeChanged("Changed", saved.getId(), saved.getTitle());
+            return saved;
         }
     }
 
@@ -155,7 +166,9 @@ public class RecipeService {
         recipeIngredient.setRecipe(recipe);
         recipe.addRecipeIngredient(recipeIngredient);
 
-        return recipeRepository.save(recipe);
+        Recipe saved = recipeRepository.save(recipe);
+        webSocketService.publishRecipeContentChanged(recipeId);
+        return saved;
     }
 
 
@@ -177,7 +190,9 @@ public class RecipeService {
 
         recipeStep.setRecipe(recipe);
         recipe.addStep(recipeStep);
-        return recipeRepository.save(recipe);
+        Recipe saved = recipeRepository.save(recipe);
+        webSocketService.publishRecipeContentChanged(recipeId);
+        return saved;
     }
 
     /**
@@ -196,7 +211,9 @@ public class RecipeService {
     public Recipe deleteIngredientFromRecipe(long recipeId, RecipeIngredient recipeIngredient) {
         Recipe recipe = findRecipe(recipeId);
         recipe.getIngredients().remove(recipeIngredient);
-        return recipeRepository.save(recipe);
+        Recipe saved = recipeRepository.save(recipe);
+        webSocketService.publishRecipeContentChanged(recipeId);
+        return saved;
     }
 
     /**
@@ -215,7 +232,9 @@ public class RecipeService {
     public Recipe deleteStepFromRecipe(long recipeId, RecipeStep recipeStep) {
         Recipe recipe = findRecipe(recipeId);
         recipe.getSteps().remove(recipeStep);
-        return recipeRepository.save(recipe);
+        Recipe saved = recipeRepository.save(recipe);
+        webSocketService.publishRecipeContentChanged(recipeId);
+        return saved;
     }
 
     //AI-generated
@@ -247,6 +266,7 @@ public class RecipeService {
         target.setPosition(patch.getPosition());
 
         recipeRepository.save(recipe); // cascade updates the step
+        webSocketService.publishRecipeContentChanged(recipeId);
         return target;
     }
 
@@ -297,7 +317,9 @@ public class RecipeService {
         Recipe recipe = getRecipe(recipeId);
         recipe.getIngredients().removeIf(ingredient ->
                 ingredient.getId() != null && ingredient.getId().equals(recipeIngredientId));
-        return updateRecipe(recipe);
+        Recipe saved = recipeRepository.save(recipe);
+        webSocketService.publishRecipeContentChanged(recipeId);
+        return saved;
     }
 
     /**
@@ -314,7 +336,9 @@ public class RecipeService {
         Recipe recipe = getRecipe(recipeId);
         recipe.getSteps().removeIf(step ->
                 step.getId() != null && step.getId().equals(stepId));
-        return updateRecipe(recipe);
+        Recipe saved = recipeRepository.save(recipe);
+        webSocketService.publishRecipeContentChanged(recipeId);
+        return saved;
     }
 
     /**
