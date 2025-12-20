@@ -306,4 +306,18 @@ public class TestIngredientRepository implements IngredientRepository {
 
         return new PageImpl<>(pageContent, pageable, ingredients.size());
     }
+
+    @Override
+    public List<Ingredient> findByNameContainingIgnoreCase(String name) {
+        calledMethods.add("findByNameContainingIgnoreCase");
+
+        if(name == null) {
+            return List.of();
+        }
+
+        String needle = name.toLowerCase();
+        return ingredients.stream()
+                .filter(i -> i.getName() != null && i.getName().toLowerCase().contains(needle))
+                .toList();
+    }
 }
