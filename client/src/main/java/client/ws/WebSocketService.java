@@ -45,7 +45,7 @@ public class WebSocketService {
             return;
         }
         try {
-            session = stompClient.connect(
+            session = stompClient.connectAsync(
                     URI.create(WS_ENDPOINT),
                     new WebSocketHttpHeaders(),
                     new StompHeaders(),
