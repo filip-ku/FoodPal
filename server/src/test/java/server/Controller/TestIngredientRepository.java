@@ -320,4 +320,17 @@ public class TestIngredientRepository implements IngredientRepository {
                 .filter(i -> i.getName() != null && i.getName().toLowerCase().contains(needle))
                 .toList();
     }
+
+    @Override
+    public boolean existsByName(String name) {
+        calledMethods.add("existsByName");
+
+        if(name == null) {
+            return false;
+        }
+
+        return ingredients.stream().anyMatch(i -> i.getName()
+                != null && i.getName().toLowerCase().contains(name));
+    }
+
 }
