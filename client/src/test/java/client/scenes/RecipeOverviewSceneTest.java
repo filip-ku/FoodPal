@@ -17,7 +17,7 @@ import org.testfx.framework.junit5.Start;
 import java.io.IOException;
 
 import static com.google.inject.Guice.createInjector;
-import static org.junit.jupiter.api.Assertions.*; // Added assertions
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(ApplicationExtension.class)
 public class RecipeOverviewSceneTest {
