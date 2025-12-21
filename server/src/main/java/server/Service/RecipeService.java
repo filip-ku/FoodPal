@@ -71,7 +71,6 @@ public class RecipeService {
             webSocketService.publishRecipeChanged("Create", saved.getId(), saved.getTitle());
             return saved;
         }
-        return recipeRepository.save(recipe);
     }
 
     /**
@@ -142,7 +141,6 @@ public class RecipeService {
             webSocketService.publishRecipeChanged("Changed", saved.getId(), saved.getTitle());
             return saved;
         }
-        return recipeRepository.save(recipe);
     }
 
     /**
