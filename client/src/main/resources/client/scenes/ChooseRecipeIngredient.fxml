@@ -4,21 +4,32 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="171.0" prefWidth="393.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.ChooseRecipeIngredientCtrl">
 
-    <children>
-        <Label layoutX="21.0" layoutY="54.0" text="Ingredient:" />
-        <ComboBox fx:id="ingredientSelect" layoutX="87.0" layoutY="50.0" prefHeight="26.0" prefWidth="220.0" />
-        <Button layoutX="142.0" layoutY="87.0" onAction="#openAddIngredient" styleClass="link-button" text="+" />
-        <Button fx:id="nextButton" defaultButton="true" layoutX="317.0" layoutY="50.0" onAction="#inputRecipeSpecificData" prefHeight="26.0" prefWidth="56.0" text="Next" />
-        <Button cancelButton="true" layoutX="317.0" layoutY="120.0" onAction="#cancel" style="-fx-background-color: #FF2C2C;" text="Cancel" />
-      <Label layoutX="22.0" layoutY="14.0" style="-fx-background-color: #D3D3D3;" text="Choose ingredient or add a new one">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Label>
-      <Label layoutX="21.0" layoutY="91.0" text="Add New Ingredient:" />
-    </children>
-</AnchorPane>
+<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.ChooseRecipeIngredientCtrl">
+   <center>
+      <StackPane BorderPane.alignment="CENTER">
+         <children>
+            <AnchorPane maxHeight="171.0" maxWidth="393.0" minHeight="171.0" minWidth="393.0" prefHeight="171.0" prefWidth="393.0">
+            
+                      <children>
+                    <Label layoutX="21.0" layoutY="54.0" text="Ingredient:" />
+                    <ComboBox fx:id="ingredientSelect" layoutX="87.0" layoutY="50.0" prefHeight="26.0" prefWidth="220.0" />
+                    <Button layoutX="142.0" layoutY="87.0" onAction="#openAddIngredient" styleClass="link-button" text="+" />
+                    <Button fx:id="nextButton" defaultButton="true" layoutX="317.0" layoutY="50.0" onAction="#inputRecipeSpecificData" prefHeight="26.0" prefWidth="56.0" text="Next" />
+                    <Button cancelButton="true" layoutX="317.0" layoutY="120.0" onAction="#cancel" style="-fx-background-color: #FF2C2C;" text="Cancel" />
+                  <Label layoutX="22.0" layoutY="14.0" style="-fx-background-color: #D3D3D3;" text="Choose ingredient or add a new one">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="21.0" layoutY="91.0" text="Add New Ingredient:" />
+                </children>
+            </AnchorPane>
+         </children>
+      </StackPane>
+   </center>
+</BorderPane>
