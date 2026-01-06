@@ -23,7 +23,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(ApplicationExtension.class)
 public class RecipeOverviewSceneTest {
 
-    private static final MyFXML FXML = new MyFXML(createInjector(new MyModule(), new ClientModule()));
+    private static final MyFXML FXML = new MyFXML(createInjector(new MyModule(),
+            new ClientModule()));
 
     private TableView<Recipe> tableRecipes;
     private Label recipeName;
