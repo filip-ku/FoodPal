@@ -51,6 +51,9 @@ public class RecipeOverviewCtrl implements Initializable {
     @FXML
     private TableColumn<RecipeStep, String> colPreparation;
 
+    /**
+     * Language indicator showing current choice and opening the language menu.
+     */
     @FXML
     private MenuButton languageMenu;
 
@@ -164,6 +167,11 @@ public class RecipeOverviewCtrl implements Initializable {
         }
     }
 
+    /**
+     * Updates the indicator text and flag to the chosen language.
+     *
+     * @param option selected language option
+     */
     private void setCurrentLanguage(LanguageOption option) {
         this.currentLanguage = option;
         languageMenu.setText(option.name);
@@ -526,6 +534,9 @@ public class RecipeOverviewCtrl implements Initializable {
         }
     }
 
+    /**
+     * Hardcoded list of languages shown in the selector.
+     */
     private final List<LanguageOption> supportedLanguages = List.of(
             new LanguageOption("en", "English", "Icons/english-flag.png"),
             new LanguageOption("nl", "Nederlands", "Icons/dutch-flag.png"),
@@ -535,6 +546,9 @@ public class RecipeOverviewCtrl implements Initializable {
     @SuppressWarnings("unused")
     private LanguageOption currentLanguage;
 
+    /**
+     * Simple value object describing a language choice.
+     */
     private static class LanguageOption {
         @SuppressWarnings("unused")
         private final String code;
@@ -548,6 +562,13 @@ public class RecipeOverviewCtrl implements Initializable {
         }
     }
 
+    /**
+     * Loads an image resource and returns a scaled {@link ImageView} for menu display.
+     *
+     * @param path   classpath to the image resource
+     * @param height desired image height in pixels
+     * @return image view or {@code null} if the resource cannot be found
+     */
     private ImageView createFlagGraphic(String path, double height) {
         var stream = RecipeOverviewCtrl.class.getClassLoader().getResourceAsStream(path);
         if (stream == null) {
