@@ -5,10 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 import server.Service.RecipeService;
+import server.ws.WebSocketService;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * A class which is used to test {@link RecipeController}
@@ -18,11 +20,14 @@ public class RecipeControllerTest {
     private TestRecipeRepository recipeRepo;
 
     private RecipeService recipeService;
+    private WebSocketService webSocketService;
+
 
     @BeforeEach
     public void setUp() {
         recipeRepo = new TestRecipeRepository();
-        recipeService = new RecipeService(recipeRepo);
+        webSocketService = mock(WebSocketService.class);
+        recipeService = new RecipeService(recipeRepo, webSocketService);
     }
 
     @Test
@@ -36,6 +41,8 @@ public class RecipeControllerTest {
         assertEquals("Pizza", savedRecipe.getTitle());
         assertTrue(recipeRepo.calledMethods.contains("save"));
         assertEquals(1, recipeRepo.recipes.size());
+        verify(webSocketService).publishRecipeListChange(savedRecipe.getId());
+        verify(webSocketService).publishRecipeChanged("Create", savedRecipe.getId(), savedRecipe.getTitle());
     }
 
     @Test
@@ -51,8 +58,6 @@ public class RecipeControllerTest {
         assertEquals(400, e.getStatusCode().value());
         assertEquals("Recipe title cannot be empty", e.getReason());
 
-        // repo save method should not have been run,
-        // as the recipeService should catch the empty title.
         assertTrue(recipeRepo.calledMethods.isEmpty());
     }
 
@@ -106,6 +111,8 @@ public class RecipeControllerTest {
 
         assertEquals(0, recipeRepo.recipes.size());
         assertTrue(recipeRepo.calledMethods.contains("deleteById"));
+        verify(webSocketService).publishRecipeListChange(recipe.getId());
+        verify(webSocketService).publishRecipeChanged("Deleted", recipe.getId(), null);
     }
 
     @Test
@@ -118,10 +125,18 @@ public class RecipeControllerTest {
 
         assertEquals(404, ex.getStatusCode().value());
 
-        //repo removeById method should not have been run,
-        // as the recipeService should catch that there is
-        // no recipe with the provided id.
         assertFalse(recipeRepo.calledMethods.contains("deleteById"));
+    }
+
+    @Test
+    void updateRecipePublishesChange() {
+        Recipe recipe = recipeRepo.save(new Recipe("Old"));
+        recipe.setTitle("New");
+
+        Recipe saved = recipeService.updateRecipe(recipe);
+
+        assertEquals("New", saved.getTitle());
+        verify(webSocketService).publishRecipeChanged("Changed", saved.getId(), "New");
     }
 
 }

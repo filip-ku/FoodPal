@@ -1,9 +1,13 @@
 package client.scenes;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.nio.file.Files;
 import java.util.ResourceBundle;
 
+import client.utils.RecipeFormatter;
 import com.google.inject.Inject;
 
 import client.utils.ServerUtils;
@@ -17,6 +21,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 
 public class RecipeOverviewCtrl implements Initializable {
 
@@ -35,9 +40,7 @@ public class RecipeOverviewCtrl implements Initializable {
     @FXML
     private TableColumn<RecipeIngredient, String> colIngredients;
     @FXML
-    private TableColumn<RecipeIngredient, String> colQuantityAndUnits;
-    @FXML
-    private TableColumn<RecipeIngredient, String> colNotes;
+    private TableColumn<RecipeIngredient, String> colAmount;
 
     @FXML
     private TableView<RecipeStep> tablePreparation;
@@ -51,6 +54,11 @@ public class RecipeOverviewCtrl implements Initializable {
     @FXML
     private Button recipeEditButton;
     private boolean editingName = false;
+
+    @FXML
+    private Button addRecipeStep;
+    @FXML
+    private Button removeStepButton;
     @FXML
     private Button editStepsButton;
 
@@ -58,6 +66,9 @@ public class RecipeOverviewCtrl implements Initializable {
     private Button recipeIngredientAdd;
     @FXML
     private Button recipeIngredientDelete;
+
+    @FXML
+    private Button downloadRecipeButton;
 
     /**
      * Constructs a {@code RecipeOverviewCtrl}.
@@ -95,12 +106,21 @@ public class RecipeOverviewCtrl implements Initializable {
                 new SimpleStringProperty(cell.getValue().getIngredient().getName())
         );
 
-        colQuantityAndUnits.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getAmount() + " "
-                        + cell.getValue().getUnit()));
+        colAmount.setCellValueFactory(cell -> {
+            var ri = cell.getValue();
 
-        colNotes.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getInformalAmount()));
+            boolean hasFormal = ri.getAmount() != null &&
+                            ri.getAmount() != 0 &&
+                            ri.getUnit() != null;
+
+            String value = hasFormal
+                    ? ri.getAmount() + " " + ri.getUnit()
+                    : ri.getInformalAmount(); // ternary operator that executes the code
+                                              // to the left of the : if the condition is true and
+                                              // the code on the right otherwise
+
+            return new SimpleStringProperty(value);
+        });
 
         colPreparation.setCellValueFactory(cell ->
                 new SimpleStringProperty(formatStepForDisplay(cell.getValue())));
@@ -111,8 +131,6 @@ public class RecipeOverviewCtrl implements Initializable {
                     if (newSel != null) {
                         recipeName.setText(newSel.getTitle());
 
-        //                TODO
-        //                Need to implement logic for Ingredients and Preparation tables
                         if (newSel.getIngredients() != null) {
                             tableIngredients.setItems(
                                     FXCollections.observableArrayList(newSel.getIngredients()));
@@ -120,14 +138,7 @@ public class RecipeOverviewCtrl implements Initializable {
                             tableIngredients.getItems().clear();
                         }
 
-                        tableIngredients.setVisible(true);
-                        tablePreparation.setVisible(true);
-
-                        recipeEditButton.setVisible(true);
-                        recipeName.setVisible(true);
-
-                        recipeIngredientAdd.setVisible(true);
-                        recipeIngredientDelete.setVisible(true);
+                        loadRecipeOverviewUI();
 
                         loadStepsForRecipe(newSel);
                     }
@@ -384,6 +395,30 @@ public class RecipeOverviewCtrl implements Initializable {
         tablePreparation.setVisible(false);
         recipeIngredientAdd.setVisible(false);
         recipeIngredientDelete.setVisible(false);
+        downloadRecipeButton.setVisible(false);
+        editStepsButton.setVisible(false);
+        removeStepButton.setVisible(false);
+        addRecipeStep.setVisible(false);
+    }
+
+    /**
+     * Makes every component that the user should
+     * be able to interact with when a recipe is selected visible
+     */
+    public void loadRecipeOverviewUI() {
+        tableIngredients.setVisible(true);
+        tablePreparation.setVisible(true);
+
+        recipeEditButton.setVisible(true);
+        recipeName.setVisible(true);
+
+        recipeIngredientAdd.setVisible(true);
+        recipeIngredientDelete.setVisible(true);
+
+        downloadRecipeButton.setVisible(true);
+        editStepsButton.setVisible(true);
+        removeStepButton.setVisible(true);
+        addRecipeStep.setVisible(true);
     }
 
     /**
@@ -494,6 +529,48 @@ public class RecipeOverviewCtrl implements Initializable {
 
         } catch (Exception e) {
             mainCtrl.showError("Failed to delete step: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Downloads the recipe as a file. This file is in markdown.
+     * It will first open a file explorer so the user can set a name and location of the file.
+     * When no recipe is selected, an error window will pop up.
+     */
+    @FXML
+    private void downloadRecipe() {
+        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            mainCtrl.showError("Select a recipe first.");
+            return;
+        }
+
+        String content = RecipeFormatter.format(selected);
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save Recipe");
+
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Markdown file (*.md)", "*.md")
+        );
+
+        chooser.setInitialFileName(
+                selected.getTitle().replaceAll("\\s+", "_") + ".md"
+        );
+
+        File file = chooser.showSaveDialog(
+                tableRecipes.getScene().getWindow()
+        );
+
+        if (file == null) {
+            return; // user cancelled
+        }
+
+        try {
+            Files.writeString(file.toPath(), content);
+        } catch (IOException e) {
+            mainCtrl.showError("Failed to save recipe.");
         }
     }
 
