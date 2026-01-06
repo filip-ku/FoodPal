@@ -14,7 +14,7 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.RecipeOverviewCtrl">
    <children>
       <Button fx:id="refreshButton" layoutX="530.0" layoutY="18.0" mnemonicParsing="false" onAction="#refresh" text="Refresh" />
-      <Button fx:id="editStepsButton" layoutX="484.0" layoutY="360.0" mnemonicParsing="false" onAction="#editSteps" text="Edit steps" />
+      <Button fx:id="editStepsButton" layoutX="399.0" layoutY="361.0" mnemonicParsing="false" onAction="#editSteps" text="Edit steps" />
       <TableView fx:id="tableRecipes" layoutX="14.0" layoutY="14.0" prefHeight="338.0" prefWidth="114.0">
         <columns>
           <TableColumn fx:id="colRecipes" minWidth="0.0" prefWidth="113.59999980926514" text="Recipes" />
@@ -38,8 +38,7 @@
       <TableView fx:id="tableIngredients" layoutX="128.0" layoutY="61.0" prefHeight="146.0" prefWidth="427.0">
         <columns>
           <TableColumn fx:id="colIngredients" prefWidth="103.20001220703125" text="Ingredient Name" />
-            <TableColumn fx:id="colQuantityAndUnits" prefWidth="76.80006408691406" text="Quantity" />
-            <TableColumn fx:id="colNotes" prefWidth="244.0" text="Notes" />
+            <TableColumn fx:id="colAmount" prefWidth="76.80006408691406" text="Amount" />
         </columns>
          <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -53,7 +52,7 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <Button layoutX="364.0" layoutY="360.0" mnemonicParsing="false" onAction="#showIngredients" text="Show Ingredients" />
+      <Button layoutX="476.0" layoutY="361.0" mnemonicParsing="false" onAction="#showIngredients" text="Show Ingredients" />
       <HBox layoutX="39.0" layoutY="360.0" prefHeight="26.0" prefWidth="70.0" style="-fx-spacing: 20;">
          <children>
             <Button fx:id="addRecipeButton" maxHeight="26.0" maxWidth="26.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#addRecipe" prefHeight="26.0" prefWidth="26.0" text="+" />
@@ -68,7 +67,7 @@
       <Button fx:id="recipeIngredientAdd" layoutX="565.0" layoutY="91.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeIngredient" text="+" />
       <Button fx:id="recipeIngredientDelete" layoutX="565.0" layoutY="121.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#deleteIngredient" text="-" />
        <Button fx:id="addRecipeStep" layoutX="565.0" layoutY="239.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeStep" text="+" />
-       <Button fx:id="removeStep" layoutX="565.0" layoutY="269.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#removeStep" text="-" />
-      <Button layoutX="128.0" layoutY="361.0" mnemonicParsing="false" onAction="#downloadRecipe" text="Download" />
+       <Button fx:id="removeStepButton" layoutX="565.0" layoutY="269.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#removeStep" text="-" />
+      <Button fx:id="downloadRecipeButton" layoutX="317.0" layoutY="361.0" mnemonicParsing="false" onAction="#downloadRecipe" text="Download" />
    </children>
 </AnchorPane>
