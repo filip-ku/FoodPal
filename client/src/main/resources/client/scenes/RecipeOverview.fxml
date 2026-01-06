@@ -69,5 +69,6 @@
       <Button fx:id="recipeIngredientDelete" layoutX="565.0" layoutY="121.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#deleteIngredient" text="-" />
        <Button fx:id="addRecipeStep" layoutX="565.0" layoutY="239.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeStep" text="+" />
        <Button fx:id="removeStep" layoutX="565.0" layoutY="269.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#removeStep" text="-" />
+      <Button layoutX="128.0" layoutY="361.0" mnemonicParsing="false" onAction="#downloadRecipe" text="Download" />
    </children>
 </AnchorPane>
