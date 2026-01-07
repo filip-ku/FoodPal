@@ -46,8 +46,23 @@ public class AddIngredientCtrl {
      * Attempts to submit a new ingredient; shows an error alert if it fails.
      */
     public void okButton() {
+        Ingredient newIngredient = getIngredient();
+
+        if (newIngredient == null) return;
+
         try {
-            server.addIngredient(getIngredient());
+            boolean nameExists = server.getIngredients().stream()
+                    .anyMatch(existing ->
+                            existing.getName().equalsIgnoreCase(newIngredient.getName()));
+
+            if (nameExists) {
+                mainCtrl.showError(
+                        "An ingredient with the name '" +
+                                newIngredient.getName() + "' already exists.");
+                return;
+            }
+
+            server.addIngredient(newIngredient);
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
             return;
@@ -71,19 +86,20 @@ public class AddIngredientCtrl {
         }
 
         try {
-            double protein = proteinInput.getText().isEmpty() ?
-                    0.0 : Double.parseDouble(proteinInput.getText());
-            double fat = fatInput.getText().isEmpty() ?
-                    0.0 : Double.parseDouble(fatInput.getText());
-            double carbs = carbsInput.getText().isEmpty() ?
-                    0.0 : Double.parseDouble(carbsInput.getText());
+            double protein = parseFields(proteinInput.getText());
+            double fat = parseFields(fatInput.getText());
+            double carbs = parseFields(carbsInput.getText());
 
             return new Ingredient(ingredientName, protein, fat, carbs);
         } catch (NumberFormatException e) {
-            mainCtrl.showExceptionErrorPopUp(e);
+            mainCtrl.showError("Please input a valid number for nutrition values.");
         }
 
         return null;
+    }
+
+    private double parseFields(String text) {
+        return text.isEmpty() ? 0.0 : Double.parseDouble(text);
     }
 
     private void clearFields() {
