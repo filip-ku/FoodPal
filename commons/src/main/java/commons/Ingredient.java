@@ -160,6 +160,11 @@ public class Ingredient {
         }
     }
 
+    /**
+     * Returns the calorie amount per 100 grams.
+     *
+     * @return calorie per 100 grams, or {@code null} if unknown.
+     */
     public Double getCalories() {
         return proteinPer100g * 4.0 + carbsPer100g * 4.0 + fatPer100g * 9.0;
     }
