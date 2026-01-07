@@ -46,6 +46,7 @@
                      </children>
                   </VBox>
                   <Label layoutX="409.0" layoutY="14.0" prefWidth="49.0" text="per 100g" />
+                  <Label fx:id="kcalLabel" layoutX="11.0" layoutY="232.0" text="Inferred kcal: 0.0" />
                </children>
             </AnchorPane>
          </children>

@@ -5,10 +5,15 @@ import com.google.inject.Inject;
 import commons.Ingredient;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
-public class AddIngredientCtrl {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class AddIngredientCtrl implements Initializable {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
@@ -22,6 +27,9 @@ public class AddIngredientCtrl {
     @FXML
     private TextField carbsInput;
 
+    @FXML
+    private Label kcalLabel;
+
     /**
      * Creates a controller with injected dependencies.
      *
@@ -32,6 +40,15 @@ public class AddIngredientCtrl {
     public AddIngredientCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        proteinInput.textProperty().addListener((obs, old, nw) -> updateKcalLabel());
+        fatInput.textProperty().addListener((obs, old, nw) -> updateKcalLabel());
+        carbsInput.textProperty().addListener((obs, old, nw) -> updateKcalLabel());
+
+        updateKcalLabel();
     }
 
     /**
@@ -100,6 +117,20 @@ public class AddIngredientCtrl {
 
     private double parseFields(String text) {
         return text.isEmpty() ? 0.0 : Double.parseDouble(text);
+    }
+
+    private void updateKcalLabel() {
+        try {
+            double protein = parseFields(proteinInput.getText());
+            double fat = parseFields(fatInput.getText());
+            double carbs = parseFields(carbsInput.getText());
+
+            double kcal = (protein * 4) + (carbs * 4) + (fat * 9);
+
+            kcalLabel.setText("Inferred kcal: " + kcal);
+        } catch (NumberFormatException e) {
+            kcalLabel.setText("Inferred kcal: 0.0");
+        }
     }
 
     private void clearFields() {
