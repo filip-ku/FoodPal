@@ -11,6 +11,7 @@ import client.utils.ServerUtils;
 import commons.Ingredient;
 import commons.Recipe;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -36,6 +37,14 @@ public class IngredientsOverviewCtrl implements Initializable {
     private TableView<Ingredient> tableIngredients;
     @FXML
     private TableColumn<Ingredient, String> colName;
+    @FXML
+    private TableColumn<Ingredient, Double> colProtein;
+    @FXML
+    private TableColumn<Ingredient, Double> colFat;
+    @FXML
+    private TableColumn<Ingredient, Double> colCarbs;
+    @FXML
+    private TableColumn<Ingredient, Double> colCalories;
     @FXML
     private TableColumn<Ingredient, Integer> colNumOfRecipes;
 
@@ -68,6 +77,18 @@ public class IngredientsOverviewCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         colName.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getName()));
+
+        colProtein.setCellValueFactory(cell ->
+                new SimpleDoubleProperty(cell.getValue().getProteinPer100g()).asObject());
+
+        colFat.setCellValueFactory(cell ->
+                new SimpleDoubleProperty(cell.getValue().getFatPer100g()).asObject());
+
+        colCarbs.setCellValueFactory(cell ->
+                new SimpleDoubleProperty(cell.getValue().getCarbsPer100g()).asObject());
+
+        colCalories.setCellValueFactory(cell ->
+                new SimpleDoubleProperty(cell.getValue().getCalories()).asObject());
 
         colNumOfRecipes.setCellValueFactory(cell ->
                 new SimpleIntegerProperty(

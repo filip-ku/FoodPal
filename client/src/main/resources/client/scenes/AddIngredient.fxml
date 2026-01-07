@@ -28,19 +28,19 @@
                         <HBox prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
                            <children>
                               <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Protein:" textAlignment="RIGHT" />
-                              <TextField fx:id="proteinInput" prefHeight="22.0" prefWidth="163.0" />
+                              <TextField fx:id="proteinInput" prefHeight="22.0" prefWidth="163.0" promptText="in grams" />
                            </children>
                         </HBox>
                         <HBox prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
                            <children>
                               <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Fat:" textAlignment="RIGHT" />
-                              <TextField fx:id="fatInput" prefHeight="22.0" prefWidth="163.0" />
+                              <TextField fx:id="fatInput" prefHeight="22.0" prefWidth="163.0" promptText="in grams" />
                            </children>
                         </HBox>
                         <HBox prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
                            <children>
                               <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Carbohyrates:" textAlignment="RIGHT" />
-                              <TextField fx:id="carbsInput" prefHeight="22.0" prefWidth="163.0" />
+                              <TextField fx:id="carbsInput" prefHeight="22.0" prefWidth="163.0" promptText="in grams" />
                            </children>
                         </HBox>
                      </children>
