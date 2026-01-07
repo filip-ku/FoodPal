@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
-
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.AddIngredientCtrl">
    <center>
@@ -17,12 +17,35 @@
                <children>
                   <Button layoutX="424.0" layoutY="207.0" mnemonicParsing="false" onAction="#okButton" text="Ok" />
                   <Button layoutX="358.0" layoutY="207.0" mnemonicParsing="false" onAction="#cancelButton" text="Cancel" />
-                  <HBox layoutX="91.0" layoutY="118.0" prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
+                  <VBox layoutX="91.0" layoutY="56.0" spacing="10.0">
                      <children>
-                        <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Ingredient Name: " textAlignment="RIGHT" />
-                        <TextField fx:id="ingredientNameInput" prefHeight="22.0" prefWidth="163.0" />
+                        <HBox prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Ingredient Name: " textAlignment="RIGHT" />
+                              <TextField fx:id="ingredientNameInput" prefHeight="22.0" prefWidth="163.0" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Protein:" textAlignment="RIGHT" />
+                              <TextField fx:id="proteinInput" prefHeight="22.0" prefWidth="163.0" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Fat:" textAlignment="RIGHT" />
+                              <TextField fx:id="fatInput" prefHeight="22.0" prefWidth="163.0" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Carbohyrates:" textAlignment="RIGHT" />
+                              <TextField fx:id="carbsInput" prefHeight="22.0" prefWidth="163.0" />
+                           </children>
+                        </HBox>
                      </children>
-                  </HBox>
+                  </VBox>
+                  <Label layoutX="409.0" layoutY="14.0" prefWidth="49.0" text="per 100g" />
                </children>
             </AnchorPane>
          </children>
