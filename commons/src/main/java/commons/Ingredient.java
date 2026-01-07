@@ -160,6 +160,10 @@ public class Ingredient {
         }
     }
 
+    public Double getCalories() {
+        return proteinPer100g * 4.0 + carbsPer100g * 4.0 + fatPer100g * 9.0;
+    }
+
     /**
      * equals method
      * @param o   the reference object with which to compare.
