@@ -196,4 +196,16 @@ public class MainCtrl {
         primaryStage.setScene(addRecipeStepScene);
     }
 
+    /**
+     * Shows the “Edit Recipe Step” screen for a given recipe + existing step.
+     * Prefills the AddRecipeStep screen with the selected step data.
+     * @param recipe the parent recipe
+     * @param step the step to edit
+     */
+    public void showEditRecipeStep(Recipe recipe, RecipeStep step) {
+        addRecipeStepCtrl.setContextForEdit(recipe, step);
+        primaryStage.setTitle("FoodPal: Edit Step");
+        primaryStage.setScene(addRecipeStepScene);
+    }
+
 }

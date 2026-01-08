@@ -332,12 +332,22 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
-     * Method is not available yet
+     * Opens RecipeStep scene if a valid recipe and corresponding step is selected
      */
     @FXML
     private void editSteps() {
-        // TODO: implement later
-        mainCtrl.showError("Editing steps is not implemented yet.");
+        Recipe selectedRecipe = tableRecipes.getSelectionModel().getSelectedItem();
+        if (selectedRecipe == null) {
+            mainCtrl.showError("Select a recipe first.");
+            return;
+        }
+
+        RecipeStep selectedStep = tablePreparation.getSelectionModel().getSelectedItem();
+        if (selectedStep == null) {
+            mainCtrl.showError("Select a step to edit.");
+            return;
+        }
+        mainCtrl.showEditRecipeStep(selectedRecipe, selectedStep);
     }
 
     /**

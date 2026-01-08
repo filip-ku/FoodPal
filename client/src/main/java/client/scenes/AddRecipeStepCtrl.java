@@ -21,6 +21,9 @@ public class AddRecipeStepCtrl {
 
     private Recipe recipe;
 
+    private RecipeStep editingStep;     // null if adding
+    private Integer originalPosition;   // for detecting position changes
+
     @FXML private TextField positionInput;   // optional; leave empty to append
     @FXML private TextArea instructionInput;
 
@@ -41,6 +44,12 @@ public class AddRecipeStepCtrl {
      */
     public void setRecipe(Recipe recipe) {
         this.recipe = recipe;
+        this.editingStep = null;
+        this.originalPosition = null;
+
+        // clear UI when opening add screen
+        if (instructionInput != null) instructionInput.clear();
+        if (positionInput != null) positionInput.clear();
     }
 
     /**
@@ -49,6 +58,41 @@ public class AddRecipeStepCtrl {
     @FXML
     public void cancel() {
         mainCtrl.showRecipeOverview();
+    }
+
+    /**
+     * Sets the context for editing an existing step.
+     * Prefills UI fields with existing values.
+     * @param recipe the recipe that the preparation step belongs to
+     * @param step the step that is being edited
+     */
+    public void setContextForEdit(Recipe recipe, RecipeStep step) {
+        if (recipe == null) {
+            throw new IllegalArgumentException("recipe must not be null");
+        }
+        if (step == null) {
+            throw new IllegalArgumentException("step must not be null");
+        }
+
+        this.recipe = recipe;
+        this.editingStep = step;
+        this.originalPosition = step.getPosition();
+
+        // Prefill instruction
+        String instruction = step.getInstruction();
+        if (instruction == null) {
+            instructionInput.setText("");
+        } else {
+            instructionInput.setText(instruction);
+        }
+
+        // Prefill position
+        Integer position = step.getPosition();
+        if (position == null) {
+            positionInput.setText("");
+        } else {
+            positionInput.setText(String.valueOf(position));
+        }
     }
 
     //AI-generated
@@ -118,7 +162,13 @@ public class AddRecipeStepCtrl {
         step.setPosition(position);
 
         // 4) Persist on server
-        server.addRecipeStep(recipe.getId(), step);
+        if (editingStep == null) {
+            server.addRecipeStep(recipe.getId(), step);
+        } else {
+            editingStep.setInstruction(instruction);
+            editingStep.setPosition(position);
+            server.updateRecipeStep(recipe.getId(), editingStep);
+        }
 
         // 5) Refresh overview and navigate back
         var overview = mainCtrl.getRecipeOverviewCtrl();
