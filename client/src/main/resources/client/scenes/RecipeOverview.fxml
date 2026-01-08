@@ -71,8 +71,7 @@
             </VBox>
             <HBox alignment="CENTER_RIGHT" spacing="10.0">
                <children>
-                   <MenuButton fx:id="languageMenu" layoutX="414.0" layoutY="18.0" mnemonicParsing="false" prefWidth="108.0" text="Language" />
-                   <Button fx:id="downloadRecipeButton" mnemonicParsing="false" onAction="#downloadRecipe" text="Download" />
+                  <Button fx:id="downloadRecipeButton" mnemonicParsing="false" onAction="#downloadRecipe" text="Download" />
                   <Button fx:id="editStepsButton" mnemonicParsing="false" onAction="#editSteps" text="Edit steps" />
                   <Button mnemonicParsing="false" onAction="#showIngredients" text="Show Ingredients" />
                </children>
@@ -90,8 +89,9 @@
       </VBox>
    </center>
    <top>
-      <HBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+      <HBox alignment="TOP_RIGHT" spacing="10.0" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
          <children>
+            <MenuButton fx:id="languageMenu" mnemonicParsing="false" prefWidth="120.0" text="Language" />
             <Button fx:id="refreshButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#refresh" text="Refresh" />
          </children>
          <padding>
