@@ -10,25 +10,36 @@ import java.util.ResourceBundle;
 import client.utils.RecipeFormatter;
 import com.google.inject.Inject;
 
+import client.ws.WebSocketService;
 import client.utils.ServerUtils;
 import commons.Recipe;
 import commons.RecipeIngredient;
 import commons.RecipeStep;
+import commons.ws.RecipeChangedEvent;
+import commons.ws.RecipeContentChangedEvent;
+import commons.ws.RecipeListEvent;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import org.springframework.messaging.simp.stomp.StompSession;
 import javafx.stage.FileChooser;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class RecipeOverviewCtrl implements Initializable {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private final WebSocketService webSocketService;
 
     private ObservableList<Recipe> data;
+
+    private StompSession.Subscription recipeContentSubscription;
 
     @FXML
     private TableView<Recipe> tableRecipes;
@@ -46,6 +57,12 @@ public class RecipeOverviewCtrl implements Initializable {
     private TableView<RecipeStep> tablePreparation;
     @FXML
     private TableColumn<RecipeStep, String> colPreparation;
+
+    /**
+     * Language indicator showing current choice and opening the language menu.
+     */
+    @FXML
+    private MenuButton languageMenu;
 
     @FXML
     private Label recipeName;
@@ -81,11 +98,14 @@ public class RecipeOverviewCtrl implements Initializable {
      *
      * @param server  injected {@link ServerUtils}
      * @param mainCtrl injected {@link MainCtrl}
+     * @param webSocketService injected {@link WebSocketService}
      */
     @Inject
-    public RecipeOverviewCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public RecipeOverviewCtrl(ServerUtils server, MainCtrl mainCtrl,
+                              WebSocketService webSocketService) {
         this.server = server;
         this.mainCtrl = mainCtrl;
+        this.webSocketService = webSocketService;
     }
 
     /**
@@ -100,6 +120,7 @@ public class RecipeOverviewCtrl implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         showMainMenu();
+        setupLanguageMenu();
 
         colRecipes.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getTitle()));
@@ -132,6 +153,14 @@ public class RecipeOverviewCtrl implements Initializable {
                 .addListener((obs, oldSel, newSel) -> {
                     if (newSel != null) {
                         recipeName.setText(newSel.getTitle());
+                        tableIngredients.setVisible(true);
+                        tablePreparation.setVisible(true);
+
+                        recipeEditButton.setVisible(true);
+                        recipeName.setVisible(true);
+
+                        recipeIngredientAdd.setVisible(true);
+                        recipeIngredientDelete.setVisible(true);
 
                         if (newSel.getIngredients() != null) {
                             tableIngredients.setItems(
@@ -141,15 +170,49 @@ public class RecipeOverviewCtrl implements Initializable {
                         }
 
                         loadRecipeOverviewUI();
-
                         loadStepsForRecipe(newSel);
+                        subscribeToRecipeContent(newSel.getId());
+                        reloadSelectedRecipeDetails(newSel);
                     }
                 });
+
         tableIngredients.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
                     recipeIngredientEditButton.setVisible(newSel != null);
                 });
+
+        setupWebSocketSubscriptions();
+    }
+
+    /**
+     * Configures the language indicator/dropdown with the available options.
+     * This is UI-only for now; selection changes are not yet persisted or applied.
+     */
+    private void setupLanguageMenu() {
+        languageMenu.getItems().clear();
+
+        for (LanguageOption option : supportedLanguages) {
+            MenuItem item = new MenuItem(option.name);
+            item.setGraphic(createFlagGraphic(option.iconPath, 16));
+            item.setOnAction(e -> setCurrentLanguage(option));
+            languageMenu.getItems().add(item);
+        }
+
+        if (!supportedLanguages.isEmpty()) {
+            setCurrentLanguage(supportedLanguages.get(0));
+        }
+    }
+
+    /**
+     * Updates the indicator text and flag to the chosen language.
+     *
+     * @param option selected language option
+     */
+    private void setCurrentLanguage(LanguageOption option) {
+        this.currentLanguage = option;
+        languageMenu.setText(option.name);
+        languageMenu.setGraphic(createFlagGraphic(option.iconPath, 16));
     }
 
     /**
@@ -224,13 +287,29 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     public void refresh() {
         try {
+            Long selectedId;
+            Recipe selectedBefore = tableRecipes.getSelectionModel().getSelectedItem();
+            if (selectedBefore != null) {
+                selectedId = selectedBefore.getId();
+            } else {
+                selectedId = null;
+            }
+
             var recipes = server.getRecipes();
             data = FXCollections.observableList(recipes);
             tableRecipes.setItems(data);
 
+            if (selectedId != null) {
+                data.stream()
+                        .filter(r -> selectedId.equals(r.getId()))
+                        .findFirst()
+                        .ifPresent(r -> tableRecipes.getSelectionModel().select(r));
+            }
+
             Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                loadStepsForRecipe(selected);
+                recipeName.setText(selected.getTitle());
+                reloadSelectedRecipeDetails(selected);
             }
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
@@ -385,10 +464,92 @@ public class RecipeOverviewCtrl implements Initializable {
             mainCtrl.showExceptionErrorPopUp(e);
         }
 
-        server.deleteRecipeIngredient(
-                selectedRecipeIngredient.getRecipe(), selectedRecipeIngredient
-        );
         tableIngredients.getItems().remove(selectedRecipeIngredient);
+    }
+
+    /**
+     * Subscribes to global recipe list and title change topics so the UI can refresh automatically.
+     * Retries are not implemented here; failures are logged to stderr.
+     */
+    private void setupWebSocketSubscriptions() {
+        try {
+            webSocketService.subscribeRecipeList(this::handleRecipeListEvent);
+            webSocketService.subscribeRecipeChanged(this::handleRecipeChangedEvent);
+        } catch (RuntimeException e) {
+            System.err.println("WebSocket subscription failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Handles list-level events (create/delete) by refreshing the full list.
+     *
+     * @param event event describing a list change
+     */
+    private void handleRecipeListEvent(RecipeListEvent event) {
+        Platform.runLater(this::refresh);
+    }
+
+    /**
+     * Handles title changes by refreshing the list (and reselecting).
+     *
+     * @param event event describing a recipe title change
+     */
+    private void handleRecipeChangedEvent(RecipeChangedEvent event) {
+        Platform.runLater(this::refresh);
+    }
+
+    /**
+     * Subscribes to content changes for the specified recipe, cancelling any previous subscription.
+     *
+     * @param recipeId the recipe to follow for ingredient/step updates
+     */
+    private void subscribeToRecipeContent(Long recipeId) {
+        if (recipeContentSubscription != null) {
+            recipeContentSubscription.unsubscribe();
+            recipeContentSubscription = null;
+        }
+        if (recipeId == null) {
+            return;
+        }
+        try {
+            recipeContentSubscription = webSocketService.subscribeRecipeContent(
+                    recipeId,
+                    this::handleRecipeContentChangedEvent
+            );
+        } catch (RuntimeException e) {
+            System.err.println("WebSocket content subscription failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Reloads the currently selected recipe's details when its content changes.
+     *
+     * @param event event indicating which recipe changed
+     */
+    private void handleRecipeContentChangedEvent(RecipeContentChangedEvent event) {
+        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
+        if (selected != null && selected.getId() != null
+                && selected.getId().equals(event.recipeId())) {
+            Platform.runLater(() -> reloadSelectedRecipeDetails(selected));
+        }
+    }
+
+    /**
+     * Reloads ingredients and steps for the given recipe and updates the tables.
+     *
+     * @param recipe currently selected recipe
+     */
+    private void reloadSelectedRecipeDetails(Recipe recipe) {
+        if (recipe == null) {
+            return;
+        }
+        try {
+            var ingredients = server.getRecipeIngredients(recipe);
+            tableIngredients.setItems(FXCollections.observableArrayList(ingredients));
+            loadStepsForRecipe(recipe);
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
+        }
     }
 
     /**
@@ -601,4 +762,49 @@ public class RecipeOverviewCtrl implements Initializable {
         }
     }
 
+    /**
+     * Hardcoded list of languages shown in the selector.
+     */
+    private final List<LanguageOption> supportedLanguages = List.of(
+            new LanguageOption("en", "English", "Icons/english-flag.png"),
+            new LanguageOption("nl", "Nederlands", "Icons/dutch-flag.png"),
+            new LanguageOption("es", "Español", "Icons/spanish-flag.png")
+    );
+
+    @SuppressWarnings("unused")
+    private LanguageOption currentLanguage;
+
+    /**
+     * Simple value object describing a language choice.
+     */
+    private static class LanguageOption {
+        @SuppressWarnings("unused")
+        private final String code;
+        private final String name;
+        private final String iconPath;
+
+        LanguageOption(String code, String name, String iconPath) {
+            this.code = code;
+            this.name = name;
+            this.iconPath = iconPath;
+        }
+    }
+
+    /**
+     * Loads an image resource and returns a scaled {@link ImageView} for menu display.
+     *
+     * @param path   classpath to the image resource
+     * @param height desired image height in pixels
+     * @return image view or {@code null} if the resource cannot be found
+     */
+    private ImageView createFlagGraphic(String path, double height) {
+        var stream = RecipeOverviewCtrl.class.getClassLoader().getResourceAsStream(path);
+        if (stream == null) {
+            return null;
+        }
+        ImageView view = new ImageView(new Image(stream));
+        view.setPreserveRatio(true);
+        view.setFitHeight(height);
+        return view;
+    }
 }
