@@ -30,6 +30,8 @@ public class AddIngredientCtrl implements Initializable {
     @FXML
     private Label kcalLabel;
 
+    private Ingredient ingredientToEdit;
+
     /**
      * Creates a controller with injected dependencies.
      *
@@ -68,18 +70,27 @@ public class AddIngredientCtrl implements Initializable {
         if (newIngredient == null) return;
 
         try {
-            boolean nameExists = server.getIngredients().stream()
-                    .anyMatch(existing ->
-                            existing.getName().equalsIgnoreCase(newIngredient.getName()));
+            if (ingredientToEdit == null) {
+                boolean nameExists = server.getIngredients().stream()
+                        .anyMatch(existing ->
+                                existing.getName().equalsIgnoreCase(newIngredient.getName()));
 
-            if (nameExists) {
-                mainCtrl.showError(
-                        "An ingredient with the name '" +
-                                newIngredient.getName() + "' already exists.");
-                return;
+                if (nameExists) {
+                    mainCtrl.showError(
+                            "An ingredient with the name '" +
+                                    newIngredient.getName() + "' already exists.");
+                    return;
+                }
+
+                server.addIngredient(newIngredient);
+            } else {
+                ingredientToEdit.setName(newIngredient.getName());
+                ingredientToEdit.setProteinPer100g(newIngredient.getProteinPer100g());
+                ingredientToEdit.setFatPer100g(newIngredient.getFatPer100g());
+                ingredientToEdit.setCarbsPer100g(newIngredient.getCarbsPer100g());
+
+                server.updateIngredient(ingredientToEdit);
             }
-
-            server.addIngredient(newIngredient);
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
             return;
@@ -133,7 +144,24 @@ public class AddIngredientCtrl implements Initializable {
         }
     }
 
+    /**
+     * Setter for the ingredient to edit.
+     *
+     * @param ingredient the ingredient to edit
+     */
+    public void setIngredientToEdit(Ingredient ingredient) {
+        this.ingredientToEdit = ingredient;
+
+        ingredientNameInput.setText(ingredient.getName());
+        proteinInput.setText(String.valueOf(ingredient.getProteinPer100g()));
+        fatInput.setText(String.valueOf(ingredient.getFatPer100g()));
+        carbsInput.setText(String.valueOf(ingredient.getCarbsPer100g()));
+
+        updateKcalLabel();
+    }
+
     private void clearFields() {
+        this.ingredientToEdit = null;
         ingredientNameInput.clear();
         proteinInput.clear();
         fatInput.clear();

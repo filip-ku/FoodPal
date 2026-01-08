@@ -546,6 +546,7 @@ public class RecipeOverviewCtrl implements Initializable {
         }
         try {
             var ingredients = server.getRecipeIngredients(recipe);
+            tableIngredients.getItems().clear();
             tableIngredients.setItems(FXCollections.observableArrayList(ingredients));
             loadStepsForRecipe(recipe);
         } catch (WebApplicationException e) {

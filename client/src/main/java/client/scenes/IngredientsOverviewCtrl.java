@@ -18,10 +18,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.stage.Modality;
 
 public class IngredientsOverviewCtrl implements Initializable {
@@ -47,6 +44,9 @@ public class IngredientsOverviewCtrl implements Initializable {
     private TableColumn<Ingredient, Double> colCalories;
     @FXML
     private TableColumn<Ingredient, Integer> colNumOfRecipes;
+
+    @FXML
+    private Button editIngredientButton;
 
     /**
      * Constructs a {@code IngredientsOverviewCtrl}.
@@ -97,6 +97,13 @@ public class IngredientsOverviewCtrl implements Initializable {
                         )
                 ).asObject()
         );
+
+        editIngredientButton.setDisable(true);
+        tableIngredients.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldSel, newSel) -> {
+                    editIngredientButton.setDisable(newSel == null);
+                });
     }
 
     /**
@@ -127,6 +134,21 @@ public class IngredientsOverviewCtrl implements Initializable {
      */
     public void addGlobalIngredient() {
         mainCtrl.showAddIngredient();
+    }
+
+    /**
+     * Checks to see if there is an ingredient selected and navigates to the
+     * addIngredient screen in edit mode if so.
+     */
+    public void editGlobalIngredient() {
+        Ingredient selected = tableIngredients.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            mainCtrl.showError("No ingredient selected for editing.");
+            return;
+        }
+
+        mainCtrl.showEditIngredient(selected);
     }
 
     /**
