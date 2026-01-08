@@ -196,4 +196,20 @@ public class MainCtrl {
         primaryStage.setScene(addRecipeStepScene);
     }
 
+    /**
+     * Displays the edit ingredient screen for the given recipe ingredient.
+     *
+     * @param recipe the parent recipe
+     * @param recipeIngredient the ingredient to edit
+     */
+    public void showEditRecipeIngredient(Recipe recipe, RecipeIngredient recipeIngredient) {
+        addRecipeIngredientCtrl.setContextForEdit(
+                recipe,
+                recipeIngredient,
+                recipeIngredient.getIngredient()
+        );
+        primaryStage.setTitle("Edit Ingredient Amount");
+        primaryStage.setScene(addRecipeIngredientScene);
+    }
+
 }

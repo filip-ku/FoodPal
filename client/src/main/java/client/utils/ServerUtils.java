@@ -233,6 +233,21 @@ public class ServerUtils {
     }
 
     /**
+     * Updates an existing {@link RecipeIngredient} on the server.
+     *
+     * @param recipe the recipe containing the ingredient
+     * @param recipeIngredient the updated recipeIngredient
+     * @return the updated recipe object
+     */
+    public Recipe updateRecipeIngredient(Recipe recipe, RecipeIngredient recipeIngredient) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/recipe/" + recipe.getId() +
+                        "/ingredients/" + recipeIngredient.getId())
+                .request(APPLICATION_JSON)
+                .put(Entity.entity(recipeIngredient, APPLICATION_JSON), Recipe.class);
+    }
+
+    /**
      * Checks whether the backend server is reachable.
      *
      * <p>This method performs a lightweight {@code GET} request to the base
