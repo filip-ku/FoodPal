@@ -69,6 +69,10 @@ public class RecipeStep {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     /**
      * Returns the recipe this step belongs to.
      *

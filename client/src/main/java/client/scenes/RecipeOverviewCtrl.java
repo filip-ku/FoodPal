@@ -492,7 +492,8 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
-     * Deletes the selected step and automatically shifts subsequent steps up by one.
+     * Deletes the selected step.
+     * The server is responsible for renumbering remaining steps.
      */
     @FXML
     public void removeStep() {
@@ -520,25 +521,10 @@ public class RecipeOverviewCtrl implements Initializable {
         }
 
         try {
-            // Delete the selected step
             server.deleteRecipeStep(selectedRecipe.getId(), selectedStep.getId());
-
-            // Fetch remaining steps and shift positions
-            List<RecipeStep> steps = server.getStepsForRecipe(selectedRecipe.getId());
-            int deletedPos = selectedStep.getPosition();
-
-            for (RecipeStep step : steps) {
-                if (step.getPosition() > deletedPos) {
-                    step.setPosition(step.getPosition() - 1);
-                    server.updateRecipeStep(selectedRecipe.getId(), step);
-                }
-            }
-
-            // Reload the step table
             loadStepsForRecipe(selectedRecipe);
-
-        } catch (Exception e) {
-            mainCtrl.showError("Failed to delete step: " + e.getMessage());
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
         }
     }
 

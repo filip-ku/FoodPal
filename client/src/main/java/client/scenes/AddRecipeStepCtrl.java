@@ -4,6 +4,7 @@ import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Recipe;
 import commons.RecipeStep;
+import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -145,14 +146,25 @@ public class AddRecipeStepCtrl {
             position = next;
         }
 
-        // In case of duplicate step numbers, gives an error
+        // Client-side precheck, ignore the step being edited.
         List<RecipeStep> existingSteps = server.getStepsForRecipe(recipe.getId());
         if (existingSteps != null) {
             for (RecipeStep s : existingSteps) {
-                if (s != null && s.getPosition() == position) {
-                    mainCtrl.showError("A step with number " + position + " already exists.");
-                    return;
+                if (s == null) continue;
+
+                boolean samePosition = s.getPosition() == position;
+                if (!samePosition) continue;
+
+                // If we are editing, allow keeping the same position for the same step
+                if (editingStep != null) {
+                    if (s.getId() != null && editingStep.getId()
+                            != null && s.getId().equals(editingStep.getId())) {
+                        continue; // it's the same step -> not a conflict
+                    }
                 }
+
+                mainCtrl.showError("A step with number " + position + " already exists.");
+                return;
             }
         }
 
@@ -162,12 +174,22 @@ public class AddRecipeStepCtrl {
         step.setPosition(position);
 
         // 4) Persist on server
-        if (editingStep == null) {
-            server.addRecipeStep(recipe.getId(), step);
-        } else {
-            editingStep.setInstruction(instruction);
-            editingStep.setPosition(position);
-            server.updateRecipeStep(recipe.getId(), editingStep);
+        try {
+            if (editingStep == null) {
+                // ADD
+                server.addRecipeStep(recipe.getId(), step);
+            } else {
+                // EDIT
+                RecipeStep updated = new RecipeStep();
+                updated.setId(editingStep.getId());
+                updated.setInstruction(instruction);
+                updated.setPosition(position);
+
+                server.updateRecipeStep(recipe.getId(), updated);
+            }
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
+            return;
         }
 
         // 5) Refresh overview and navigate back
