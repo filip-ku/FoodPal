@@ -48,7 +48,12 @@ public class IngredientController {
         long count = ingredientService.countIngredients();
         return ResponseEntity.ok(count);
     }
-
+    /**
+     * Returns how many times an ingredient is used.
+     * AI-generated
+     * @param id the ingredient ID
+     * @return the usage count of the ingredient
+     */
     public ResponseEntity<Long> getIngredientUsage(@PathVariable Long id){
         long usage = ingredientService.countUsageOfIngredient(id);
         return ResponseEntity.ok(usage);
