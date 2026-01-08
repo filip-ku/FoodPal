@@ -1,5 +1,6 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -7,6 +8,7 @@ import java.util.Objects;
 /**
  * JPA entity representing an ingredient.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 public class Ingredient {
 
