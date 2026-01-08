@@ -353,6 +353,34 @@ public class RecipeService {
     }
 
     /**
+     * Updates an existing {@link RecipeIngredient} in a recipe.
+     *
+     * @param recipeId the id of the recipe
+     * @param recipeIngredientId the id of the recipe ingredient to update
+     * @param patch the updated recipe ingredient data
+     * @return the updated recipe
+     * @throws ResponseStatusException if the recipe or ingredient is not found
+     */
+    public Recipe updateRecipeIngredient(Long recipeId, Long recipeIngredientId,
+                                         RecipeIngredient patch) {
+        Recipe recipe = getRecipe(recipeId);
+        RecipeIngredient target = recipe.getIngredients().stream()
+                .filter(ri -> ri.getId() != null && ri.getId().equals(recipeIngredientId))
+                .findFirst()
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "Recipe ingredient not found"));
+
+        target.setAmount(patch.getAmount());
+        target.setUnit(patch.getUnit());
+        target.setInformalAmount(patch.getInformalAmount());
+
+        Recipe saved = recipeRepository.save(recipe);
+        webSocketService.publishRecipeContentChanged(recipeId);
+        return saved;
+    }
+
+    /**
      * checks if string is empty or null
      * @param s string
      * @return boolean

@@ -66,6 +66,8 @@ public class RecipeOverviewCtrl implements Initializable {
     private Button recipeIngredientAdd;
     @FXML
     private Button recipeIngredientDelete;
+    @FXML
+    private Button editIngredientButton;
 
     @FXML
     private Button downloadRecipeButton;
