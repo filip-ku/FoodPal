@@ -96,6 +96,34 @@ public class AddRecipeStepCtrl {
         }
     }
 
+    /**
+     * Chooses an automatic step position.
+     * Uses the smallest positive integer not already used by an existing step.
+     *
+     * @param steps the existing steps for the recipe
+     * @return the first free position starting at 1
+     */
+    private static int chooseAutoPosition(List<RecipeStep> steps) {
+        int pos = 1;
+        if (steps == null) {
+            return pos;
+        }
+
+        boolean used;
+        do {
+            used = false;
+            for (RecipeStep s : steps) {
+                if (s != null && s.getPosition() == pos) {
+                    used = true;
+                    pos++;
+                    break;
+                }
+            }
+        } while (used);
+
+        return pos;
+    }
+
     //AI-generated
     /**
      * Validates input, computes position (append if empty),
@@ -137,17 +165,20 @@ public class AddRecipeStepCtrl {
         }
 
         // If position not provided, append at the end
+        List<RecipeStep> existingSteps;
+        try {
+            existingSteps = server.getStepsForRecipe(recipe.getId());
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
+            return;
+        }
+
+        // If position not provided, choose a free position
         if (position == null) {
-            List<RecipeStep> existing = server.getStepsForRecipe(recipe.getId());
-            int next = 1;
-            if (existing != null) {
-                next = existing.size() + 1;
-            }
-            position = next;
+            position = chooseAutoPosition(existingSteps);
         }
 
         // Client-side precheck, ignore the step being edited.
-        List<RecipeStep> existingSteps = server.getStepsForRecipe(recipe.getId());
         if (existingSteps != null) {
             for (RecipeStep s : existingSteps) {
                 if (s == null) continue;
