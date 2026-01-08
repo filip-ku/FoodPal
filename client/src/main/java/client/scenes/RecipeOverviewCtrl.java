@@ -176,10 +176,11 @@ public class RecipeOverviewCtrl implements Initializable {
                     }
                 });
 
+        recipeIngredientEditButton.setDisable(true);
         tableIngredients.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
-                    recipeIngredientEditButton.setVisible(newSel != null);
+                    recipeIngredientEditButton.setDisable(newSel == null);
                 });
 
         setupWebSocketSubscriptions();
@@ -588,6 +589,7 @@ public class RecipeOverviewCtrl implements Initializable {
         editStepsButton.setVisible(true);
         removeStepButton.setVisible(true);
         addRecipeStep.setVisible(true);
+        recipeIngredientEditButton.setVisible(true);
     }
 
     /**
