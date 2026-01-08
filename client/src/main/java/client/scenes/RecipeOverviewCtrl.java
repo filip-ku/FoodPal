@@ -145,6 +145,11 @@ public class RecipeOverviewCtrl implements Initializable {
                         loadStepsForRecipe(newSel);
                     }
                 });
+        tableIngredients.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldSel, newSel) -> {
+                    recipeIngredientEditButton.setVisible(newSel != null);
+                });
     }
 
     /**
@@ -422,7 +427,6 @@ public class RecipeOverviewCtrl implements Initializable {
         editStepsButton.setVisible(true);
         removeStepButton.setVisible(true);
         addRecipeStep.setVisible(true);
-        recipeIngredientEditButton.setVisible(true);
     }
 
     /**
