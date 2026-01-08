@@ -67,7 +67,7 @@ public class RecipeOverviewCtrl implements Initializable {
     @FXML
     private Button recipeIngredientDelete;
     @FXML
-    private Button editIngredientButton;
+    private Button recipeIngredientEditButton;
 
     @FXML
     private Button downloadRecipeButton;
@@ -401,6 +401,7 @@ public class RecipeOverviewCtrl implements Initializable {
         editStepsButton.setVisible(false);
         removeStepButton.setVisible(false);
         addRecipeStep.setVisible(false);
+        recipeIngredientEditButton.setVisible(false);
     }
 
     /**
@@ -421,6 +422,7 @@ public class RecipeOverviewCtrl implements Initializable {
         editStepsButton.setVisible(true);
         removeStepButton.setVisible(true);
         addRecipeStep.setVisible(true);
+        recipeIngredientEditButton.setVisible(true);
     }
 
     /**
@@ -532,6 +534,25 @@ public class RecipeOverviewCtrl implements Initializable {
         } catch (Exception e) {
             mainCtrl.showError("Failed to delete step: " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void editIngredientAmount() {
+        Recipe selectedRecipe = tableRecipes.getSelectionModel().getSelectedItem();
+        RecipeIngredient selectedIngredient =
+                tableIngredients.getSelectionModel().getSelectedItem();
+
+        if (selectedRecipe == null) {
+            mainCtrl.showError("Select a recipe first.");
+            return;
+        }
+
+        if (selectedIngredient == null) {
+            mainCtrl.showError("Select an ingredient to edit.");
+            return;
+        }
+
+        mainCtrl.showEditRecipeIngredient(selectedRecipe, selectedIngredient);
     }
 
     /**
