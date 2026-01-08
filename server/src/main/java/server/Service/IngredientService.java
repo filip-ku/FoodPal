@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import server.Repository.IngredientRepository;
 import server.Repository.RecipeRepository;
@@ -76,6 +77,7 @@ public class IngredientService {
      * Deletes an ingredient by the ID
      * @param id the ID of the ingredient
      */
+    @Transactional
     public void removeIngredient(Long id){
         log.info("Removing ingredient with id {}",id);
         if (ingredientRepository.existsById(id)) {
@@ -95,6 +97,12 @@ public class IngredientService {
         return ingredientRepository.count();
     }
 
+    /**
+     * Counts how many times a specific ingredient is used across all recipes.
+     *
+     * @param id of the ingredient to count usage for
+     * @return the number of times the ingredient appears in all recipes
+     */
     public long countUsageOfIngredient(long id){
         Ingredient ingredient = findIngredient(id);
 
