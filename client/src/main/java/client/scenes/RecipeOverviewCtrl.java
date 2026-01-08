@@ -42,9 +42,7 @@ public class RecipeOverviewCtrl implements Initializable {
     @FXML
     private TableColumn<RecipeIngredient, String> colIngredients;
     @FXML
-    private TableColumn<RecipeIngredient, String> colQuantityAndUnits;
-    @FXML
-    private TableColumn<RecipeIngredient, String> colNotes;
+    private TableColumn<RecipeIngredient, String> colAmount;
 
     @FXML
     private TableView<RecipeStep> tablePreparation;
@@ -64,6 +62,11 @@ public class RecipeOverviewCtrl implements Initializable {
     @FXML
     private Button recipeEditButton;
     private boolean editingName = false;
+
+    @FXML
+    private Button addRecipeStep;
+    @FXML
+    private Button removeStepButton;
     @FXML
     private Button editStepsButton;
 
@@ -71,6 +74,9 @@ public class RecipeOverviewCtrl implements Initializable {
     private Button recipeIngredientAdd;
     @FXML
     private Button recipeIngredientDelete;
+
+    @FXML
+    private Button downloadRecipeButton;
 
     /**
      * Constructs a {@code RecipeOverviewCtrl}.
@@ -109,12 +115,21 @@ public class RecipeOverviewCtrl implements Initializable {
                 new SimpleStringProperty(cell.getValue().getIngredient().getName())
         );
 
-        colQuantityAndUnits.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getAmount() + " "
-                        + cell.getValue().getUnit()));
+        colAmount.setCellValueFactory(cell -> {
+            var ri = cell.getValue();
 
-        colNotes.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getInformalAmount()));
+            boolean hasFormal = ri.getAmount() != null &&
+                            ri.getAmount() != 0 &&
+                            ri.getUnit() != null;
+
+            String value = hasFormal
+                    ? ri.getAmount() + " " + ri.getUnit()
+                    : ri.getInformalAmount(); // ternary operator that executes the code
+                                              // to the left of the : if the condition is true and
+                                              // the code on the right otherwise
+
+            return new SimpleStringProperty(value);
+        });
 
         colPreparation.setCellValueFactory(cell ->
                 new SimpleStringProperty(formatStepForDisplay(cell.getValue())));
@@ -125,8 +140,6 @@ public class RecipeOverviewCtrl implements Initializable {
                     if (newSel != null) {
                         recipeName.setText(newSel.getTitle());
 
-        //                TODO
-        //                Need to implement logic for Ingredients and Preparation tables
                         if (newSel.getIngredients() != null) {
                             tableIngredients.setItems(
                                     FXCollections.observableArrayList(newSel.getIngredients()));
@@ -134,14 +147,7 @@ public class RecipeOverviewCtrl implements Initializable {
                             tableIngredients.getItems().clear();
                         }
 
-                        tableIngredients.setVisible(true);
-                        tablePreparation.setVisible(true);
-
-                        recipeEditButton.setVisible(true);
-                        recipeName.setVisible(true);
-
-                        recipeIngredientAdd.setVisible(true);
-                        recipeIngredientDelete.setVisible(true);
+                        loadRecipeOverviewUI();
 
                         loadStepsForRecipe(newSel);
                     }
@@ -183,6 +189,55 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     public void addRecipe() {
         mainCtrl.showAddRecipe();
+    }
+
+    /**
+     * clones an existing recipe (making a copy)
+     */
+    @FXML
+    public void cloneRecipe() {
+
+        Recipe original = tableRecipes.getSelectionModel().getSelectedItem();
+        if(original == null){
+            mainCtrl.showError("Select recipe first!");
+            return;
+        }
+
+        Recipe clone;
+        if(original.getServings() != null){
+            clone = new Recipe(original.getTitle() + " (copy)", original.getServings());
+        }
+        else{
+            clone = new Recipe(original.getTitle() + " (copy)");
+        }
+
+        for(RecipeIngredient ri : original.getIngredients()){
+            RecipeIngredient riClone =
+                    new RecipeIngredient(clone, ri.getIngredient(), ri.getPosition());
+
+            riClone.setAmount(ri.getAmount());
+            riClone.setUnit(ri.getUnit());
+            riClone.setInformalAmount(ri.getInformalAmount());
+            riClone.setNote(ri.getNote());
+
+            clone.addRecipeIngredient(riClone);
+        }
+
+        for (RecipeStep step : original.getSteps()){
+            RecipeStep stepClone = new RecipeStep(clone, step.getPosition(), step.getInstruction());
+
+            clone.addStep(stepClone);
+        }
+
+        try{
+            server.addRecipe(clone);
+        }
+        catch (WebApplicationException e){
+            mainCtrl.showError(e.getMessage());
+            return;
+        }
+
+        refresh();
     }
 
     /**
@@ -379,6 +434,30 @@ public class RecipeOverviewCtrl implements Initializable {
         tablePreparation.setVisible(false);
         recipeIngredientAdd.setVisible(false);
         recipeIngredientDelete.setVisible(false);
+        downloadRecipeButton.setVisible(false);
+        editStepsButton.setVisible(false);
+        removeStepButton.setVisible(false);
+        addRecipeStep.setVisible(false);
+    }
+
+    /**
+     * Makes every component that the user should
+     * be able to interact with when a recipe is selected visible
+     */
+    public void loadRecipeOverviewUI() {
+        tableIngredients.setVisible(true);
+        tablePreparation.setVisible(true);
+
+        recipeEditButton.setVisible(true);
+        recipeName.setVisible(true);
+
+        recipeIngredientAdd.setVisible(true);
+        recipeIngredientDelete.setVisible(true);
+
+        downloadRecipeButton.setVisible(true);
+        editStepsButton.setVisible(true);
+        removeStepButton.setVisible(true);
+        addRecipeStep.setVisible(true);
     }
 
     /**

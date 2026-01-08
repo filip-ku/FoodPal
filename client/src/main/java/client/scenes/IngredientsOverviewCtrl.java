@@ -1,13 +1,17 @@
 package client.scenes;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import com.google.inject.Inject;
 
 import client.utils.ServerUtils;
 import commons.Ingredient;
+import commons.Recipe;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,6 +27,8 @@ public class IngredientsOverviewCtrl implements Initializable {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+
+    private Map<Long, Integer> ingredientUsageCount = new HashMap<>();
 
     private ObservableList<Ingredient> data;
 
@@ -63,17 +69,30 @@ public class IngredientsOverviewCtrl implements Initializable {
         colName.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getName()));
 
-        // TODO: Show how many recipes an ingredient is used in
+        colNumOfRecipes.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(
+                        ingredientUsageCount.getOrDefault(
+                                cell.getValue().getId(), 0
+                        )
+                ).asObject()
+        );
     }
 
     /**
-     * Refreshes the recipe list from the server and updates the table view.
+     * Refreshes the recipe list from the server and updates the table view,
+     * recalculates how many recipes each ingredient is used in, and updates
+     * the table view accordingly.
      */
     public void refresh() {
         try {
             var ingredients = server.getIngredients();
+
+            updateIngredientUsageCounts(ingredients);
+
             data = FXCollections.observableList(ingredients);
             tableIngredients.setItems(data);
+            tableIngredients.refresh();
+
         } catch (WebApplicationException e) {
             var alert = new Alert(Alert.AlertType.ERROR);
             alert.initModality(Modality.APPLICATION_MODAL);
@@ -128,5 +147,32 @@ public class IngredientsOverviewCtrl implements Initializable {
         }
 
         data.remove(selected);
+    }
+
+    /**
+     * Recomputes how many recipes each ingredient is used in.
+     * @param ingredients list containing the ingredients, which need their recipes counted.
+     */
+    private void updateIngredientUsageCounts(Iterable<Ingredient> ingredients) {
+        var recipes = server.getRecipes();
+
+        ingredientUsageCount.clear();
+
+        for (Ingredient ingredient : ingredients) {
+            int count = 0;
+
+            for (Recipe recipe : recipes) {
+                if (recipe.getIngredients() != null &&
+                        recipe.getIngredients().stream()
+                                .anyMatch(ri ->
+                                        ri.getIngredient().getId()
+                                                .equals(ingredient.getId())
+                                )) {
+                    count++;
+                }
+            }
+
+            ingredientUsageCount.put(ingredient.getId(), count);
+        }
     }
 }
