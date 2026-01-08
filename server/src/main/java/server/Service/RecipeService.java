@@ -363,6 +363,12 @@ public class RecipeService {
      */
     public Recipe updateRecipeIngredient(Long recipeId, Long recipeIngredientId,
                                          RecipeIngredient patch) {
+
+        if (patch == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Recipe ingredient data cannot be null");
+        } 
+                                            
         Recipe recipe = getRecipe(recipeId);
         RecipeIngredient target = recipe.getIngredients().stream()
                 .filter(ri -> ri.getId() != null && ri.getId().equals(recipeIngredientId))
