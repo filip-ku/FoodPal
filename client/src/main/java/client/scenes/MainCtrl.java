@@ -66,7 +66,7 @@ public class MainCtrl {
         this.ingredientsOverviewCtrl = ingredientsOverview.getKey();
         this.ingredientsOverview = new Scene(ingredientsOverview.getValue());
 
-        this.chooseRecipeIngredientCtrl  = chooseRecipeIngredient.getKey();
+        this.chooseRecipeIngredientCtrl = chooseRecipeIngredient.getKey();
         this.chooseRecipeIngredientScene = new Scene(chooseRecipeIngredient.getValue());
 
         this.addRecipeIngredientCtrl = addRecipeIngredient.getKey();
@@ -163,6 +163,7 @@ public class MainCtrl {
 
     /**
      * Opens the AddRecipeIngredient screen in ADD mode.
+     *
      * @param recipe     parent recipe
      * @param ingredient chosen global ingredient
      */
@@ -174,6 +175,7 @@ public class MainCtrl {
 
     /**
      * Opens the AddRecipeIngredient screen in EDIT mode.
+     *
      * @param recipe     parent recipe
      * @param ri         existing recipe-ingredient row to edit
      * @param ingredient global ingredient referenced by the row
@@ -188,6 +190,7 @@ public class MainCtrl {
 
     /**
      * Shows the “Add Recipe Step” screen for a given recipe.
+     *
      * @param recipe the recipe to which a new step will be added
      */
     public void showAddRecipeStep(Recipe recipe) {
@@ -199,18 +202,20 @@ public class MainCtrl {
     /**
      * Shows the “Edit Recipe Step” screen for a given recipe + existing step.
      * Prefills the AddRecipeStep screen with the selected step data.
+     *
      * @param recipe the parent recipe
-     * @param step the step to edit
+     * @param step   the step to edit
      */
     public void showEditRecipeStep(Recipe recipe, RecipeStep step) {
         addRecipeStepCtrl.setContextForEdit(recipe, step);
         primaryStage.setTitle("FoodPal: Edit Step");
         primaryStage.setScene(addRecipeStepScene);
+    }
 
     /**
      * Displays the edit ingredient screen for the given recipe ingredient.
      *
-     * @param recipe the parent recipe
+     * @param recipe           the parent recipe
      * @param recipeIngredient the ingredient to edit
      */
     public void showEditRecipeIngredient(Recipe recipe, RecipeIngredient recipeIngredient) {
@@ -222,5 +227,4 @@ public class MainCtrl {
         primaryStage.setTitle("Edit Ingredient Amount");
         primaryStage.setScene(addRecipeIngredientScene);
     }
-
 }
