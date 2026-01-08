@@ -191,6 +191,22 @@ public class AddRecipeIngredientCtrl {
             boolean riAlreadyExists = recipe.getIngredients().stream()
                     .anyMatch(existingRi -> existingRi.getIngredient().equals(ingredient));
 
+            boolean hasAmount = amount != null && amount != 0;
+            boolean hasUnit = unit != null;
+            boolean hasInformal = informal != null && !informal.isBlank();
+
+            if (hasAmount != hasUnit) {
+                mainCtrl.showError("Amount and unit must both be filled together.");
+                return;
+            }
+
+            boolean hasAmountAndUnit = hasAmount && hasUnit;
+
+            if (!(hasAmountAndUnit ^ hasInformal)) {
+                mainCtrl.showError("Please fill in either amount and unit OR informal amount.");
+                return;
+            }
+
             if (riAlreadyExists) {
                 mainCtrl.showError("This ingredient is already in the recipe.");
                 return;

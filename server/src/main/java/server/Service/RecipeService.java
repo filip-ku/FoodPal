@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Business‑logic layer for {@link Recipe} objects.
+ * Business-logic layer for {@link Recipe} objects.
  *
  * <p>This service sits between the controller and the repository. It
  * validates input, translates repository exceptions into Spring Web
@@ -28,6 +28,7 @@ import java.util.List;
  */
 @Service
 public class RecipeService {
+
     private final RecipeRepository recipeRepository;
     private final WebSocketService webSocketService;
 
@@ -115,6 +116,7 @@ public class RecipeService {
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        recipeRepository.deleteById(id);
     }
 
     /**
@@ -159,8 +161,10 @@ public class RecipeService {
         Recipe recipe = findRecipe(recipeId);
 
         if (recipe.getIngredients().contains(recipeIngredient)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Recipe ingredient already exists");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Recipe ingredient already exists"
+            );
         }
 
         recipeIngredient.setRecipe(recipe);
@@ -170,7 +174,6 @@ public class RecipeService {
         webSocketService.publishRecipeContentChanged(recipeId);
         return saved;
     }
-
 
     /**
      * Adds a {@link RecipeStep} to an existing {@link Recipe}.
@@ -270,11 +273,6 @@ public class RecipeService {
         return target;
     }
 
-    private Recipe findRecipe(long recipeId) {
-        return recipeRepository.findById(recipeId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    }
-
     /**
      * Returns all recipe ingredients belonging to the given recipe.
      *
@@ -302,7 +300,7 @@ public class RecipeService {
         Recipe recipe = getRecipe(recipeId);
         return new ArrayList<>(recipe.getSteps());
     }
-
+    
     /**
      * Removes a recipe ingredient from a recipe by its id.
      *
@@ -342,6 +340,19 @@ public class RecipeService {
     }
 
     /**
+     * Finds a {@link Recipe} by its ID.
+     *
+     * @param recipeId the ID of the recipe to find
+     * @return the {@link Recipe} with the given ID
+     * @throws ResponseStatusException if no recipe is found (HTTP 404)
+     */
+    private Recipe findRecipe(long recipeId) {
+        return recipeRepository.findById(recipeId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    /**
      * checks if string is empty or null
      * @param s string
      * @return boolean
@@ -349,5 +360,4 @@ public class RecipeService {
     private static boolean isNullOrEmpty(String s) {
         return s == null || s.isEmpty();
     }
-
 }

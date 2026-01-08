@@ -58,8 +58,6 @@ public class RecipeControllerTest {
         assertEquals(400, e.getStatusCode().value());
         assertEquals("Recipe title cannot be empty", e.getReason());
 
-        // repo save method should not have been run,
-        // as the recipeService should catch the empty title.
         assertTrue(recipeRepo.calledMethods.isEmpty());
     }
 
@@ -127,9 +125,6 @@ public class RecipeControllerTest {
 
         assertEquals(404, ex.getStatusCode().value());
 
-        //repo removeById method should not have been run,
-        // as the recipeService should catch that there is
-        // no recipe with the provided id.
         assertFalse(recipeRepo.calledMethods.contains("deleteById"));
     }
 

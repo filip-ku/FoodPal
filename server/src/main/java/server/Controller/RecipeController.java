@@ -77,7 +77,6 @@ public class RecipeController {
         recipeService.removeRecipe(id);
         return ResponseEntity.noContent().build();
     }
-
     /**
      * Updates an existing recipe.
      *
@@ -99,7 +98,7 @@ public class RecipeController {
     @PostMapping("/{id}/ingredient")
     public ResponseEntity<Recipe> addRecipeIngredient
     (@RequestBody RecipeIngredient recipeIngredient,
-             @PathVariable Long id) {
+        @PathVariable Long id) {
         Recipe recipe = recipeService.addIngredientToRecipe(id, recipeIngredient);
         return ResponseEntity.ok(recipe);
     }
@@ -113,7 +112,7 @@ public class RecipeController {
      */
     @PostMapping("/{id}/steps")
     public ResponseEntity<Recipe> addRecipeStep(@RequestBody RecipeStep recipeStep,
-                                                      @PathVariable Long id) {
+                                                @PathVariable Long id) {
         Recipe recipe = recipeService.addStepToRecipe(id, recipeStep);
         return ResponseEntity.ok(recipe);
     }
