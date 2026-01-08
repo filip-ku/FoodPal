@@ -152,6 +152,21 @@ public class RecipeController {
         Recipe updated = recipeService.removeIngredientFromRecipe(id, recipeIngredientId);
         return ResponseEntity.ok(updated);
     }
+    /**
+     * Updates an existing ingredient of a specific recipe.
+     * AI-generated
+     *
+     * @param recipeId the ID of the recipe containing the ingredient
+     * @param ingredientId the ID of the ingredient to be updated
+     * @param recipeIngredient the updated ingredient data
+     * @return the updated {@link Recipe}
+     */
+    @PutMapping("/{recipeId}/ingredients/{ingredientId}")
+    public Recipe updateRecipeIngredient(@PathVariable Long recipeId,
+                                         @PathVariable Long ingredientId,
+                                         @RequestBody RecipeIngredient recipeIngredient) {
+        return recipeService.updateRecipeIngredient(recipeId, ingredientId, recipeIngredient);
+    }
 
     /**
      * Removes a step from a recipe.
