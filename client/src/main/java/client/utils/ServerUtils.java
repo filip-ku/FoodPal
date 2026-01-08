@@ -255,7 +255,7 @@ public class ServerUtils {
      * @return the updated recipe object
      */
     public Recipe updateRecipeIngredient(Recipe recipe, RecipeIngredient recipeIngredient) {
-        return ClientBuilder.newClient(new ClientConfig())
+        return client
                 .target(SERVER).path("api/recipe/" + recipe.getId() +
                         "/ingredients/" + recipeIngredient.getId())
                 .request(APPLICATION_JSON)
