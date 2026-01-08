@@ -22,6 +22,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class RecipeOverviewCtrl implements Initializable {
 
@@ -46,6 +48,12 @@ public class RecipeOverviewCtrl implements Initializable {
     private TableView<RecipeStep> tablePreparation;
     @FXML
     private TableColumn<RecipeStep, String> colPreparation;
+
+    /**
+     * Language indicator showing current choice and opening the language menu.
+     */
+    @FXML
+    private MenuButton languageMenu;
 
     @FXML
     private Label recipeName;
@@ -98,6 +106,7 @@ public class RecipeOverviewCtrl implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         showMainMenu();
+        setupLanguageMenu();
 
         colRecipes.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getTitle()));
@@ -143,6 +152,36 @@ public class RecipeOverviewCtrl implements Initializable {
                         loadStepsForRecipe(newSel);
                     }
                 });
+    }
+
+    /**
+     * Configures the language indicator/dropdown with the available options.
+     * This is UI-only for now; selection changes are not yet persisted or applied.
+     */
+    private void setupLanguageMenu() {
+        languageMenu.getItems().clear();
+
+        for (LanguageOption option : supportedLanguages) {
+            MenuItem item = new MenuItem(option.name);
+            item.setGraphic(createFlagGraphic(option.iconPath, 16));
+            item.setOnAction(e -> setCurrentLanguage(option));
+            languageMenu.getItems().add(item);
+        }
+
+        if (!supportedLanguages.isEmpty()) {
+            setCurrentLanguage(supportedLanguages.get(0));
+        }
+    }
+
+    /**
+     * Updates the indicator text and flag to the chosen language.
+     *
+     * @param option selected language option
+     */
+    private void setCurrentLanguage(LanguageOption option) {
+        this.currentLanguage = option;
+        languageMenu.setText(option.name);
+        languageMenu.setGraphic(createFlagGraphic(option.iconPath, 16));
     }
 
     /**
@@ -574,4 +613,49 @@ public class RecipeOverviewCtrl implements Initializable {
         }
     }
 
+    /**
+     * Hardcoded list of languages shown in the selector.
+     */
+    private final List<LanguageOption> supportedLanguages = List.of(
+            new LanguageOption("en", "English", "Icons/english-flag.png"),
+            new LanguageOption("nl", "Nederlands", "Icons/dutch-flag.png"),
+            new LanguageOption("es", "Español", "Icons/spanish-flag.png")
+    );
+
+    @SuppressWarnings("unused")
+    private LanguageOption currentLanguage;
+
+    /**
+     * Simple value object describing a language choice.
+     */
+    private static class LanguageOption {
+        @SuppressWarnings("unused")
+        private final String code;
+        private final String name;
+        private final String iconPath;
+
+        LanguageOption(String code, String name, String iconPath) {
+            this.code = code;
+            this.name = name;
+            this.iconPath = iconPath;
+        }
+    }
+
+    /**
+     * Loads an image resource and returns a scaled {@link ImageView} for menu display.
+     *
+     * @param path   classpath to the image resource
+     * @param height desired image height in pixels
+     * @return image view or {@code null} if the resource cannot be found
+     */
+    private ImageView createFlagGraphic(String path, double height) {
+        var stream = RecipeOverviewCtrl.class.getClassLoader().getResourceAsStream(path);
+        if (stream == null) {
+            return null;
+        }
+        ImageView view = new ImageView(new Image(stream));
+        view.setPreserveRatio(true);
+        view.setFitHeight(height);
+        return view;
+    }
 }
