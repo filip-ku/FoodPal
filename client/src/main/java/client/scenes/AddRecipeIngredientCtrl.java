@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import commons.Ingredient;
 import commons.Recipe;
 import commons.RecipeIngredient;
+import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
@@ -179,54 +180,54 @@ public class AddRecipeIngredientCtrl {
         final String unit = emptyToNull(unitsInput.getText());
         final String informal = emptyToNull(notesInput.getText());
 
-        RecipeIngredient ri;
-        if (mode == Mode.ADD) {
-            ri = new RecipeIngredient();
-            ri.setRecipe(recipe);
-            ri.setIngredient(ingredient);
-            ri.setAmount(amount);
-            ri.setUnit(unit);
-            ri.setInformalAmount(informal);
+        boolean hasAmount = amount != null && amount != 0;
+        boolean hasUnit = unit != null;
+        boolean hasInformal = informal != null && !informal.isBlank();
 
-            boolean riAlreadyExists = recipe.getIngredients().stream()
-                    .anyMatch(existingRi -> existingRi.getIngredient().equals(ingredient));
-
-            boolean hasAmount = amount != null && amount != 0;
-            boolean hasUnit = unit != null;
-            boolean hasInformal = informal != null && !informal.isBlank();
-
-            if (hasAmount != hasUnit) {
-                mainCtrl.showError("Amount and unit must both be filled together.");
-                return;
-            }
-
-            boolean hasAmountAndUnit = hasAmount && hasUnit;
-
-            if (!(hasAmountAndUnit ^ hasInformal)) {
-                mainCtrl.showError("Please fill in either amount and unit OR informal amount.");
-                return;
-            }
-
-            if (riAlreadyExists) {
-                mainCtrl.showError("This ingredient is already in the recipe.");
-                return;
-            }
-
-            server.addRecipeIngredient(recipe, ri);
-        } else {
-            existing.setAmount(amount);
-            existing.setUnit(unit);
-            existing.setInformalAmount(informal);
+        if (hasAmount != hasUnit) {
+            mainCtrl.showError("Amount and unit must both be filled together.");
+            return;
         }
 
-        if (mainCtrl.getRecipeOverviewCtrl() != null) {
-            mainCtrl.getRecipeOverviewCtrl().selectRecipe(recipe);
+        boolean hasAmountAndUnit = hasAmount && hasUnit;
+        if (!(hasAmountAndUnit ^ hasInformal)) {
+            mainCtrl.showError("Please fill in either amount and unit OR informal amount.");
+            return;
         }
-        if (mainCtrl != null) {
+        try{
+            if (mode == Mode.ADD) {
+                RecipeIngredient ri = new RecipeIngredient();
+                ri.setRecipe(recipe);
+                ri.setIngredient(ingredient);
+                ri.setAmount(amount);
+                ri.setUnit(unit);
+                ri.setInformalAmount(informal);
+
+                boolean riAlreadyExists = recipe.getIngredients().stream()
+                        .anyMatch(existingRi -> existingRi.getIngredient().equals(ingredient));
+
+                if (riAlreadyExists) {
+                    mainCtrl.showError("This ingredient is already in the recipe.");
+                    return;
+                }
+
+                server.addRecipeIngredient(recipe, ri);
+            } else {
+                existing.setAmount(amount);
+                existing.setUnit(unit);
+                existing.setInformalAmount(informal);
+                server.updateRecipeIngredient(recipe, existing);
+            }
+
+            if (mainCtrl.getRecipeOverviewCtrl() != null) {
+                mainCtrl.getRecipeOverviewCtrl().refresh();
+                mainCtrl.getRecipeOverviewCtrl().selectRecipe(recipe);
+            }
             mainCtrl.showRecipeOverview();
+            clearFields();
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
         }
-
-        clearFields();
     }
 
     /**

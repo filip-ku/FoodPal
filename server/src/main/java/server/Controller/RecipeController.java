@@ -153,6 +153,13 @@ public class RecipeController {
         return ResponseEntity.ok(updated);
     }
 
+    @PutMapping("/recipe/{recipeId}/ingredients/{ingredientId}")
+    public Recipe updateRecipeIngredient(@PathVariable Long recipeId,
+                                         @PathVariable Long ingredientId,
+                                         @RequestBody RecipeIngredient recipeIngredient) {
+        return recipeService.updateRecipeIngredient(recipeId, ingredientId, recipeIngredient);
+    }
+
     /**
      * Removes a step from a recipe.
      *
