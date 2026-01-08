@@ -69,6 +69,10 @@ public class RecipeStep {
         return id;
     }
 
+    /**
+     * Sets the step's id
+     * @param id recipe step identifier
+     */
     public void setId(Long id) {
         this.id = id;
     }
