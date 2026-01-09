@@ -6,9 +6,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import server.Repository.IngredientRepository;
 import server.Repository.RecipeRepository;
+import server.ws.WebSocketService;
 
 import java.util.List;
 
@@ -18,17 +20,20 @@ public class IngredientService {
     private final IngredientRepository ingredientRepository;
     private static final Logger log = LoggerFactory.getLogger(IngredientService.class);
     private final RecipeRepository recipeRepository;
+    private final WebSocketService webSocketService;
 
     /**
      * Constructs the service with the required repository
      * @param ingredientRepository the required repository
      * @param recipeRepository the repository of recipe
+     * @param webSocketService the WebSocket service for publishing events
      */
     @Autowired
     public IngredientService(IngredientRepository ingredientRepository,
-                             RecipeRepository recipeRepository){
+                             RecipeRepository recipeRepository, WebSocketService webSocketService){
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
+        this.webSocketService = webSocketService;
     }
 
     /**
@@ -36,6 +41,7 @@ public class IngredientService {
      * @param ingredient the ingredient to be added
      * @return the ingredient with an assigned ID
      */
+    @Transactional
     public Ingredient addIngredient(Ingredient ingredient){
         log.info("Adding ingredient {}",ingredient);
         if (ingredient == null){
@@ -51,7 +57,9 @@ public class IngredientService {
         }
 
         log.debug("Adding ingredient with id {}",ingredient.getId());
-        return ingredientRepository.save(ingredient);
+        Ingredient saved = ingredientRepository.save(ingredient);
+        webSocketService.publishIngredientListChanged(saved.getId());
+        return saved;
     }
 
     /**
@@ -76,10 +84,12 @@ public class IngredientService {
      * Deletes an ingredient by the ID
      * @param id the ID of the ingredient
      */
+    @Transactional
     public void removeIngredient(Long id){
         log.info("Removing ingredient with id {}",id);
         if (ingredientRepository.existsById(id)) {
             ingredientRepository.deleteById(id);
+            webSocketService.publishIngredientListChanged(id);
         }
         else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -113,6 +123,7 @@ public class IngredientService {
      * @param ingredient data that will be updated to
      * @return the updated ingredient
      */
+    @Transactional
     public Ingredient updateIngredient(long id, Ingredient ingredient){
         log.info("Updating ingredient with id {}", id);
 
@@ -128,16 +139,20 @@ public class IngredientService {
         existing.setCarbsPer100g(ingredient.getCarbsPer100g());
         existing.setProteinPer100g(ingredient.getProteinPer100g());
         existing.setFatPer100g(ingredient.getFatPer100g());
-        return ingredientRepository.save(existing);
+        Ingredient updatedIngredient = ingredientRepository.save(existing);
+        webSocketService.publishIngredientListChanged(updatedIngredient.getId());
+        return updatedIngredient;
 
     }
 
     /**
      * Deletes all ingredients
      */
+    @Transactional
     public void deleteAllIngredients(){
         log.info("Deleting all ingredients");
         ingredientRepository.deleteAll();
+        webSocketService.publishIngredientListChanged(null);
     }
 
     /**

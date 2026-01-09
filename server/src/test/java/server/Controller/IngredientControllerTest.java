@@ -6,11 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import server.Service.IngredientService;
 import server.Repository.RecipeRepository;
+import server.ws.WebSocketService;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for {@link IngredientController}.
@@ -24,13 +26,16 @@ class IngredientControllerTest {
     private IngredientController ingredientController;
 
     private RecipeRepository recipeRepo;
+    private WebSocketService webSocketService;
 
     @BeforeEach
     void setUp() {
         ingredientRepo = new TestIngredientRepository();
         recipeRepo = mock(RecipeRepository.class);
+        webSocketService = mock(WebSocketService.class);
 
-        ingredientService = new IngredientService(ingredientRepo, recipeRepo);
+        ingredientService = new IngredientService(ingredientRepo, recipeRepo,
+                webSocketService);
         ingredientController = new IngredientController(ingredientService);
     }
 
@@ -50,6 +55,9 @@ class IngredientControllerTest {
         assertEquals("Tomato", response.getBody().getName());
         assertTrue(ingredientRepo.calledMethods.contains("save"));
         assertEquals(1, ingredientRepo.ingredients.size());
+
+        verify(webSocketService)
+                .publishIngredientListChanged(response.getBody().getId());
     }
 
     @Test
@@ -151,6 +159,9 @@ class IngredientControllerTest {
         assertNull(response.getBody());
         assertEquals(0, ingredientRepo.ingredients.size());
         assertTrue(ingredientRepo.calledMethods.contains("deleteById"));
+
+        verify(webSocketService)
+                .publishIngredientListChanged(id);
     }
 
     @Test
@@ -170,6 +181,9 @@ class IngredientControllerTest {
         assertNull(response.getBody());
         assertEquals(0, ingredientRepo.ingredients.size());
         assertTrue(ingredientRepo.calledMethods.contains("deleteAll"));
+
+        verify(webSocketService)
+                .publishIngredientListChanged(null);
     }
 
 
@@ -193,6 +207,9 @@ class IngredientControllerTest {
         assertEquals("Sweet Potato", response.getBody().getName());
         assertTrue(ingredientRepo.calledMethods.contains("findById"));
         assertTrue(ingredientRepo.calledMethods.contains("save"));
+
+        verify(webSocketService)
+                .publishIngredientListChanged(id);
     }
 
     @Test

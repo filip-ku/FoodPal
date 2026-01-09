@@ -1,5 +1,6 @@
 package client.ws;
 
+import commons.ws.IngredientListEvent;
 import commons.ws.RecipeChangedEvent;
 import commons.ws.RecipeContentChangedEvent;
 import commons.ws.RecipeListEvent;
@@ -121,6 +122,15 @@ public class WebSocketService {
         public void handleFrame(StompHeaders headers, Object payload) {
             consumer.accept((T) payload);
         }
+    }
+
+    public StompSession.Subscription subscribeIngredientList(
+            Consumer<IngredientListEvent> handler) {
+
+        ensureConnected();
+        return session.subscribe("/topic/ingredient-list",
+                new TypedFrameHandler<>(IngredientListEvent.class, handler)
+        );
     }
 }
 
