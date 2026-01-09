@@ -27,6 +27,7 @@ public class RecipeOverviewSceneTest {
     private TableView<Recipe> tableRecipes;
     private Label recipeName;
     private Button editButton;
+    private Button editIngredientButton;
 
     @Start
     private void start(Stage stage) throws IOException {
@@ -40,6 +41,7 @@ public class RecipeOverviewSceneTest {
         tableRecipes = (TableView<Recipe>) scene.lookup("#tableRecipes");
         recipeName = (Label) scene.lookup("#recipeName");
         editButton = (Button) scene.lookup("#recipeEditButton");
+        editIngredientButton = (Button) scene.lookup("#recipeIngredientEditButton");
     }
 
     @Test
@@ -86,5 +88,46 @@ public class RecipeOverviewSceneTest {
             tableRecipes.getItems().remove(r);
         });
         assertEquals(0, tableRecipes.getItems().size());
+    }
+
+    @Test
+    public void editIngredientButtonExists() {
+        assertNotNull(editIngredientButton, "Edit ingredient button should exist");
+    }
+
+    @Test
+    public void clickingEditButtonDoesNotCrash(FxRobot robot) {
+        robot.interact(() -> {
+            editIngredientButton.setVisible(true);
+        });
+        robot.clickOn(editIngredientButton);
+        assertTrue(true, "Clicking edit button should not crash the application");
+    }
+
+    @Test
+    public void editButtonStartsHidden() {
+        assertFalse(editIngredientButton.isVisible(),
+                "Edit ingredient button should be hidden initially");
+    }
+
+    @Test
+    public void editButtonCanBeShown(FxRobot robot) {
+        robot.interact(() -> {
+            editIngredientButton.setVisible(true);
+        });
+
+        assertTrue(editIngredientButton.isVisible(),
+                "Edit button should be visible after setting it");
+    }
+
+    @Test
+    public void editButtonCanBeHidden(FxRobot robot) {
+        robot.interact(() -> {
+            editIngredientButton.setVisible(true);
+            editIngredientButton.setVisible(false);
+        });
+
+        assertFalse(editIngredientButton.isVisible(),
+                "Edit button should be hidden after setting it to false");
     }
 }
