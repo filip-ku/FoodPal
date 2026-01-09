@@ -10,17 +10,23 @@ import java.util.ResourceBundle;
 import client.utils.RecipeFormatter;
 import com.google.inject.Inject;
 
+import client.ws.WebSocketService;
 import client.utils.ServerUtils;
 import commons.Recipe;
 import commons.RecipeIngredient;
 import commons.RecipeStep;
+import commons.ws.RecipeChangedEvent;
+import commons.ws.RecipeContentChangedEvent;
+import commons.ws.RecipeListEvent;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import org.springframework.messaging.simp.stomp.StompSession;
 import javafx.stage.FileChooser;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -30,9 +36,12 @@ public class RecipeOverviewCtrl implements Initializable {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private final WebSocketService webSocketService;
 
     private ObservableList<Recipe> data;
     private ObservableList<Recipe> allRecipes; // Unfiltered list of all recipes
+
+    private StompSession.Subscription recipeContentSubscription;
 
     @FXML
     private TableView<Recipe> tableRecipes;
@@ -76,6 +85,8 @@ public class RecipeOverviewCtrl implements Initializable {
     private Button recipeIngredientAdd;
     @FXML
     private Button recipeIngredientDelete;
+    @FXML
+    private Button recipeIngredientEditButton;
 
     @FXML
     private Button downloadRecipeButton;
@@ -96,11 +107,14 @@ public class RecipeOverviewCtrl implements Initializable {
      *
      * @param server  injected {@link ServerUtils}
      * @param mainCtrl injected {@link MainCtrl}
+     * @param webSocketService injected {@link WebSocketService}
      */
     @Inject
-    public RecipeOverviewCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public RecipeOverviewCtrl(ServerUtils server, MainCtrl mainCtrl,
+                              WebSocketService webSocketService) {
         this.server = server;
         this.mainCtrl = mainCtrl;
+        this.webSocketService = webSocketService;
     }
 
     /**
@@ -148,6 +162,14 @@ public class RecipeOverviewCtrl implements Initializable {
                 .addListener((obs, oldSel, newSel) -> {
                     if (newSel != null) {
                         recipeName.setText(newSel.getTitle());
+                        tableIngredients.setVisible(true);
+                        tablePreparation.setVisible(true);
+
+                        recipeEditButton.setVisible(true);
+                        recipeName.setVisible(true);
+
+                        recipeIngredientAdd.setVisible(true);
+                        recipeIngredientDelete.setVisible(true);
 
                         if (newSel.getIngredients() != null) {
                             tableIngredients.setItems(
@@ -157,10 +179,19 @@ public class RecipeOverviewCtrl implements Initializable {
                         }
 
                         loadRecipeOverviewUI();
-
                         loadStepsForRecipe(newSel);
+                        subscribeToRecipeContent(newSel.getId());
+                        reloadSelectedRecipeDetails(newSel);
                     }
                 });
+
+        tableIngredients.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldSel, newSel) -> {
+                    recipeIngredientEditButton.setVisible(newSel != null);
+                });
+
+        setupWebSocketSubscriptions();
     }
 
     /**
@@ -268,13 +299,29 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     public void refresh() {
         try {
+            Long selectedId;
+            Recipe selectedBefore = tableRecipes.getSelectionModel().getSelectedItem();
+            if (selectedBefore != null) {
+                selectedId = selectedBefore.getId();
+            } else {
+                selectedId = null;
+            }
+
             var recipes = server.getRecipes();
             allRecipes = FXCollections.observableList(recipes);
             applyLanguageFilter(); // Apply current filter state
 
+            if (selectedId != null) {
+                data.stream()
+                        .filter(r -> selectedId.equals(r.getId()))
+                        .findFirst()
+                        .ifPresent(r -> tableRecipes.getSelectionModel().select(r));
+            }
+
             Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                loadStepsForRecipe(selected);
+                recipeName.setText(selected.getTitle());
+                reloadSelectedRecipeDetails(selected);
             }
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
@@ -475,10 +522,92 @@ public class RecipeOverviewCtrl implements Initializable {
             mainCtrl.showExceptionErrorPopUp(e);
         }
 
-        server.deleteRecipeIngredient(
-                selectedRecipeIngredient.getRecipe(), selectedRecipeIngredient
-        );
         tableIngredients.getItems().remove(selectedRecipeIngredient);
+    }
+
+    /**
+     * Subscribes to global recipe list and title change topics so the UI can refresh automatically.
+     * Retries are not implemented here; failures are logged to stderr.
+     */
+    private void setupWebSocketSubscriptions() {
+        try {
+            webSocketService.subscribeRecipeList(this::handleRecipeListEvent);
+            webSocketService.subscribeRecipeChanged(this::handleRecipeChangedEvent);
+        } catch (RuntimeException e) {
+            System.err.println("WebSocket subscription failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Handles list-level events (create/delete) by refreshing the full list.
+     *
+     * @param event event describing a list change
+     */
+    private void handleRecipeListEvent(RecipeListEvent event) {
+        Platform.runLater(this::refresh);
+    }
+
+    /**
+     * Handles title changes by refreshing the list (and reselecting).
+     *
+     * @param event event describing a recipe title change
+     */
+    private void handleRecipeChangedEvent(RecipeChangedEvent event) {
+        Platform.runLater(this::refresh);
+    }
+
+    /**
+     * Subscribes to content changes for the specified recipe, cancelling any previous subscription.
+     *
+     * @param recipeId the recipe to follow for ingredient/step updates
+     */
+    private void subscribeToRecipeContent(Long recipeId) {
+        if (recipeContentSubscription != null) {
+            recipeContentSubscription.unsubscribe();
+            recipeContentSubscription = null;
+        }
+        if (recipeId == null) {
+            return;
+        }
+        try {
+            recipeContentSubscription = webSocketService.subscribeRecipeContent(
+                    recipeId,
+                    this::handleRecipeContentChangedEvent
+            );
+        } catch (RuntimeException e) {
+            System.err.println("WebSocket content subscription failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Reloads the currently selected recipe's details when its content changes.
+     *
+     * @param event event indicating which recipe changed
+     */
+    private void handleRecipeContentChangedEvent(RecipeContentChangedEvent event) {
+        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
+        if (selected != null && selected.getId() != null
+                && selected.getId().equals(event.recipeId())) {
+            Platform.runLater(() -> reloadSelectedRecipeDetails(selected));
+        }
+    }
+
+    /**
+     * Reloads ingredients and steps for the given recipe and updates the tables.
+     *
+     * @param recipe currently selected recipe
+     */
+    private void reloadSelectedRecipeDetails(Recipe recipe) {
+        if (recipe == null) {
+            return;
+        }
+        try {
+            var ingredients = server.getRecipeIngredients(recipe);
+            tableIngredients.setItems(FXCollections.observableArrayList(ingredients));
+            loadStepsForRecipe(recipe);
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
+        }
     }
 
     /**
@@ -496,6 +625,7 @@ public class RecipeOverviewCtrl implements Initializable {
         editStepsButton.setVisible(false);
         removeStepButton.setVisible(false);
         addRecipeStep.setVisible(false);
+        recipeIngredientEditButton.setVisible(false);
     }
 
     /**
@@ -627,6 +757,25 @@ public class RecipeOverviewCtrl implements Initializable {
         } catch (Exception e) {
             mainCtrl.showError("Failed to delete step: " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void editIngredientAmount() {
+        Recipe selectedRecipe = tableRecipes.getSelectionModel().getSelectedItem();
+        RecipeIngredient selectedIngredient =
+                tableIngredients.getSelectionModel().getSelectedItem();
+
+        if (selectedRecipe == null) {
+            mainCtrl.showError("Select a recipe first.");
+            return;
+        }
+
+        if (selectedIngredient == null) {
+            mainCtrl.showError("Select an ingredient to edit.");
+            return;
+        }
+
+        mainCtrl.showEditRecipeIngredient(selectedRecipe, selectedIngredient);
     }
 
     /**

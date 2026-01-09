@@ -22,6 +22,7 @@ import com.google.inject.Scopes;
 import client.scenes.AddRecipeCtrl;
 import client.scenes.MainCtrl;
 import client.scenes.RecipeOverviewCtrl;
+import client.ws.WebSocketService;
 
 /**
  * Guice module that declares the application’s core controllers.
@@ -40,5 +41,6 @@ public class MyModule implements Module {
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
         binder.bind(AddRecipeCtrl.class).in(Scopes.SINGLETON);
         binder.bind(RecipeOverviewCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(WebSocketService.class).in(Scopes.SINGLETON);
     }
 }
