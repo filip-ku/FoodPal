@@ -124,7 +124,7 @@ public class ServerUtils {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/ingredient/" + ingredient.getId())
                 .request(APPLICATION_JSON)
-                .post(Entity.entity(ingredient, APPLICATION_JSON), Ingredient.class);
+                .put(Entity.entity(ingredient, APPLICATION_JSON), Ingredient.class);
     }
 
     /**

@@ -7,6 +7,8 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -25,7 +27,6 @@
                      </children>
                   </StackPane>
                   <Button fx:id="recipeEditButton" mnemonicParsing="false" onAction="#editNameClicked" text="Edit" visible="false" />
-                  <Button fx:id="recipeIngredientEditButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#editIngredientAmount" prefHeight="26.0" prefWidth="94.0" text="edit amount" />
                </children>
             </HBox>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" VBox.vgrow="ALWAYS">
@@ -43,8 +44,17 @@
                         </TableView>
                         <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="40.0" spacing="20.0">
                            <children>
-                              <Button fx:id="recipeIngredientAdd" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeIngredient" text="+" />
+                              <Button fx:id="recipeIngredientAdd" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeIngredient" text="+" />
                               <Button fx:id="recipeIngredientDelete" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#deleteIngredient" text="-" />
+                              <Button fx:id="recipeIngredientEditButton" alignment="CENTER" contentDisplay="CENTER" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#editIngredientAmount">
+                                 <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@/Icons/edit-icon.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
                            </children>
                         </VBox>
                      </children>
@@ -89,7 +99,7 @@
       </VBox>
    </center>
    <top>
-      <HBox alignment="TOP_RIGHT" spacing="10.0" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+      <HBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
             <MenuButton fx:id="languageMenu" mnemonicParsing="false" prefWidth="120.0" text="Language" />
             <Button fx:id="refreshButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#refresh" text="Refresh" />
