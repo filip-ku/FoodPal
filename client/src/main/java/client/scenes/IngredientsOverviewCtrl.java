@@ -11,16 +11,14 @@ import client.utils.ServerUtils;
 import commons.Ingredient;
 import commons.Recipe;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.stage.Modality;
 
 public class IngredientsOverviewCtrl implements Initializable {
@@ -37,7 +35,18 @@ public class IngredientsOverviewCtrl implements Initializable {
     @FXML
     private TableColumn<Ingredient, String> colName;
     @FXML
+    private TableColumn<Ingredient, Double> colProtein;
+    @FXML
+    private TableColumn<Ingredient, Double> colFat;
+    @FXML
+    private TableColumn<Ingredient, Double> colCarbs;
+    @FXML
+    private TableColumn<Ingredient, Double> colCalories;
+    @FXML
     private TableColumn<Ingredient, Integer> colNumOfRecipes;
+
+    @FXML
+    private Button editIngredientButton;
 
     /**
      * Constructs a {@code IngredientsOverviewCtrl}.
@@ -69,6 +78,18 @@ public class IngredientsOverviewCtrl implements Initializable {
         colName.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getName()));
 
+        colProtein.setCellValueFactory(cell ->
+                new SimpleDoubleProperty(cell.getValue().getProteinPer100g()).asObject());
+
+        colFat.setCellValueFactory(cell ->
+                new SimpleDoubleProperty(cell.getValue().getFatPer100g()).asObject());
+
+        colCarbs.setCellValueFactory(cell ->
+                new SimpleDoubleProperty(cell.getValue().getCarbsPer100g()).asObject());
+
+        colCalories.setCellValueFactory(cell ->
+                new SimpleDoubleProperty(cell.getValue().getCalories()).asObject());
+
         colNumOfRecipes.setCellValueFactory(cell ->
                 new SimpleIntegerProperty(
                         ingredientUsageCount.getOrDefault(
@@ -76,6 +97,13 @@ public class IngredientsOverviewCtrl implements Initializable {
                         )
                 ).asObject()
         );
+
+        editIngredientButton.setDisable(true);
+        tableIngredients.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldSel, newSel) -> {
+                    editIngredientButton.setDisable(newSel == null);
+                });
     }
 
     /**
@@ -106,6 +134,21 @@ public class IngredientsOverviewCtrl implements Initializable {
      */
     public void addGlobalIngredient() {
         mainCtrl.showAddIngredient();
+    }
+
+    /**
+     * Checks to see if there is an ingredient selected and navigates to the
+     * addIngredient screen in edit mode if so.
+     */
+    public void editGlobalIngredient() {
+        Ingredient selected = tableIngredients.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            mainCtrl.showError("No ingredient selected for editing.");
+            return;
+        }
+
+        mainCtrl.showEditIngredient(selected);
     }
 
     /**

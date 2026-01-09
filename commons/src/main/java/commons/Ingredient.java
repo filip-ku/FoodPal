@@ -1,5 +1,6 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -7,6 +8,7 @@ import java.util.Objects;
 /**
  * JPA entity representing an ingredient.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 public class Ingredient {
 
@@ -158,6 +160,15 @@ public class Ingredient {
         } else {
             this.name = name;
         }
+    }
+
+    /**
+     * Returns the calorie amount per 100 grams.
+     *
+     * @return calorie per 100 grams, or {@code null} if unknown.
+     */
+    public Double getCalories() {
+        return proteinPer100g * 4.0 + carbsPer100g * 4.0 + fatPer100g * 9.0;
     }
 
     /**
