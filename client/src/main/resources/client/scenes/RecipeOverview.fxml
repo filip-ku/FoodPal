@@ -82,7 +82,7 @@
             <HBox alignment="CENTER_RIGHT" spacing="10.0">
                <children>
                   <Button fx:id="downloadRecipeButton" mnemonicParsing="false" onAction="#downloadRecipe" text="Download" />
-                  <Button fx:id="editStepsButton" mnemonicParsing="false" onAction="#editSteps" text="Edit steps" />
+                  <Button fx:id="editStepsButton" mnemonicParsing="false" onAction="#editSteps" text="Edit Step" />
                   <Button mnemonicParsing="false" onAction="#showIngredients" text="Show Ingredients" />
                </children>
                <opaqueInsets>

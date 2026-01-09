@@ -3,8 +3,8 @@ package client.scenes;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import client.utils.RecipeFormatter;
@@ -419,12 +419,22 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
-     * Method is not available yet
+     * Opens RecipeStep scene if a valid recipe and corresponding step is selected
      */
     @FXML
     private void editSteps() {
-        // TODO: implement later
-        mainCtrl.showError("Editing steps is not implemented yet.");
+        Recipe selectedRecipe = tableRecipes.getSelectionModel().getSelectedItem();
+        if (selectedRecipe == null) {
+            mainCtrl.showError("Select a recipe first.");
+            return;
+        }
+
+        RecipeStep selectedStep = tablePreparation.getSelectionModel().getSelectedItem();
+        if (selectedStep == null) {
+            mainCtrl.showError("Select a step to edit.");
+            return;
+        }
+        mainCtrl.showEditRecipeStep(selectedRecipe, selectedStep);
     }
 
     /**
@@ -654,7 +664,8 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
-     * Deletes the selected step and automatically shifts subsequent steps up by one.
+     * Deletes the selected step.
+     * The server is responsible for renumbering remaining steps.
      */
     @FXML
     public void removeStep() {
@@ -682,25 +693,10 @@ public class RecipeOverviewCtrl implements Initializable {
         }
 
         try {
-            // Delete the selected step
             server.deleteRecipeStep(selectedRecipe.getId(), selectedStep.getId());
-
-            // Fetch remaining steps and shift positions
-            List<RecipeStep> steps = server.getStepsForRecipe(selectedRecipe.getId());
-            int deletedPos = selectedStep.getPosition();
-
-            for (RecipeStep step : steps) {
-                if (step.getPosition() > deletedPos) {
-                    step.setPosition(step.getPosition() - 1);
-                    server.updateRecipeStep(selectedRecipe.getId(), step);
-                }
-            }
-
-            // Reload the step table
             loadStepsForRecipe(selectedRecipe);
-
-        } catch (Exception e) {
-            mainCtrl.showError("Failed to delete step: " + e.getMessage());
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
         }
     }
 

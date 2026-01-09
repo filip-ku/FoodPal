@@ -70,6 +70,14 @@ public class RecipeStep {
     }
 
     /**
+     * Sets the step's id
+     * @param id recipe step identifier
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
      * Returns the recipe this step belongs to.
      *
      * @return the owning recipe, never {@code null}
