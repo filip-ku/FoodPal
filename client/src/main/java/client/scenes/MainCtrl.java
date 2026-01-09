@@ -120,12 +120,20 @@ public class MainCtrl {
         addIngredient.setOnKeyPressed(e -> addIngredientCtrl.keyPressed(e));
     }
 
+    /**
+     * Displays the ingredients overview screen.
+     */
     public void showIngredientsOverview() {
         primaryStage.setTitle("FoodPal: Ingredients");
         primaryStage.setScene(ingredientsOverview);
         ingredientsOverviewCtrl.refresh();
     }
 
+    /**
+     * Getter for the AddIngredientCtrl
+     *
+     * @return AddIngredientCtrl
+     */
     public AddIngredientCtrl getAddIngredientCtrl() {
         return addIngredientCtrl;
     }
@@ -143,6 +151,11 @@ public class MainCtrl {
         alert.showAndWait();
     }
 
+    /**
+     * Shows a pop-up error message that contains the exception message
+     *
+     * @param e exception error's message
+     */
     public void showExceptionErrorPopUp(Exception e) {
         var alert = new Alert(Alert.AlertType.ERROR);
         alert.initModality(Modality.APPLICATION_MODAL);
@@ -212,4 +225,14 @@ public class MainCtrl {
         primaryStage.setScene(addRecipeIngredientScene);
     }
 
+    /**
+     * Shows addIngredient scene in edit mode
+     *
+     * @param ingredient the ingredient to edit
+     */
+    public void showEditIngredient(Ingredient ingredient) {
+        primaryStage.setTitle("FoodPal: Editing Ingredient");
+        addIngredientCtrl.setIngredientToEdit(ingredient);
+        primaryStage.setScene(addIngredient);
+    }
 }
