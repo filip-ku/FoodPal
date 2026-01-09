@@ -24,6 +24,7 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import java.util.stream.Collectors;
 
 public class RecipeOverviewCtrl implements Initializable {
 
@@ -31,6 +32,7 @@ public class RecipeOverviewCtrl implements Initializable {
     private final MainCtrl mainCtrl;
 
     private ObservableList<Recipe> data;
+    private ObservableList<Recipe> allRecipes; // Unfiltered list of all recipes
 
     @FXML
     private TableView<Recipe> tableRecipes;
@@ -77,6 +79,13 @@ public class RecipeOverviewCtrl implements Initializable {
 
     @FXML
     private Button downloadRecipeButton;
+
+    @FXML
+    private CheckBox filterEnglish;
+    @FXML
+    private CheckBox filterDutch;
+    @FXML
+    private CheckBox filterSpanish;
 
     /**
      * Constructs a {@code RecipeOverviewCtrl}.
@@ -211,6 +220,9 @@ public class RecipeOverviewCtrl implements Initializable {
             clone = new Recipe(original.getTitle() + " (copy)");
         }
 
+        // Preserve the language from the original recipe
+        clone.setLanguage(original.getLanguage());
+
         for(RecipeIngredient ri : original.getIngredients()){
             RecipeIngredient riClone =
                     new RecipeIngredient(clone, ri.getIngredient(), ri.getPosition());
@@ -257,8 +269,8 @@ public class RecipeOverviewCtrl implements Initializable {
     public void refresh() {
         try {
             var recipes = server.getRecipes();
-            data = FXCollections.observableList(recipes);
-            tableRecipes.setItems(data);
+            allRecipes = FXCollections.observableList(recipes);
+            applyLanguageFilter(); // Apply current filter state
 
             Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
             if (selected != null) {
@@ -267,6 +279,52 @@ public class RecipeOverviewCtrl implements Initializable {
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
         }
+    }
+
+    /**
+     * Filters recipes based on selected language checkboxes.
+     * If no languages are selected, all recipes are shown.
+     */
+    @FXML
+    public void applyLanguageFilter() {
+        if (allRecipes == null) {
+            return; // Recipes not loaded yet
+        }
+
+        // Check if filter checkboxes are initialized
+        if (filterEnglish == null || filterDutch == null || filterSpanish == null) {
+            return; // UI not fully initialized yet
+        }
+
+        // Collect selected language codes
+        java.util.Set<String> selectedLanguages = new java.util.HashSet<>();
+        if (filterEnglish.isSelected()) {
+            selectedLanguages.add("en");
+        }
+        if (filterDutch.isSelected()) {
+            selectedLanguages.add("nl");
+        }
+        if (filterSpanish.isSelected()) {
+            selectedLanguages.add("es");
+        }
+
+        // If no languages are selected, show all recipes
+        if (selectedLanguages.isEmpty()) {
+            data = FXCollections.observableList(allRecipes);
+        } else {
+            // Filter recipes by selected languages
+            List<Recipe> filtered = allRecipes.stream()
+                    .filter(recipe -> {
+                        String recipeLanguage = recipe.getLanguage();
+                        // Include recipe if its language matches any selected language
+                        // Also include recipes with no language set (null) when no filter is active
+                        return recipeLanguage != null && selectedLanguages.contains(recipeLanguage);
+                    })
+                    .collect(Collectors.toList());
+            data = FXCollections.observableList(filtered);
+        }
+
+        tableRecipes.setItems(data);
     }
 
     /**
