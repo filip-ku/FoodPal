@@ -228,6 +228,10 @@ public class IngredientsOverviewCtrl implements Initializable {
         }
     }
 
+    /**
+     * Subscribes to global ingredient list topic so the UI can refresh automatically.
+     * Retries are not implemented here; failures are logged to stderr.
+     */
     private void setupWebSocketSubscriptions() {
         try {
             webSocketService.subscribeIngredientList(

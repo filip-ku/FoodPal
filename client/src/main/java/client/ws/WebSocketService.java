@@ -124,6 +124,12 @@ public class WebSocketService {
         }
     }
 
+    /**
+     * Subscribes to Ingredient list changes (add/delete/edit) topic.
+     *
+     * @param handler callback invoked for each list change
+     * @return the active subscription
+     */
     public StompSession.Subscription subscribeIngredientList(
             Consumer<IngredientListEvent> handler) {
 
