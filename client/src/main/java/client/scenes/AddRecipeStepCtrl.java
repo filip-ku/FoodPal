@@ -131,83 +131,172 @@ public class AddRecipeStepCtrl {
      */
     @FXML
     public void ok() {
-        if (recipe == null) {
-            mainCtrl.showError("No recipe selected.");
+        // 0) Validate recipe
+        if (!validateRecipeSelected()) {
             return;
         }
 
         // 1) Validate instruction
-        String instructionRaw = instructionInput.getText();
-        if (instructionRaw == null || instructionRaw.trim().isEmpty()) {
-            mainCtrl.showError("Instruction cannot be empty.");
-            return;
-        }
-        String instruction = instructionRaw.trim();
-
-        // 2) Determine position
-        Integer position = null;
-        String posText = positionInput.getText();
-        if (posText != null) {
-            String t = posText.trim();
-            if (!t.isEmpty()) {
-                try {
-                    int p = Integer.parseInt(t);
-                    if (p < 1) {
-                        mainCtrl.showError("Position must be a non-zero integer.");
-                        return;
-                    }
-                    position = p;
-                } catch (NumberFormatException ex) {
-                    mainCtrl.showError("Position must be an integer.");
-                    return;
-                }
-            }
-        }
-
-        // If position not provided, append at the end
-        List<RecipeStep> existingSteps;
-        try {
-            existingSteps = server.getStepsForRecipe(recipe.getId());
-        } catch (WebApplicationException e) {
-            mainCtrl.showExceptionErrorPopUp(e);
+        String instruction = readAndValidateInstruction();
+        if (instruction == null) {
             return;
         }
 
-        // If position not provided, choose a free position
+        // 2) Determine position (optional)
+        Integer position = readAndValidatePosition();
+        if (position == INVALID_POSITION) {
+            return;
+        }
+
+        // 3) Fetch existing steps
+        List<RecipeStep> existingSteps = fetchExistingStepsOrShowError();
+        if (existingSteps == null) {
+            return;
+        }
+
+        // 4) If position not provided, choose a free position
         if (position == null) {
             position = chooseAutoPosition(existingSteps);
         }
 
-        // Client-side precheck, ignore the step being edited.
-        if (existingSteps != null) {
-            for (RecipeStep s : existingSteps) {
-                if (s == null) continue;
-
-                boolean samePosition = s.getPosition() == position;
-                if (!samePosition) continue;
-
-                // If we are editing, allow keeping the same position for the same step
-                if (editingStep != null) {
-                    if (s.getId() != null && editingStep.getId()
-                            != null && s.getId().equals(editingStep.getId())) {
-                        continue; // it's the same step -> not a conflict
-                    }
-                }
-
-                mainCtrl.showError("A step with number " + position + " already exists.");
-                return;
-            }
+        // 5) Client-side precheck, ignore the step being edited.
+        if (!validateNoPositionConflict(existingSteps, position)) {
+            return;
         }
 
-        // 3) Create recipeStep object
-        RecipeStep step = new RecipeStep();
-        step.setInstruction(instruction);
-        step.setPosition(position);
+        // 6) Persist on server (add or edit)
+        if (!persistStepOrShowError(instruction, position)) {
+            return;
+        }
 
-        // 4) Persist on server
+        // 7) Refresh overview, clear fields, and navigate back
+        refreshOverview();
+        clearInputs();
+        mainCtrl.showRecipeOverview();
+    }
+
+    private static final Integer INVALID_POSITION = Integer.MIN_VALUE;
+
+    /**
+     * Ensures a recipe is selected; otherwise shows an error.
+     *
+     * @return true if a recipe is selected; false otherwise.
+     */
+    private boolean validateRecipeSelected() {
+        if (recipe == null) {
+            mainCtrl.showError("No recipe selected.");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Reads and validates the instruction input (trimmed and non-empty);
+     * otherwise shows an error.
+     *
+     * @return trimmed instruction, or null if invalid.
+     */
+    private String readAndValidateInstruction() {
+        String instructionRaw = instructionInput.getText();
+        if (instructionRaw == null || instructionRaw.trim().isEmpty()) {
+            mainCtrl.showError("Instruction cannot be empty.");
+            return null;
+        }
+        return instructionRaw.trim();
+    }
+
+    /**
+     * Reads and validates the optional position input; if empty returns null,
+     * and if invalid shows an error.
+     *
+     * @return parsed position, null if not provided, or INVALID_POSITION if invalid.
+     */
+    private Integer readAndValidatePosition() {
+        String posText = positionInput.getText();
+        if (posText == null) {
+            return null;
+        }
+
+        String t = posText.trim();
+        if (t.isEmpty()) {
+            return null;
+        }
+
+        try {
+            int p = Integer.parseInt(t);
+            if (p < 1) {
+                mainCtrl.showError("Position must be a non-zero integer.");
+                return INVALID_POSITION;
+            }
+            return p;
+        } catch (NumberFormatException ex) {
+            mainCtrl.showError("Position must be an integer.");
+            return INVALID_POSITION;
+        }
+    }
+
+    /**
+     * Fetches existing steps for the selected recipe; otherwise shows an error popup.
+     *
+     * @return list of existing steps, or null if the request failed.
+     */
+    private List<RecipeStep> fetchExistingStepsOrShowError() {
+        try {
+            return server.getStepsForRecipe(recipe.getId());
+        } catch (WebApplicationException e) {
+            mainCtrl.showExceptionErrorPopUp(e);
+            return null;
+        }
+    }
+
+    /**
+     * Validates that no other step already uses the given position, ignoring the step
+     * currently being edited; otherwise shows an error.
+     *
+     * @param existingSteps current steps for the recipe
+     * @param position      desired position
+     * @return true if no conflict exists; false otherwise.
+     */
+    private boolean validateNoPositionConflict(List<RecipeStep> existingSteps, int position) {
+        if (existingSteps == null) {
+            return true;
+        }
+
+        for (RecipeStep s : existingSteps) {
+            if (s == null) continue;
+
+            boolean samePosition = s.getPosition() == position;
+            if (!samePosition) continue;
+
+            // If we are editing, allow keeping the same position for the same step
+            if (editingStep != null) {
+                if (s.getId() != null && editingStep.getId() != null
+                        && s.getId().equals(editingStep.getId())) {
+                    continue; // it's the same step -> not a conflict
+                }
+            }
+
+            mainCtrl.showError("A step with number " + position + " already exists.");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Persists the step via the server as either an add or an update
+     *
+     * @param instruction validated instruction
+     * @param position    final position
+     * @return true if the request succeeded; false otherwise.
+     */
+    private boolean persistStepOrShowError(String instruction, int position) {
         try {
             if (editingStep == null) {
                 // ADD
+                RecipeStep step = new RecipeStep();
+                step.setInstruction(instruction);
+                step.setPosition(position);
                 server.addRecipeStep(recipe.getId(), step);
             } else {
                 // EDIT
@@ -215,26 +304,32 @@ public class AddRecipeStepCtrl {
                 updated.setId(editingStep.getId());
                 updated.setInstruction(instruction);
                 updated.setPosition(position);
-
                 server.updateRecipeStep(recipe.getId(), updated);
             }
+            return true;
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
-            return;
+            return false;
         }
+    }
 
-        // 5) Refresh overview and navigate back
+    /**
+     * Refreshes the overview controller to keep the selected recipe and reload its steps.
+     */
+    private void refreshOverview() {
         var overview = mainCtrl.getRecipeOverviewCtrl();
         if (overview != null) {
-            overview.refresh();             // ensure recipes list is up to date
-            overview.selectRecipe(recipe);  // keep selection
+            overview.refresh();                  // ensure recipes list is up to date
+            overview.selectRecipe(recipe);       // keep selection
             overview.loadStepsForRecipe(recipe); // reload steps table
         }
+    }
 
-        // clearing text fields
+    /**
+     * Clears the instruction and position input fields.
+     */
+    private void clearInputs() {
         instructionInput.clear();
         positionInput.clear();
-
-        mainCtrl.showRecipeOverview();
     }
 }
