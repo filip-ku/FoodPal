@@ -22,6 +22,13 @@ public class Recipe {
     @Column()
     private BigDecimal servings;
 
+    /**
+     * Language code for the recipe (e.g., "en", "nl", "es").
+     * Represents the language of the ingredients and preparation instructions.
+     */
+    @Column(length = 10)
+    private String language;
+
     @JsonManagedReference
     @OneToMany(
             mappedBy = "recipe",
@@ -126,6 +133,23 @@ public class Recipe {
         this.servings = servings;
     }
 
+    /**
+     * Returns the language code for this recipe.
+     *
+     * @return the language code (e.g., "en", "nl", "es").
+     */
+    public String getLanguage() {
+        return language;
+    }
+
+    /**
+     * Sets the language code for this recipe.
+     *
+     * @param language the language code (e.g., "en", "nl", "es").
+     */
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
     // AI-generated
     /**
@@ -230,7 +254,8 @@ public class Recipe {
         Recipe recipe = (Recipe) o;
         return Objects.equals(servings, recipe.servings)
                 && Objects.equals(id, recipe.id)
-                && Objects.equals(title, recipe.title);
+                && Objects.equals(title, recipe.title)
+                && Objects.equals(language, recipe.language);
     }
 
     /**
@@ -239,6 +264,6 @@ public class Recipe {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, servings);
+        return Objects.hash(id, title, servings, language);
     }
 }
