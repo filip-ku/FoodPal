@@ -91,6 +91,12 @@
             </VBox>
             <HBox alignment="CENTER_RIGHT" spacing="10.0">
                <children>
+                  <HBox fx:id="scaleHBox" alignment="CENTER">
+                     <children>
+                        <Label alignment="CENTER" text="Recipe Scale: " />
+                        <TextField fx:id="scaleFactorField" prefHeight="26.0" prefWidth="42.0" promptText="1.0" />
+                     </children>
+                  </HBox>
                   <Button fx:id="downloadRecipeButton" mnemonicParsing="false" onAction="#downloadRecipe" text="Download" />
                   <Button mnemonicParsing="false" onAction="#showIngredients" text="Show Ingredients" />
                </children>

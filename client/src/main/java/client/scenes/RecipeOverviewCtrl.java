@@ -26,6 +26,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import org.springframework.messaging.simp.stomp.StompSession;
 import javafx.stage.FileChooser;
 import javafx.scene.image.Image;
@@ -92,6 +93,11 @@ public class RecipeOverviewCtrl implements Initializable {
     private Button downloadRecipeButton;
 
     @FXML
+    private HBox scaleHBox;
+    @FXML
+    private TextField scaleFactorField;
+
+    @FXML
     private CheckBox filterEnglish;
     @FXML
     private CheckBox filterDutch;
@@ -140,13 +146,20 @@ public class RecipeOverviewCtrl implements Initializable {
 
         colAmount.setCellValueFactory(cell -> {
             var ri = cell.getValue();
+            double factor = 1.0;
+
+            try {
+                factor = Double.parseDouble(scaleFactorField.getText());
+            } catch (NumberFormatException e) {
+                factor = 1.0;
+            }
 
             boolean hasFormal = ri.getAmount() != null &&
                             ri.getAmount() != 0 &&
                             ri.getUnit() != null;
 
             String value = hasFormal
-                    ? ri.getAmount() + " " + ri.getUnit()
+                    ? ri.getAmount() * factor + " " + ri.getUnit()
                     : ri.getInformalAmount(); // ternary operator that executes the code
                                               // to the left of the : if the condition is true and
                                               // the code on the right otherwise
@@ -161,16 +174,6 @@ public class RecipeOverviewCtrl implements Initializable {
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
                     if (newSel != null) {
-                        recipeName.setText(newSel.getTitle());
-                        tableIngredients.setVisible(true);
-                        tablePreparation.setVisible(true);
-
-                        recipeEditButton.setVisible(true);
-                        recipeName.setVisible(true);
-
-                        recipeIngredientAdd.setVisible(true);
-                        recipeIngredientDelete.setVisible(true);
-
                         if (newSel.getIngredients() != null) {
                             tableIngredients.setItems(
                                     FXCollections.observableArrayList(newSel.getIngredients()));
@@ -178,7 +181,7 @@ public class RecipeOverviewCtrl implements Initializable {
                             tableIngredients.getItems().clear();
                         }
 
-                        loadRecipeOverviewUI();
+                        loadRecipeOverviewUI(newSel);
                         loadStepsForRecipe(newSel);
                         subscribeToRecipeContent(newSel.getId());
                         reloadSelectedRecipeDetails(newSel);
@@ -198,6 +201,10 @@ public class RecipeOverviewCtrl implements Initializable {
                 .addListener((obs, oldSel, newSel) -> {
                     editStepsButton.setDisable(newSel == null);
                 });
+
+        scaleFactorField.textProperty().addListener((obs, oldVal, newVal) -> {
+            tableIngredients.refresh();
+        });
 
         setupWebSocketSubscriptions();
     }
@@ -645,13 +652,18 @@ public class RecipeOverviewCtrl implements Initializable {
         removeStepButton.setVisible(false);
         addRecipeStep.setVisible(false);
         recipeIngredientEditButton.setVisible(false);
+        scaleHBox.setVisible(false);
     }
 
     /**
      * Makes every component that the user should
      * be able to interact with when a recipe is selected visible
+     *
+     * @param newSel the recipe that is selected
      */
-    public void loadRecipeOverviewUI() {
+    public void loadRecipeOverviewUI(Recipe newSel) {
+        recipeName.setText(newSel.getTitle());
+
         tableIngredients.setVisible(true);
         tablePreparation.setVisible(true);
 
@@ -666,6 +678,7 @@ public class RecipeOverviewCtrl implements Initializable {
         removeStepButton.setVisible(true);
         addRecipeStep.setVisible(true);
         recipeIngredientEditButton.setVisible(true);
+        scaleHBox.setVisible(true);
     }
 
     /**
