@@ -17,8 +17,10 @@ import java.util.Properties;
  */
 public class ConfigUtils {
 
-    private static final String CONFIG_DIR = System.getProperty("user.home") + File.separator + ".foodpal";
-    private static final String CONFIG_FILE = CONFIG_DIR + File.separator + "config.properties";
+    private static final String CONFIG_DIR = System.getProperty("user.home")
+            + File.separator + ".foodpal";
+    private static final String CONFIG_FILE = CONFIG_DIR + File.separator
+            + "config.properties";
     
     private static final String KEY_UI_LANGUAGE = "ui.language";
     private static final String KEY_RECIPES_LANGUAGE_FILTER = "recipes.languageFilter";
