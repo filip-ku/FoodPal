@@ -45,7 +45,7 @@ public class AddRecipeIngredientCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        unitsInput.getItems().addAll("g", "kg", "ml", "L", "tsp", "tbsp", "cup");
+        unitsInput.getItems().addAll("g", "kg", "mL", "L", "tsp", "tbsp", "cup");
     }
 
     /**

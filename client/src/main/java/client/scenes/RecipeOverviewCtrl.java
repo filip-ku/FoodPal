@@ -158,13 +158,68 @@ public class RecipeOverviewCtrl implements Initializable {
                             ri.getAmount() != 0 &&
                             ri.getUnit() != null;
 
-            String value = hasFormal
-                    ? ri.getAmount() * factor + " " + ri.getUnit()
-                    : ri.getInformalAmount(); // ternary operator that executes the code
-                                              // to the left of the : if the condition is true and
-                                              // the code on the right otherwise
+            if (hasFormal) {
+                double scaledAmount = factor * ri.getAmount();
+                String displayUnit = ri.getUnit();
 
-            return new SimpleStringProperty(value);
+                if (scaledAmount >= 3) {
+                    switch (displayUnit) {
+                        case "g" -> {
+                            if (scaledAmount >= 1000) {
+                                scaledAmount /= 1000;
+                                displayUnit = "kg";
+                                if (scaledAmount >= 1000) {
+                                    scaledAmount /= 1000;
+                                    displayUnit = "ton";
+                                }
+                            }
+                        }
+                        case "kg" -> {
+                            if (scaledAmount >= 1000) {
+                                scaledAmount /= 1000;
+                                displayUnit = "ton";
+                            }
+                        }
+                        case "mL" -> {
+                            if (scaledAmount >= 1000) {
+                                scaledAmount /= 1000;
+                                displayUnit = "L";
+                                if (scaledAmount >= 1000) {
+                                    scaledAmount /= 1000;
+                                    displayUnit = "kL";
+                                }
+                            }
+                        }
+                        case "L" -> {
+                            if (scaledAmount >= 1000) {
+                                scaledAmount /= 1000;
+                                displayUnit = "kL";
+                            }
+                        }
+                        case "tsp" -> {
+                            scaledAmount /= 3;
+                            displayUnit = "tbsp";
+                            if (scaledAmount >= 16) {
+                                scaledAmount /= 16;
+                                displayUnit = "cup";
+                            }
+                        }
+                        case "tbsp" -> {
+                            if (scaledAmount >= 16) {
+                                scaledAmount /= 16;
+                                displayUnit = "cup";
+                            }
+                        }
+                        default -> {
+                            break;
+                        }
+                    }
+                }
+
+                return new SimpleStringProperty(scaledAmount + " " + displayUnit);
+            }
+
+            return new SimpleStringProperty(ri.getInformalAmount());
         });
 
         colPreparation.setCellValueFactory(cell ->
