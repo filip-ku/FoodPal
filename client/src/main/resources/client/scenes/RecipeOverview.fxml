@@ -91,6 +91,7 @@
             </VBox>
             <HBox alignment="CENTER_RIGHT" spacing="10.0">
                <children>
+                  <Label fx:id="estimatedKcalLabel" text="Estimated kcal: 0.0" />
                   <HBox fx:id="scaleHBox" alignment="CENTER">
                      <children>
                         <Label alignment="CENTER" text="Recipe Scale: " />

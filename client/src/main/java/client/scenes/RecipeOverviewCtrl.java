@@ -98,6 +98,9 @@ public class RecipeOverviewCtrl implements Initializable {
     private TextField scaleFactorField;
 
     @FXML
+    private Label estimatedKcalLabel;
+
+    @FXML
     private CheckBox filterEnglish;
     @FXML
     private CheckBox filterDutch;
@@ -708,6 +711,7 @@ public class RecipeOverviewCtrl implements Initializable {
         addRecipeStep.setVisible(false);
         recipeIngredientEditButton.setVisible(false);
         scaleHBox.setVisible(false);
+        estimatedKcalLabel.setVisible(false);
     }
 
     /**
@@ -734,6 +738,15 @@ public class RecipeOverviewCtrl implements Initializable {
         addRecipeStep.setVisible(true);
         recipeIngredientEditButton.setVisible(true);
         scaleHBox.setVisible(true);
+        estimatedKcalLabel.setVisible(true);
+
+        double totalKcal = 0.0;
+
+        for (RecipeIngredient ri : newSel.getIngredients()) {
+            totalKcal += ri.getIngredient().getCalories();
+        }
+
+        estimatedKcalLabel.setText("Estimated kcal: " + totalKcal + "kcal/100g");
     }
 
     /**
