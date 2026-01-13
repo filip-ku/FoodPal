@@ -7,10 +7,15 @@ import commons.Recipe;
 import commons.RecipeIngredient;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class AddRecipeIngredientCtrl {
+
+public class AddRecipeIngredientCtrl implements Initializable {
 
     // Differentiating between adding and editing an ingredient
     public enum Mode { ADD, EDIT }
@@ -28,9 +33,20 @@ public class AddRecipeIngredientCtrl {
     @FXML
     private TextField quantityInput;
     @FXML
-    private TextField unitsInput;
+    private ComboBox<String> unitsInput;
     @FXML
     private TextField notesInput;
+
+    /**
+     * Initializer method for AddRecipeIngredient.fxml.
+     *
+     * @param location  location of the FXML file (unused)
+     * @param resources resource bundle for internationalization (unused)
+     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        unitsInput.getItems().addAll("g", "kg", "ml", "L", "tsp", "tbsp", "cup");
+    }
 
     /**
      * Creates a controller with injected dependencies.
@@ -90,7 +106,7 @@ public class AddRecipeIngredientCtrl {
 
         if (ri == null) {
             quantityInput.clear();
-            unitsInput.clear();
+            unitsInput.setValue(null);
             notesInput.clear();
         } else {
             if (ri.getAmount() == null) {
@@ -100,9 +116,9 @@ public class AddRecipeIngredientCtrl {
             }
 
             if (ri.getUnit() == null) {
-                unitsInput.clear();
+                unitsInput.setValue(null);
             } else {
-                unitsInput.setText(ri.getUnit());
+                unitsInput.setValue(ri.getUnit());
             }
 
             if (ri.getInformalAmount() == null) {
@@ -177,7 +193,7 @@ public class AddRecipeIngredientCtrl {
             return;
         }
 
-        final String unit = emptyToNull(unitsInput.getText());
+        final String unit = emptyToNull(unitsInput.getValue());
         final String informal = emptyToNull(notesInput.getText());
 
         boolean hasAmount = amount != null && amount != 0;
@@ -237,7 +253,7 @@ public class AddRecipeIngredientCtrl {
     public void clearFields() {
         ingredientNameInput.clear();
         quantityInput.clear();
-        unitsInput.clear();
+        unitsInput.setValue(null);
         notesInput.clear();
     }
 

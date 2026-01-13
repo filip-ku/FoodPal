@@ -47,7 +47,7 @@
                            <children>
                               <Button fx:id="recipeIngredientAdd" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeIngredient" text="+" />
                               <Button fx:id="recipeIngredientDelete" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#deleteIngredient" text="-" />
-                              <Button fx:id="recipeIngredientEditButton" alignment="CENTER" contentDisplay="CENTER" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#editIngredientAmount">
+                              <Button fx:id="recipeIngredientEditButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="26.0" maxWidth="26.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#editIngredientAmount">
                                  <graphic>
                                     <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -74,6 +74,15 @@
                            <children>
                                <Button fx:id="addRecipeStep" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeStep" text="+" />
                                <Button fx:id="removeStepButton" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#removeStep" text="-" />
+                              <Button fx:id="editStepsButton" maxHeight="26.0" maxWidth="26.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#editSteps">
+                                 <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@/Icons/edit-icon.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
                            </children>
                         </VBox>
                      </children>
@@ -83,7 +92,6 @@
             <HBox alignment="CENTER_RIGHT" spacing="10.0">
                <children>
                   <Button fx:id="downloadRecipeButton" mnemonicParsing="false" onAction="#downloadRecipe" text="Download" />
-                  <Button fx:id="editStepsButton" mnemonicParsing="false" onAction="#editSteps" text="Edit Step" />
                   <Button mnemonicParsing="false" onAction="#showIngredients" text="Show Ingredients" />
                </children>
                <opaqueInsets>

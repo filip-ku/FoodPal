@@ -186,10 +186,17 @@ public class RecipeOverviewCtrl implements Initializable {
                 });
 
         recipeIngredientEditButton.setDisable(true);
+        editStepsButton.setDisable(true);
+
         tableIngredients.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
                     recipeIngredientEditButton.setDisable(newSel == null);
+                });
+        tablePreparation.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldSel, newSel) -> {
+                    editStepsButton.setDisable(newSel == null);
                 });
 
         setupWebSocketSubscriptions();
