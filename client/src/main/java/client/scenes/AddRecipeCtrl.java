@@ -13,7 +13,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -29,11 +28,6 @@ public class AddRecipeCtrl implements Initializable {
 
     @FXML
     private ComboBox<String> languageComboBox;
-
-    /**
-     * Supported languages for recipe creation.
-     */
-    private static final List<String> SUPPORTED_LANGUAGES = List.of("en", "nl", "es");
 
     /**
      * Creates a controller with injected dependencies.
