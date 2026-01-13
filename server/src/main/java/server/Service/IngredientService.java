@@ -1,6 +1,7 @@
 package server.Service;
 
 import commons.Ingredient;
+import commons.Recipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,18 +75,28 @@ public class IngredientService {
     }
 
     /**
-     * Deletes an ingredient by the ID
+     * Deletes an {@link commons.Ingredient} by the ID
+     * and also automatically deletes the {@link commons.RecipeIngredient}
+     * related to the ingredient.
+     *
      * @param id the ID of the ingredient
      */
     @Transactional
     public void removeIngredient(Long id){
         log.info("Removing ingredient with id {}",id);
-        if (ingredientRepository.existsById(id)) {
-            ingredientRepository.deleteById(id);
+
+        Ingredient ingredient = ingredientRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        List<Recipe> recipes = recipeRepository.findAll();
+
+        for (Recipe recipe : recipes) {
+            recipe.getIngredients().removeIf(
+                    ri -> ri.getIngredient().equals(ingredient)
+            );
         }
-        else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        recipeRepository.flush();
+        ingredientRepository.delete(ingredient);
     }
 
     /**

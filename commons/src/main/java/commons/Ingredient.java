@@ -31,13 +31,6 @@ public class Ingredient {
     @Column()
     private Double carbsPer100g;
 
-    @OneToMany(
-            mappedBy = "ingredient",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true
-    )
-    private java.util.List<RecipeIngredient> recipeIngredients = new java.util.ArrayList<>();
-
     /**
      * Default constructor required by JPA.
      */
