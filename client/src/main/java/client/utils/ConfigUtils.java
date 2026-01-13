@@ -40,7 +40,8 @@ public class ConfigUtils {
     /**
      * Loads the configuration properties from the config file.
      *
-     * @return a Properties object containing the configuration, or an empty Properties if the file doesn't exist
+     * @return a Properties object containing the configuration,
+     * or an empty Properties if the file doesn't exist
      */
     private static Properties loadProperties() {
         Properties props = new Properties();
