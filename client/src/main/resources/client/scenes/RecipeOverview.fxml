@@ -19,7 +19,7 @@
    <center>
       <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
          <children>
-            <HBox prefHeight="22.0" prefWidth="452.0" style="-fx-spacing: 10;" VBox.vgrow="NEVER">
+            <HBox alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="452.0" style="-fx-spacing: 10;" VBox.vgrow="NEVER">
                <children>
                   <StackPane alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="179.0">
                      <children>
@@ -28,6 +28,7 @@
                      </children>
                   </StackPane>
                   <Button fx:id="recipeEditButton" mnemonicParsing="false" onAction="#editNameClicked" text="Edit" visible="false" />
+                  <Label fx:id="servingsLabel" text="Servings: 0" />
                </children>
             </HBox>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" VBox.vgrow="ALWAYS">
@@ -115,7 +116,7 @@
       </VBox>
    </center>
    <top>
-      <HBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" spacing="10.0" BorderPane.alignment="CENTER">
+      <HBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" prefWidth="670.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
             <MenuButton fx:id="languageMenu" mnemonicParsing="false" prefWidth="120.0" text="Language" />
             <Button fx:id="refreshButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#refresh" text="Refresh" />

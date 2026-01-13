@@ -101,6 +101,9 @@ public class RecipeOverviewCtrl implements Initializable {
     private Label estimatedKcalLabel;
 
     @FXML
+    private Label servingsLabel;
+
+    @FXML
     private CheckBox filterEnglish;
     @FXML
     private CheckBox filterDutch;
@@ -154,6 +157,10 @@ public class RecipeOverviewCtrl implements Initializable {
             try {
                 factor = Double.parseDouble(scaleFactorField.getText());
             } catch (NumberFormatException e) {
+                factor = 1.0;
+            }
+
+            if (factor <= 0) {
                 factor = 1.0;
             }
 
@@ -262,6 +269,7 @@ public class RecipeOverviewCtrl implements Initializable {
 
         scaleFactorField.textProperty().addListener((obs, oldVal, newVal) -> {
             tableIngredients.refresh();
+            refresh();
         });
 
         setupWebSocketSubscriptions();
@@ -712,6 +720,7 @@ public class RecipeOverviewCtrl implements Initializable {
         recipeIngredientEditButton.setVisible(false);
         scaleHBox.setVisible(false);
         estimatedKcalLabel.setVisible(false);
+        servingsLabel.setVisible(false);
     }
 
     /**
@@ -747,6 +756,18 @@ public class RecipeOverviewCtrl implements Initializable {
         }
 
         estimatedKcalLabel.setText("Estimated kcal: " + totalKcal + "kcal/100g");
+
+        servingsLabel.setVisible(true);
+
+        double factor = 1.0;
+
+        try {
+            factor = Double.parseDouble(scaleFactorField.getText());
+        } catch (NumberFormatException e) {
+            factor = 1.0;
+        }
+
+        servingsLabel.setText("Servings: " + (newSel.getServings().intValue() * factor));
     }
 
     /**
