@@ -96,7 +96,7 @@ public class IngredientService {
             );
         }
         recipeRepository.flush();
-        ingredientRepository.delete(ingredient);
+        ingredientRepository.deleteById(id);
     }
 
     /**
