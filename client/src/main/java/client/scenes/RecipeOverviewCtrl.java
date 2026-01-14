@@ -152,84 +152,7 @@ public class RecipeOverviewCtrl implements Initializable {
 
         colAmount.setCellValueFactory(cell -> {
             var ri = cell.getValue();
-            double factor = 1.0;
-
-            try {
-                factor = Double.parseDouble(scaleFactorField.getText());
-            } catch (NumberFormatException e) {
-                factor = 1.0;
-            }
-
-            if (factor <= 0) {
-                factor = 1.0;
-            }
-
-            boolean hasFormal = ri.getAmount() != null &&
-                            ri.getAmount() != 0 &&
-                            ri.getUnit() != null;
-
-            if (hasFormal) {
-                double scaledAmount = factor * ri.getAmount();
-                String displayUnit = ri.getUnit();
-
-                if (scaledAmount >= 3) {
-                    switch (displayUnit) {
-                        case "g" -> {
-                            if (scaledAmount >= 1000) {
-                                scaledAmount /= 1000;
-                                displayUnit = "kg";
-                                if (scaledAmount >= 1000) {
-                                    scaledAmount /= 1000;
-                                    displayUnit = "ton";
-                                }
-                            }
-                        }
-                        case "kg" -> {
-                            if (scaledAmount >= 1000) {
-                                scaledAmount /= 1000;
-                                displayUnit = "ton";
-                            }
-                        }
-                        case "mL" -> {
-                            if (scaledAmount >= 1000) {
-                                scaledAmount /= 1000;
-                                displayUnit = "L";
-                                if (scaledAmount >= 1000) {
-                                    scaledAmount /= 1000;
-                                    displayUnit = "kL";
-                                }
-                            }
-                        }
-                        case "L" -> {
-                            if (scaledAmount >= 1000) {
-                                scaledAmount /= 1000;
-                                displayUnit = "kL";
-                            }
-                        }
-                        case "tsp" -> {
-                            scaledAmount /= 3;
-                            displayUnit = "tbsp";
-                            if (scaledAmount >= 16) {
-                                scaledAmount /= 16;
-                                displayUnit = "cup";
-                            }
-                        }
-                        case "tbsp" -> {
-                            if (scaledAmount >= 16) {
-                                scaledAmount /= 16;
-                                displayUnit = "cup";
-                            }
-                        }
-                        default -> {
-                            break;
-                        }
-                    }
-                }
-
-                return new SimpleStringProperty(scaledAmount + " " + displayUnit);
-            }
-
-            return new SimpleStringProperty(ri.getInformalAmount());
+            return loadAmountsForRecipeIngredient(ri);
         });
 
         colPreparation.setCellValueFactory(cell ->
@@ -273,6 +196,85 @@ public class RecipeOverviewCtrl implements Initializable {
         });
 
         setupWebSocketSubscriptions();
+    }
+
+    private SimpleStringProperty loadAmountsForRecipeIngredient(RecipeIngredient ri) {
+        double factor = 1.0;
+
+        try {
+            factor = Double.parseDouble(scaleFactorField.getText());
+        } catch (NumberFormatException e) {
+            factor = 1.0;
+        }
+
+        if (factor <= 0) {
+            factor = 1.0;
+        }
+
+        boolean hasFormal = ri.getAmount() != null &&
+                ri.getAmount() != 0 &&
+                ri.getUnit() != null;
+
+        if (hasFormal) {
+            double scaledAmount = factor * ri.getAmount();
+            String displayUnit = ri.getUnit();
+
+            if (scaledAmount >= 3) {
+                switch (displayUnit) {
+                    case "g" -> {
+                        if (scaledAmount >= 1000) {
+                            scaledAmount /= 1000;
+                            displayUnit = "kg";
+                            if (scaledAmount >= 1000) {
+                                scaledAmount /= 1000;
+                                displayUnit = "ton";
+                            }
+                        }
+                    }
+                    case "kg" -> {
+                        if (scaledAmount >= 1000) {
+                            scaledAmount /= 1000;
+                            displayUnit = "ton";
+                        }
+                    }
+                    case "mL" -> {
+                        if (scaledAmount >= 1000) {
+                            scaledAmount /= 1000;
+                            displayUnit = "L";
+                            if (scaledAmount >= 1000) {
+                                scaledAmount /= 1000;
+                                displayUnit = "kL";
+                            }
+                        }
+                    }
+                    case "L" -> {
+                        if (scaledAmount >= 1000) {
+                            scaledAmount /= 1000;
+                            displayUnit = "kL";
+                        }
+                    }
+                    case "tsp" -> {
+                        scaledAmount /= 3;
+                        displayUnit = "tbsp";
+                        if (scaledAmount >= 16) {
+                            scaledAmount /= 16;
+                            displayUnit = "cup";
+                        }
+                    }
+                    case "tbsp" -> {
+                        if (scaledAmount >= 16) {
+                            scaledAmount /= 16;
+                            displayUnit = "cup";
+                        }
+                    }
+                    default -> {
+                        break;
+                    }
+                }
+            }
+            return new SimpleStringProperty(scaledAmount + " " + displayUnit);
+        }
+        return new SimpleStringProperty(ri.getInformalAmount());
     }
 
     /**
