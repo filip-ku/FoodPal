@@ -7,8 +7,6 @@ import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import com.google.inject.Inject;
 /**

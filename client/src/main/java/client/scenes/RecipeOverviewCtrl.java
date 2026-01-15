@@ -751,7 +751,8 @@ public class RecipeOverviewCtrl implements Initializable {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Delete");
         confirm.setHeaderText("Delete Step");
-        confirm.setContentText("Are you sure you want to delete step " + selectedStep.getPosition() + "?");
+        confirm.setContentText("Are you sure you want to delete step "
+                + selectedStep.getPosition() + "?");
 
         var result = confirm.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
