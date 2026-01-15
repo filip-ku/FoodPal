@@ -139,6 +139,15 @@
                <children>
                   <Button fx:id="addRecipeButton" maxHeight="26.0" maxWidth="26.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#addRecipe" prefHeight="26.0" prefWidth="26.0" text="+" />
                   <Button fx:id="deleteRecipeButton" maxHeight="26.0" maxWidth="26.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#deleteRecipe" prefHeight="26.0" prefWidth="26.0" text="-" />
+                   <Button alignment="CENTER" contentDisplay="CENTER" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#cloneRecipe">
+                       <graphic>
+                           <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                               <image>
+                                   <Image url="@/Icons/duplicate-icon.png" />
+                               </image>
+                           </ImageView>
+                       </graphic>
+                   </Button>
                </children>
                <padding>
                   <Insets top="10.0" />
