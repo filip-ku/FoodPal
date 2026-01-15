@@ -205,4 +205,27 @@ public class RecipeStepsTest {
 
         assertEquals(404, ex.getStatusCode().value());
     }
+
+    @Test
+    void addStepToRecipe_nonExistingRecipe_throwsNotFound() {
+        RecipeStep step = new RecipeStep();
+        step.setPosition(1);
+        step.setInstruction("Do something");
+
+        var ex = assertThrows(ResponseStatusException.class,
+                () -> recipeService.addStepToRecipe(999L, step));
+
+        assertEquals(404, ex.getStatusCode().value());
+        assertTrue(recipeRepo.calledMethods.contains("findById"));
+        verify(webSocketService, never()).publishRecipeContentChanged(anyLong());
+    }
+
+    @Test
+    void getStepsForRecipe_nonExistingRecipe_throwsNotFound() {
+        var ex = assertThrows(ResponseStatusException.class,
+                () -> recipeService.getStepsForRecipe(999L));
+
+        assertEquals(404, ex.getStatusCode().value());
+        verify(webSocketService, never()).publishRecipeContentChanged(anyLong());
+    }
 }
