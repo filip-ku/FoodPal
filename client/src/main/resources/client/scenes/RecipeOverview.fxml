@@ -28,7 +28,6 @@
                      </children>
                   </StackPane>
                   <Button fx:id="recipeEditButton" mnemonicParsing="false" onAction="#editNameClicked" text="Edit" visible="false" />
-                  <Button fx:id="favButton" mnemonicParsing="false" onAction="#favoriteRecipe" prefHeight="22.0" prefWidth="28.0" style="-fx-text-fill: gold;" text="☆" />
                </children>
             </HBox>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" VBox.vgrow="ALWAYS">
