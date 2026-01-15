@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -12,6 +13,7 @@ import com.google.inject.Inject;
 
 import client.ws.WebSocketService;
 import client.utils.ServerUtils;
+import client.utils.ConfigUtils;
 import commons.Recipe;
 import commons.RecipeIngredient;
 import commons.RecipeStep;
@@ -130,6 +132,7 @@ public class RecipeOverviewCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         showMainMenu();
         setupLanguageMenu();
+        loadRecipeLanguageFilter();
 
         colRecipes.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getTitle()));
@@ -197,7 +200,7 @@ public class RecipeOverviewCtrl implements Initializable {
 
     /**
      * Configures the language indicator/dropdown with the available options.
-     * This is UI-only for now; selection changes are not yet persisted or applied.
+     * Loads the saved UI language from config if available.
      */
     private void setupLanguageMenu() {
         languageMenu.getItems().clear();
@@ -209,13 +212,24 @@ public class RecipeOverviewCtrl implements Initializable {
             languageMenu.getItems().add(item);
         }
 
-        if (!supportedLanguages.isEmpty()) {
+        // Load saved UI language from config (defaults to "en" if not set)
+        String savedLanguageCode = ConfigUtils.getUILanguage();
+        LanguageOption savedLanguage = supportedLanguages.stream()
+                .filter(opt -> opt.code.equals(savedLanguageCode))
+                .findFirst()
+                .orElse(null);
+
+        if (savedLanguage != null) {
+            setCurrentLanguage(savedLanguage);
+        } else if (!supportedLanguages.isEmpty()) {
+            // Fallback to first language if saved language code is invalid
             setCurrentLanguage(supportedLanguages.get(0));
         }
     }
 
     /**
      * Updates the indicator text and flag to the chosen language.
+     * Persists the selection to the config file.
      *
      * @param option selected language option
      */
@@ -223,6 +237,8 @@ public class RecipeOverviewCtrl implements Initializable {
         this.currentLanguage = option;
         languageMenu.setText(option.name);
         languageMenu.setGraphic(createFlagGraphic(option.iconPath, 16));
+        // Persist UI language choice
+        ConfigUtils.setUILanguage(option.code);
     }
 
     /**
@@ -332,6 +348,7 @@ public class RecipeOverviewCtrl implements Initializable {
     /**
      * Filters recipes based on selected language checkboxes.
      * If no languages are selected, all recipes are shown.
+     * Persists the filter selection to the config file.
      */
     @FXML
     public void applyLanguageFilter() {
@@ -356,6 +373,9 @@ public class RecipeOverviewCtrl implements Initializable {
             selectedLanguages.add("es");
         }
 
+        // Persist recipe language filter selection
+        ConfigUtils.setRecipeLanguageFilter(new ArrayList<>(selectedLanguages));
+
         // If no languages are selected, show all recipes
         if (selectedLanguages.isEmpty()) {
             data = FXCollections.observableList(allRecipes);
@@ -373,6 +393,29 @@ public class RecipeOverviewCtrl implements Initializable {
         }
 
         tableRecipes.setItems(data);
+    }
+
+    /**
+     * Loads the saved recipe language filter from config and applies it to the UI.
+     * Also applies the filter to the recipe list if recipes are already loaded.
+     */
+    private void loadRecipeLanguageFilter() {
+        // Check if filter checkboxes are initialized
+        if (filterEnglish == null || filterDutch == null || filterSpanish == null) {
+            return; // UI not fully initialized yet
+        }
+
+        List<String> savedFilter = ConfigUtils.getRecipeLanguageFilter();
+        
+        // Set checkboxes based on saved filter
+        filterEnglish.setSelected(savedFilter.contains("en"));
+        filterDutch.setSelected(savedFilter.contains("nl"));
+        filterSpanish.setSelected(savedFilter.contains("es"));
+        
+        // Apply the filter if recipes are already loaded
+        if (allRecipes != null) {
+            applyLanguageFilter();
+        }
     }
 
     /**
