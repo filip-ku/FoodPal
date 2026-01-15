@@ -29,6 +29,13 @@ public class Recipe {
     @Column(length = 10)
     private String language;
 
+    /**
+     * Local-only flag indicating if this recipe is marked as favorite by the current user.
+     * This field is not persisted to the database and is managed client-side only.
+     */
+    @Transient
+    private boolean favorite = false;
+
     @JsonManagedReference
     @OneToMany(
             mappedBy = "recipe",
@@ -150,6 +157,21 @@ public class Recipe {
     public void setLanguage(String language) {
         this.language = language;
     }
+
+
+    /**
+     * Returns whether this recipe is marked as favorite.
+     *AI generated
+     * @return true if favorite, false otherwise
+     */
+    public boolean isFavorite() {return favorite;}
+
+    /**
+     * Sets the favorite status of this recipe.
+     * AI generated
+     * @param favorite true to mark as favorite, false otherwise
+     */
+    public void setFavorite(boolean favorite) {this.favorite = favorite;}
 
     // AI-generated
     /**
