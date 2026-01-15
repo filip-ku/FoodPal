@@ -212,19 +212,17 @@ public class RecipeOverviewCtrl implements Initializable {
             languageMenu.getItems().add(item);
         }
 
-        // Load saved UI language from config
+        // Load saved UI language from config (defaults to "en" if not set)
         String savedLanguageCode = ConfigUtils.getUILanguage();
-        LanguageOption savedLanguage = null;
-        if (savedLanguageCode != null) {
-            savedLanguage = supportedLanguages.stream()
-                    .filter(opt -> opt.code.equals(savedLanguageCode))
-                    .findFirst()
-                    .orElse(null);
-        }
+        LanguageOption savedLanguage = supportedLanguages.stream()
+                .filter(opt -> opt.code.equals(savedLanguageCode))
+                .findFirst()
+                .orElse(null);
 
         if (savedLanguage != null) {
             setCurrentLanguage(savedLanguage);
         } else if (!supportedLanguages.isEmpty()) {
+            // Fallback to first language if saved language code is invalid
             setCurrentLanguage(supportedLanguages.get(0));
         }
     }

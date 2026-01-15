@@ -79,7 +79,7 @@ public class ConfigUtils {
     /**
      * Gets the saved UI language code from the config file.
      *
-     * @return the language code (e.g., "en", "nl", "es"), or null if not set
+     * @return the language code (e.g., "en", "nl", "es"), defaults to "en" if not set
      */
     public static String getUILanguage() {
         Properties props = loadProperties();
