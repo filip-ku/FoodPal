@@ -123,6 +123,8 @@
                   <CheckBox fx:id="filterEnglish" mnemonicParsing="false" onAction="#applyLanguageFilter" text="English" />
                   <CheckBox fx:id="filterDutch" mnemonicParsing="false" onAction="#applyLanguageFilter" text="Dutch" />
                   <CheckBox fx:id="filterSpanish" mnemonicParsing="false" onAction="#applyLanguageFilter" text="Spanish" />
+                   <CheckBox fx:id="filterFavorites" text="Favorites" onAction="#applyLanguageFilter" />
+
                </children>
                <padding>
                   <Insets bottom="10.0" />

@@ -408,30 +408,24 @@ public class RecipeOverviewCtrl implements Initializable {
             selectedLanguages.add("es");
         }
 
-        // If no languages are selected, show all recipes
-        if (selectedLanguages.isEmpty()) {
-            data = FXCollections.observableList(allRecipes);
-        } else {
-            boolean filterByFavorites = filterFavorites != null && filterFavorites.isSelected();
+        boolean filterByFavorites = filterFavorites != null && filterFavorites.isSelected();
 
-            // Filter recipes by selected languages
-            List<Recipe> filtered = allRecipes.stream()
-                    .filter(recipe -> {
-                        // Apply language filter
-                        boolean languageMatch = selectedLanguages.isEmpty() ||
-                                (recipe.getLanguage() != null &&
-                                        selectedLanguages.contains(recipe.getLanguage()));
+        // Filter recipes by selected languages
+        List<Recipe> filtered = allRecipes.stream()
+                .filter(recipe -> {
+                    // Apply language filter
+                    boolean languageMatch = selectedLanguages.isEmpty() ||
+                            (recipe.getLanguage() != null &&
+                                    selectedLanguages.contains(recipe.getLanguage()));
 
-                        // Apply favorites filter
-                        boolean favoriteMatch = !filterByFavorites ||
-                                favoritesManager.isFavorite(recipe.getId());
+                    // Apply favorites filter
+                    boolean favoriteMatch = !filterByFavorites ||
+                            favoritesManager.isFavorite(recipe.getId());
 
-                        return languageMatch && favoriteMatch;
+                    return languageMatch && favoriteMatch;
                     })
-                    .collect(Collectors.toList());
-            data = FXCollections.observableList(filtered);
-        }
-
+                .collect(Collectors.toList());
+        data = FXCollections.observableList(filtered);
         tableRecipes.setItems(data);
     }
 
