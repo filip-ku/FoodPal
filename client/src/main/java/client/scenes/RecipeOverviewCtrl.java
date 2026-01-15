@@ -121,7 +121,7 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     @Inject
     public RecipeOverviewCtrl(ServerUtils server, MainCtrl mainCtrl,
-                              WebSocketService webSocketService, FavoritesManager favoritesManager) {
+                              WebSocketService webSocketService, FavoritesManager favoritesManager){
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.webSocketService = webSocketService;
@@ -423,7 +423,7 @@ public class RecipeOverviewCtrl implements Initializable {
                             favoritesManager.isFavorite(recipe.getId());
 
                     return languageMatch && favoriteMatch;
-                    })
+                })
                 .collect(Collectors.toList());
         data = FXCollections.observableList(filtered);
         tableRecipes.setItems(data);
