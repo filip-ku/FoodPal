@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import client.utils.FavoritesManager;
 import client.utils.RecipeFormatter;
 import com.google.inject.Inject;
 
@@ -30,6 +32,8 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import javafx.stage.FileChooser;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RecipeOverviewCtrl implements Initializable {
@@ -37,6 +41,7 @@ public class RecipeOverviewCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final WebSocketService webSocketService;
+    private final FavoritesManager favoritesManager;
 
     private ObservableList<Recipe> data;
     private ObservableList<Recipe> allRecipes; // Unfiltered list of all recipes
@@ -59,6 +64,10 @@ public class RecipeOverviewCtrl implements Initializable {
     private TableView<RecipeStep> tablePreparation;
     @FXML
     private TableColumn<RecipeStep, String> colPreparation;
+    @FXML
+    private Button favButton;
+    @FXML
+    private CheckBox filterFavorites;
 
     /**
      * Language indicator showing current choice and opening the language menu.
@@ -108,13 +117,15 @@ public class RecipeOverviewCtrl implements Initializable {
      * @param server  injected {@link ServerUtils}
      * @param mainCtrl injected {@link MainCtrl}
      * @param webSocketService injected {@link WebSocketService}
+     * @param favoritesManager injected {@link FavoritesManager}
      */
     @Inject
     public RecipeOverviewCtrl(ServerUtils server, MainCtrl mainCtrl,
-                              WebSocketService webSocketService) {
+                              WebSocketService webSocketService, FavoritesManager favoritesManager) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.webSocketService = webSocketService;
+        this.favoritesManager = favoritesManager;
     }
 
     /**
@@ -130,6 +141,29 @@ public class RecipeOverviewCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         showMainMenu();
         setupLanguageMenu();
+
+        // Add this BEFORE the existing colRecipes.setCellValueFactory line
+
+        colRecipes.setCellFactory(column -> new TableCell<Recipe, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    Recipe recipe = getTableView().getItems().get(getIndex());
+                    setText(item);
+
+                    if (favoritesManager.isFavorite(recipe.getId())) {
+                        setStyle("-fx-font-weight: bold; -fx-text-fill: #DAA520;");
+                    } else {
+                        setStyle("");
+                    }
+                }
+            }
+        });
 
         colRecipes.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getTitle()));
@@ -167,6 +201,7 @@ public class RecipeOverviewCtrl implements Initializable {
 
                         recipeEditButton.setVisible(true);
                         recipeName.setVisible(true);
+                        updateFavoriteButton(newSel);
 
                         recipeIngredientAdd.setVisible(true);
                         recipeIngredientDelete.setVisible(true);
@@ -309,6 +344,23 @@ public class RecipeOverviewCtrl implements Initializable {
             }
 
             var recipes = server.getRecipes();
+
+            Set<Long> currentRecipeIds = new HashSet<>();
+            for (Recipe recipe : recipes) {
+                currentRecipeIds.add(recipe.getId());
+                // Mark favorites
+                recipe.setFavorite(favoritesManager.isFavorite(recipe.getId()));
+            }
+
+            // Check for deleted favorites and warn user
+            Set<Long> favoriteIds = new HashSet<>(favoritesManager.getFavoriteIds());
+            favoriteIds.removeAll(currentRecipeIds);
+            if (!favoriteIds.isEmpty()) {
+                favoritesManager.cleanupDeletedRecipes(favoriteIds);
+                mainCtrl.showError("Warning: " + favoriteIds.size() +
+                        " favorite recipe(s) were deleted from the server.");
+            }
+
             allRecipes = FXCollections.observableList(recipes);
             applyLanguageFilter(); // Apply current filter state
 
@@ -360,13 +412,21 @@ public class RecipeOverviewCtrl implements Initializable {
         if (selectedLanguages.isEmpty()) {
             data = FXCollections.observableList(allRecipes);
         } else {
+            boolean filterByFavorites = filterFavorites != null && filterFavorites.isSelected();
+
             // Filter recipes by selected languages
             List<Recipe> filtered = allRecipes.stream()
                     .filter(recipe -> {
-                        String recipeLanguage = recipe.getLanguage();
-                        // Include recipe if its language matches any selected language
-                        // Also include recipes with no language set (null) when no filter is active
-                        return recipeLanguage != null && selectedLanguages.contains(recipeLanguage);
+                        // Apply language filter
+                        boolean languageMatch = selectedLanguages.isEmpty() ||
+                                (recipe.getLanguage() != null &&
+                                        selectedLanguages.contains(recipe.getLanguage()));
+
+                        // Apply favorites filter
+                        boolean favoriteMatch = !filterByFavorites ||
+                                favoritesManager.isFavorite(recipe.getId());
+
+                        return languageMatch && favoriteMatch;
                     })
                     .collect(Collectors.toList());
             data = FXCollections.observableList(filtered);
@@ -638,6 +698,7 @@ public class RecipeOverviewCtrl implements Initializable {
         removeStepButton.setVisible(false);
         addRecipeStep.setVisible(false);
         recipeIngredientEditButton.setVisible(false);
+        favButton.setVisible(false);
     }
 
     /**
@@ -659,6 +720,7 @@ public class RecipeOverviewCtrl implements Initializable {
         removeStepButton.setVisible(true);
         addRecipeStep.setVisible(true);
         recipeIngredientEditButton.setVisible(true);
+        favButton.setVisible(true);
     }
 
     /**
@@ -863,5 +925,47 @@ public class RecipeOverviewCtrl implements Initializable {
         view.setPreserveRatio(true);
         view.setFitHeight(height);
         return view;
+    }
+
+    /**
+     * Toggles the favorite status of the currently selected recipe.
+     * Updates the button appearance and refreshes the table to show highlighting.
+     */
+    @FXML
+    private void favouriteRecipe() {
+        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            mainCtrl.showError("Select a recipe first.");
+            return;
+        }
+
+        boolean isFavorite = favoritesManager.toggleFavorite(selected.getId());
+        selected.setFavorite(isFavorite);
+        updateFavoriteButton(selected);
+
+        // Refresh the table to update highlighting
+        tableRecipes.refresh();
+    }
+
+    /**
+     * Updates the favorite button appearance based on the recipe's favorite status.
+     *
+     * @param recipe the currently selected recipe, or null to reset the button
+     */
+    private void updateFavoriteButton(Recipe recipe) {
+        if (recipe == null) {
+            favButton.setText("☆");
+            favButton.setStyle("");
+            return;
+        }
+
+        if (favoritesManager.isFavorite(recipe.getId())) {
+            favButton.setText("★");
+            favButton.setStyle("-fx-text-fill: gold; -fx-font-size: 20px;");
+        } else {
+            favButton.setText("☆");
+            favButton.setStyle("-fx-font-size: 20px;");
+        }
     }
 }
