@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.utils.FavoritesManager;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
@@ -42,5 +43,6 @@ public class MyModule implements Module {
         binder.bind(AddRecipeCtrl.class).in(Scopes.SINGLETON);
         binder.bind(RecipeOverviewCtrl.class).in(Scopes.SINGLETON);
         binder.bind(WebSocketService.class).in(Scopes.SINGLETON);
+        binder.bind(FavoritesManager.class).in(Scopes.SINGLETON);
     }
 }
