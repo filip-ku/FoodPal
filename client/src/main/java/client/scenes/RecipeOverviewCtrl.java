@@ -198,6 +198,14 @@ public class RecipeOverviewCtrl implements Initializable {
         setupWebSocketSubscriptions();
     }
 
+    /**
+     * Loads the amount column of the ingredients table with the correct values
+     * Also normalizes units when the user scales the recipe
+     * (1000g becomes 1kg for example)
+     *
+     * @param ri RecipeIngredient to load amounts for
+     * @return SimpleStringProperty containing the amount to display
+     */
     private SimpleStringProperty loadAmountsForRecipeIngredient(RecipeIngredient ri) {
         double factor = 1.0;
 
