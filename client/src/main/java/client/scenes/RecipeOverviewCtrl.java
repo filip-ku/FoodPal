@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -12,6 +13,7 @@ import com.google.inject.Inject;
 
 import client.ws.WebSocketService;
 import client.utils.ServerUtils;
+import client.utils.ConfigUtils;
 import commons.Recipe;
 import commons.RecipeIngredient;
 import commons.RecipeStep;
@@ -27,6 +29,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import org.springframework.messaging.simp.stomp.StompSession;
 import javafx.stage.FileChooser;
 import javafx.scene.image.Image;
@@ -96,6 +99,17 @@ public class RecipeOverviewCtrl implements Initializable {
     private TextField searchField;
 
     @FXML
+    private HBox scaleHBox;
+    @FXML
+    private TextField scaleFactorField;
+
+    @FXML
+    private Label estimatedKcalLabel;
+
+    @FXML
+    private Label servingsLabel;
+
+    @FXML
     private CheckBox filterEnglish;
     @FXML
     private CheckBox filterDutch;
@@ -134,6 +148,7 @@ public class RecipeOverviewCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         showMainMenu();
         setupLanguageMenu();
+        loadRecipeLanguageFilter();
 
         colRecipes.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getTitle()));
@@ -144,18 +159,7 @@ public class RecipeOverviewCtrl implements Initializable {
 
         colAmount.setCellValueFactory(cell -> {
             var ri = cell.getValue();
-
-            boolean hasFormal = ri.getAmount() != null &&
-                            ri.getAmount() != 0 &&
-                            ri.getUnit() != null;
-
-            String value = hasFormal
-                    ? ri.getAmount() + " " + ri.getUnit()
-                    : ri.getInformalAmount(); // ternary operator that executes the code
-                                              // to the left of the : if the condition is true and
-                                              // the code on the right otherwise
-
-            return new SimpleStringProperty(value);
+            return loadAmountsForRecipeIngredient(ri);
         });
 
         colPreparation.setCellValueFactory(cell ->
@@ -165,16 +169,6 @@ public class RecipeOverviewCtrl implements Initializable {
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
                     if (newSel != null) {
-                        recipeName.setText(newSel.getTitle());
-                        tableIngredients.setVisible(true);
-                        tablePreparation.setVisible(true);
-
-                        recipeEditButton.setVisible(true);
-                        recipeName.setVisible(true);
-
-                        recipeIngredientAdd.setVisible(true);
-                        recipeIngredientDelete.setVisible(true);
-
                         if (newSel.getIngredients() != null) {
                             tableIngredients.setItems(
                                     FXCollections.observableArrayList(newSel.getIngredients()));
@@ -182,7 +176,7 @@ public class RecipeOverviewCtrl implements Initializable {
                             tableIngredients.getItems().clear();
                         }
 
-                        loadRecipeOverviewUI();
+                        loadRecipeOverviewUI(newSel);
                         loadStepsForRecipe(newSel);
                         subscribeToRecipeContent(newSel.getId());
                         reloadSelectedRecipeDetails(newSel);
@@ -200,18 +194,117 @@ public class RecipeOverviewCtrl implements Initializable {
         });
 
         recipeIngredientEditButton.setDisable(true);
+        editStepsButton.setDisable(true);
+
         tableIngredients.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
                     recipeIngredientEditButton.setDisable(newSel == null);
                 });
+        tablePreparation.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldSel, newSel) -> {
+                    editStepsButton.setDisable(newSel == null);
+                });
+
+        scaleFactorField.textProperty().addListener((obs, oldVal, newVal) -> {
+            tableIngredients.refresh();
+            refresh();
+        });
 
         setupWebSocketSubscriptions();
     }
 
     /**
+     * Loads the amount column of the ingredients table with the correct values
+     * Also normalizes units when the user scales the recipe
+     * (1000g becomes 1kg for example)
+     *
+     * @param ri RecipeIngredient to load amounts for
+     * @return SimpleStringProperty containing the amount to display
+     */
+    private SimpleStringProperty loadAmountsForRecipeIngredient(RecipeIngredient ri) {
+        double factor = 1.0;
+
+        try {
+            factor = Double.parseDouble(scaleFactorField.getText());
+        } catch (NumberFormatException e) {
+            factor = 1.0;
+        }
+
+        if (factor <= 0) {
+            factor = 1.0;
+        }
+
+        boolean hasFormal = ri.getAmount() != null &&
+                ri.getAmount() != 0 &&
+                ri.getUnit() != null;
+
+        if (hasFormal) {
+            double scaledAmount = factor * ri.getAmount();
+            String displayUnit = ri.getUnit();
+
+            if (scaledAmount >= 3) {
+                switch (displayUnit) {
+                    case "g" -> {
+                        if (scaledAmount >= 1000) {
+                            scaledAmount /= 1000;
+                            displayUnit = "kg";
+                            if (scaledAmount >= 1000) {
+                                scaledAmount /= 1000;
+                                displayUnit = "ton";
+                            }
+                        }
+                    }
+                    case "kg" -> {
+                        if (scaledAmount >= 1000) {
+                            scaledAmount /= 1000;
+                            displayUnit = "ton";
+                        }
+                    }
+                    case "mL" -> {
+                        if (scaledAmount >= 1000) {
+                            scaledAmount /= 1000;
+                            displayUnit = "L";
+                            if (scaledAmount >= 1000) {
+                                scaledAmount /= 1000;
+                                displayUnit = "kL";
+                            }
+                        }
+                    }
+                    case "L" -> {
+                        if (scaledAmount >= 1000) {
+                            scaledAmount /= 1000;
+                            displayUnit = "kL";
+                        }
+                    }
+                    case "tsp" -> {
+                        scaledAmount /= 3;
+                        displayUnit = "tbsp";
+                        if (scaledAmount >= 16) {
+                            scaledAmount /= 16;
+                            displayUnit = "cup";
+                        }
+                    }
+                    case "tbsp" -> {
+                        if (scaledAmount >= 16) {
+                            scaledAmount /= 16;
+                            displayUnit = "cup";
+                        }
+                    }
+                    default -> {
+                        break;
+                    }
+                }
+            }
+            return new SimpleStringProperty(scaledAmount + " " + displayUnit);
+        }
+        return new SimpleStringProperty(ri.getInformalAmount());
+    }
+
+    /**
      * Configures the language indicator/dropdown with the available options.
-     * This is UI-only for now; selection changes are not yet persisted or applied.
+     * Loads the saved UI language from config if available.
      */
     private void setupLanguageMenu() {
         languageMenu.getItems().clear();
@@ -223,13 +316,24 @@ public class RecipeOverviewCtrl implements Initializable {
             languageMenu.getItems().add(item);
         }
 
-        if (!supportedLanguages.isEmpty()) {
+        // Load saved UI language from config (defaults to "en" if not set)
+        String savedLanguageCode = ConfigUtils.getUILanguage();
+        LanguageOption savedLanguage = supportedLanguages.stream()
+                .filter(opt -> opt.code.equals(savedLanguageCode))
+                .findFirst()
+                .orElse(null);
+
+        if (savedLanguage != null) {
+            setCurrentLanguage(savedLanguage);
+        } else if (!supportedLanguages.isEmpty()) {
+            // Fallback to first language if saved language code is invalid
             setCurrentLanguage(supportedLanguages.get(0));
         }
     }
 
     /**
      * Updates the indicator text and flag to the chosen language.
+     * Persists the selection to the config file.
      *
      * @param option selected language option
      */
@@ -237,6 +341,8 @@ public class RecipeOverviewCtrl implements Initializable {
         this.currentLanguage = option;
         languageMenu.setText(option.name);
         languageMenu.setGraphic(createFlagGraphic(option.iconPath, 16));
+        // Persist UI language choice
+        ConfigUtils.setUILanguage(option.code);
     }
 
     /**
@@ -429,6 +535,7 @@ public class RecipeOverviewCtrl implements Initializable {
     /**
      * Filters recipes based on selected language checkboxes.
      * If no languages are selected, all recipes are shown.
+     * Persists the filter selection to the config file.
      */
     @FXML
     public void applyLanguageFilter() {
@@ -453,6 +560,9 @@ public class RecipeOverviewCtrl implements Initializable {
             selectedLanguages.add("es");
         }
 
+        // Persist recipe language filter selection
+        ConfigUtils.setRecipeLanguageFilter(new ArrayList<>(selectedLanguages));
+
         // If no languages are selected, show all recipes
         if (selectedLanguages.isEmpty()) {
             data = FXCollections.observableList(allRecipes);
@@ -471,6 +581,29 @@ public class RecipeOverviewCtrl implements Initializable {
 
         tableRecipes.setItems(data);
         filterRecipes(searchField.getText());
+    }
+
+    /**
+     * Loads the saved recipe language filter from config and applies it to the UI.
+     * Also applies the filter to the recipe list if recipes are already loaded.
+     */
+    private void loadRecipeLanguageFilter() {
+        // Check if filter checkboxes are initialized
+        if (filterEnglish == null || filterDutch == null || filterSpanish == null) {
+            return; // UI not fully initialized yet
+        }
+
+        List<String> savedFilter = ConfigUtils.getRecipeLanguageFilter();
+
+        // Set checkboxes based on saved filter
+        filterEnglish.setSelected(savedFilter.contains("en"));
+        filterDutch.setSelected(savedFilter.contains("nl"));
+        filterSpanish.setSelected(savedFilter.contains("es"));
+
+        // Apply the filter if recipes are already loaded
+        if (allRecipes != null) {
+            applyLanguageFilter();
+        }
     }
 
     /**
@@ -736,13 +869,20 @@ public class RecipeOverviewCtrl implements Initializable {
         removeStepButton.setVisible(false);
         addRecipeStep.setVisible(false);
         recipeIngredientEditButton.setVisible(false);
+        scaleHBox.setVisible(false);
+        estimatedKcalLabel.setVisible(false);
+        servingsLabel.setVisible(false);
     }
 
     /**
      * Makes every component that the user should
      * be able to interact with when a recipe is selected visible
+     *
+     * @param newSel the recipe that is selected
      */
-    public void loadRecipeOverviewUI() {
+    public void loadRecipeOverviewUI(Recipe newSel) {
+        recipeName.setText(newSel.getTitle());
+
         tableIngredients.setVisible(true);
         tablePreparation.setVisible(true);
 
@@ -757,6 +897,28 @@ public class RecipeOverviewCtrl implements Initializable {
         removeStepButton.setVisible(true);
         addRecipeStep.setVisible(true);
         recipeIngredientEditButton.setVisible(true);
+        scaleHBox.setVisible(true);
+        estimatedKcalLabel.setVisible(true);
+
+        double totalKcal = 0.0;
+
+        for (RecipeIngredient ri : newSel.getIngredients()) {
+            totalKcal += ri.getIngredient().getCalories();
+        }
+
+        estimatedKcalLabel.setText("Estimated kcal: " + totalKcal + "kcal/100g");
+
+        servingsLabel.setVisible(true);
+
+        double factor = 1.0;
+
+        try {
+            factor = Double.parseDouble(scaleFactorField.getText());
+        } catch (NumberFormatException e) {
+            factor = 1.0;
+        }
+
+        servingsLabel.setText("Servings: " + (newSel.getServings().intValue() * factor));
     }
 
     /**
