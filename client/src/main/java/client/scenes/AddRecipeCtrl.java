@@ -12,6 +12,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -28,6 +29,9 @@ public class AddRecipeCtrl implements Initializable {
 
     @FXML
     private ComboBox<String> languageComboBox;
+
+    @FXML
+    private TextField servings;
 
     /**
      * Creates a controller with injected dependencies.
@@ -87,6 +91,19 @@ public class AddRecipeCtrl implements Initializable {
     private Recipe getRecipe() {
         Recipe recipe = new Recipe(title.getText());
         String selectedLanguageName = languageComboBox.getSelectionModel().getSelectedItem();
+
+        try {
+            int servingsValue = Integer.parseInt(servings.getText());
+            recipe.setServings(BigDecimal.valueOf(servingsValue));
+        }  catch (NumberFormatException e) {
+            if (servings.getText().isBlank()) {
+                mainCtrl.showError("Servings cannot be blank.");
+            } else {
+                mainCtrl.showError("Servings must be a number.");
+            }
+            return null;
+        }
+
         if (selectedLanguageName != null) {
             // Map display name to language code
             String languageCode = mapLanguageNameToCode(selectedLanguageName);

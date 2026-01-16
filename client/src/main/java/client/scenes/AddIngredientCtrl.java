@@ -44,6 +44,12 @@ public class AddIngredientCtrl implements Initializable {
         this.server = server;
     }
 
+    /**
+     * Initializer method for AddIngredient.fxml.
+     *
+     * @param location  location of the FXML file (unused)
+     * @param resources resource bundle for internationalization (unused)
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         proteinInput.textProperty().addListener((obs, old, nw) -> updateKcalLabel());
