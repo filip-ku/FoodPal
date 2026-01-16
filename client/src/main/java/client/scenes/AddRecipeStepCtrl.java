@@ -1,16 +1,14 @@
 package client.scenes;
 
 import client.utils.ServerUtils;
-import com.google.inject.Inject;
 import commons.Recipe;
 import commons.RecipeStep;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-
 import java.util.List;
-
+import com.google.inject.Inject;
 /**
  * Screen for creating a new recipe step.
  * Lets the user enter instruction text and (optionally) a position.
@@ -28,11 +26,6 @@ public class AddRecipeStepCtrl {
     @FXML private TextField positionInput;   // optional; leave empty to append
     @FXML private TextArea instructionInput;
 
-    /**
-     * Constructs the controller with injected dependencies.
-     * @param server   server utilities for backend calls
-     * @param mainCtrl main navigation controller
-     */
     @Inject
     public AddRecipeStepCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.server = server;
@@ -41,6 +34,8 @@ public class AddRecipeStepCtrl {
 
     /**
      * Sets the recipe context for which a new step will be created.
+     * Displays the next auto-assigned step number (read-only).
+     *
      * @param recipe target recipe
      */
     public void setRecipe(Recipe recipe) {
@@ -48,24 +43,40 @@ public class AddRecipeStepCtrl {
         this.editingStep = null;
         this.originalPosition = null;
 
-        // clear UI when opening add screen
+        // Clear UI when opening add screen
         if (instructionInput != null) instructionInput.clear();
-        if (positionInput != null) positionInput.clear();
-    }
 
-    /**
-     * Cancels and returns to the overview.
-     */
-    @FXML
-    public void cancel() {
-        mainCtrl.showRecipeOverview();
+        if (positionInput != null) {
+            // Always show position but do not allow editing
+            positionInput.setEditable(false);
+            positionInput.setDisable(true);
+
+            // Compute and display next available step number
+            if (recipe == null || recipe.getId() == null) {
+                positionInput.setText(""); // cannot compute without recipe id
+                positionInput.setPromptText("Auto");
+                return;
+            }
+
+            try {
+                List<RecipeStep> existingSteps = server.getStepsForRecipe(recipe.getId());
+                int next = chooseAutoPosition(existingSteps);
+                positionInput.setText(String.valueOf(next));
+            } catch (WebApplicationException e) {
+                // If backend fails, still show something sensible
+                positionInput.setText("");
+                positionInput.setPromptText("Auto");
+                mainCtrl.showExceptionErrorPopUp(e);
+            }
+        }
     }
 
     /**
      * Sets the context for editing an existing step.
-     * Prefills UI fields with existing values.
+     * Displays the current step number (read-only) and prefills instruction text.
+     *
      * @param recipe the recipe that the preparation step belongs to
-     * @param step the step that is being edited
+     * @param step   the step that is being edited
      */
     public void setContextForEdit(Recipe recipe, RecipeStep step) {
         if (recipe == null) {
@@ -81,19 +92,24 @@ public class AddRecipeStepCtrl {
 
         // Prefill instruction
         String instruction = step.getInstruction();
-        if (instruction == null) {
-            instructionInput.setText("");
-        } else {
-            instructionInput.setText(instruction);
-        }
+        instructionInput.setText(instruction == null ? "" : instruction);
 
-        // Prefill position
-        Integer position = step.getPosition();
-        if (position == null) {
-            positionInput.setText("");
-        } else {
-            positionInput.setText(String.valueOf(position));
+        // Prefill + lock position (read-only display)
+        if (positionInput != null) {
+            positionInput.setEditable(false);
+            positionInput.setDisable(true);
+
+            Integer position = step.getPosition();
+            positionInput.setText(position == null ? "" : String.valueOf(position));
         }
+    }
+
+    /**
+     * Cancels and returns to the overview.
+     */
+    @FXML
+    public void cancel() {
+        mainCtrl.showRecipeOverview();
     }
 
     /**
@@ -131,51 +147,50 @@ public class AddRecipeStepCtrl {
      */
     @FXML
     public void ok() {
-        // 0) Validate recipe
         if (!validateRecipeSelected()) {
             return;
         }
 
-        // 1) Validate instruction
         String instruction = readAndValidateInstruction();
         if (instruction == null) {
             return;
         }
 
-        // 2) Determine position (optional)
-        Integer position = readAndValidatePosition();
-        if (position == INVALID_POSITION) {
-            return;
-        }
-
-        // 3) Fetch existing steps
+        // Always fetch latest steps once
         List<RecipeStep> existingSteps = fetchExistingStepsOrShowError();
         if (existingSteps == null) {
             return;
         }
 
-        // 4) If position not provided, choose a free position
-        if (position == null) {
+        int position;
+
+        if (editingStep == null) {
+            // ADD MODE: client assigns next available number, user cannot influence it
             position = chooseAutoPosition(existingSteps);
+            positionInput.setText(String.valueOf(position)); // keep UI consistent
+        } else {
+            // EDIT MODE: keep the existing number
+            Integer current = editingStep.getPosition();
+            if (current == null || current < 1) {
+                mainCtrl.showError("Invalid step number on selected step.");
+                return;
+            }
+            position = current;
         }
 
-        // 5) Client-side precheck, ignore the step being edited.
+        // Safety check
         if (!validateNoPositionConflict(existingSteps, position)) {
             return;
         }
 
-        // 6) Persist on server (add or edit)
         if (!persistStepOrShowError(instruction, position)) {
             return;
         }
 
-        // 7) Refresh overview, clear fields, and navigate back
         refreshOverview();
         clearInputs();
         mainCtrl.showRecipeOverview();
     }
-
-    private static final Integer INVALID_POSITION = Integer.MIN_VALUE;
 
     /**
      * Ensures a recipe is selected; otherwise shows an error.
@@ -205,35 +220,6 @@ public class AddRecipeStepCtrl {
         return instructionRaw.trim();
     }
 
-    /**
-     * Reads and validates the optional position input; if empty returns null,
-     * and if invalid shows an error.
-     *
-     * @return parsed position, null if not provided, or INVALID_POSITION if invalid.
-     */
-    private Integer readAndValidatePosition() {
-        String posText = positionInput.getText();
-        if (posText == null) {
-            return null;
-        }
-
-        String t = posText.trim();
-        if (t.isEmpty()) {
-            return null;
-        }
-
-        try {
-            int p = Integer.parseInt(t);
-            if (p < 1) {
-                mainCtrl.showError("Position must be a non-zero integer.");
-                return INVALID_POSITION;
-            }
-            return p;
-        } catch (NumberFormatException ex) {
-            mainCtrl.showError("Position must be an integer.");
-            return INVALID_POSITION;
-        }
-    }
 
     /**
      * Fetches existing steps for the selected recipe; otherwise shows an error popup.
@@ -265,7 +251,8 @@ public class AddRecipeStepCtrl {
         for (RecipeStep s : existingSteps) {
             if (s == null) continue;
 
-            boolean samePosition = s.getPosition() == position;
+            Integer sp = s.getPosition();
+            boolean samePosition = sp != 0 && sp.equals(position);
             if (!samePosition) continue;
 
             // If we are editing, allow keeping the same position for the same step
