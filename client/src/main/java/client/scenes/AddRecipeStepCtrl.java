@@ -26,6 +26,11 @@ public class AddRecipeStepCtrl {
     @FXML private TextField positionInput;   // optional; leave empty to append
     @FXML private TextArea instructionInput;
 
+    /**
+     * AddRecipeStepCtrl constructor
+     * @param server serverUtils connection
+     * @param mainCtrl mainCtrl reference
+     */
     @Inject
     public AddRecipeStepCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.server = server;
