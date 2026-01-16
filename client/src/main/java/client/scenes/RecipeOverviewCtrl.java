@@ -884,8 +884,8 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
-     * Deletes the selected step.
-     * The server is responsible for renumbering remaining steps.
+     * Deletes the selected step, then renumbers the remaining steps (1..n),
+     * then reloads the steps table.
      */
     @FXML
     public void removeStep() {
@@ -901,6 +901,15 @@ public class RecipeOverviewCtrl implements Initializable {
             return;
         }
 
+        if (selectedRecipe.getId() == null) {
+            mainCtrl.showError("Selected recipe has no id.");
+            return;
+        }
+        if (selectedStep.getId() == null) {
+            mainCtrl.showError("Selected step has no id.");
+            return;
+        }
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Delete");
         confirm.setHeaderText("Delete Step");
@@ -913,10 +922,70 @@ public class RecipeOverviewCtrl implements Initializable {
         }
 
         try {
+            // 1) Delete
             server.deleteRecipeStep(selectedRecipe.getId(), selectedStep.getId());
+
+            // 2) Renumber on client, persist to server
+            renumberAndPersistSteps(selectedRecipe.getId());
+
+            // 3) Reload UI from server
             loadStepsForRecipe(selectedRecipe);
+
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
+        }
+    }
+
+    //AI-generated code
+    /**
+     * Renumbers steps to be 1 through n with no gaps and persists changes to the backend.
+     */
+    private void renumberAndPersistSteps(Long recipeId) {
+        List<RecipeStep> steps = server.getStepsForRecipe(recipeId);
+        if (steps == null || steps.isEmpty()) {
+            return;
+        }
+
+        steps.sort((a, b) -> {
+            int pa = (a == null) ? Integer.MAX_VALUE : a.getPosition();
+            int pb = (b == null) ? Integer.MAX_VALUE : b.getPosition();
+
+            // push <=0 to the end
+            if (pa <= 0) pa = Integer.MAX_VALUE;
+            if (pb <= 0) pb = Integer.MAX_VALUE;
+
+            // by id if available, otherwise keep as-is
+            if (pa != pb) return Integer.compare(pa, pb);
+
+            Long ida = (a == null) ? null : a.getId();
+            Long idb = (b == null) ? null : b.getId();
+            if (ida == null && idb == null) return 0;
+            if (ida == null) return 1;
+            if (idb == null) return -1;
+            return ida.compareTo(idb);
+        });
+
+        int expected = 1;
+
+        for (RecipeStep s : steps) {
+            if (s == null) continue;
+            if (s.getId() == null) continue; // cannot persist without id
+
+            // If the server requires instruction for updates, ensure it's present.
+            String instr = s.getInstruction();
+            if (instr == null) instr = "";
+
+            if (s.getPosition() != expected) {
+                RecipeStep updated = new RecipeStep();
+                updated.setId(s.getId());
+                updated.setInstruction(instr);
+                updated.setPosition(expected);
+
+                // Persist
+                server.updateRecipeStep(recipeId, updated);
+            }
+
+            expected++;
         }
     }
 
