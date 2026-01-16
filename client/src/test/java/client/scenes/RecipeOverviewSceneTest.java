@@ -209,7 +209,8 @@ public class RecipeOverviewSceneTest {
             );
         });
 
-        assertEquals(1, tableRecipes.getItems().size(), "Only one recipe should remain after filtering");
+        assertEquals(1, tableRecipes.getItems().size(),
+                "Only one recipe should remain after filtering");
         assertEquals("English Recipe", tableRecipes.getItems().get(0).getTitle(),
                 "The remaining recipe should be the English one");
     }
