@@ -27,7 +27,7 @@
                         <Label fx:id="recipeName" text="Welcome to FoodPal!" />
                      </children>
                   </StackPane>
-                  <Button fx:id="recipeEditButton" mnemonicParsing="false" onAction="#editNameClicked" text="Edit" visible="false" />
+                  <Button fx:id="recipeEditButton" mnemonicParsing="false" onAction="#editNameClicked" text="%button.edit" visible="false" />
                </children>
             </HBox>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" VBox.vgrow="ALWAYS">
