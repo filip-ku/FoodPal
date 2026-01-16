@@ -28,6 +28,7 @@
                      </children>
                   </StackPane>
                   <Button fx:id="recipeEditButton" mnemonicParsing="false" onAction="#editNameClicked" text="Edit" visible="false" />
+                  <Button fx:id="favButton" mnemonicParsing="false" onAction="#favouriteRecipe" prefHeight="22.0" prefWidth="28.0" style="-fx-text-fill: gold;" text="☆" />
                </children>
             </HBox>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" VBox.vgrow="ALWAYS">
@@ -138,6 +139,8 @@
                   <CheckBox fx:id="filterEnglish" mnemonicParsing="false" onAction="#applyLanguageFilter" text="English" />
                   <CheckBox fx:id="filterDutch" mnemonicParsing="false" onAction="#applyLanguageFilter" text="Dutch" />
                   <CheckBox fx:id="filterSpanish" mnemonicParsing="false" onAction="#applyLanguageFilter" text="Spanish" />
+                   <CheckBox fx:id="filterFavorites" text="Favorites" onAction="#applyLanguageFilter" />
+
                </children>
                <padding>
                   <Insets bottom="10.0" />
