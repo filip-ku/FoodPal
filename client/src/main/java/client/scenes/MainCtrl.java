@@ -43,7 +43,7 @@ public class MainCtrl {
      * @param ingredientsOverview    Ingredients overview pair
      * @param chooseRecipeIngredient Choose-recipe-ingredient pair
      * @param addRecipeIngredient    AddRecipeIngredient pair
-     * @param addRecipeStep
+     * @param addRecipeStep          AddRecipeStep pair
      */
     public void initialize(Stage primaryStage,
                            Pair<RecipeOverviewCtrl, Parent> overview,

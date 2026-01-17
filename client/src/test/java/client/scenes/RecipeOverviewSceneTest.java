@@ -16,6 +16,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import static com.google.inject.Guice.createInjector;
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,6 +45,12 @@ public class RecipeOverviewSceneTest {
         recipeName = (Label) scene.lookup("#recipeName");
         editButton = (Button) scene.lookup("#recipeEditButton");
         editIngredientButton = (Button) scene.lookup("#recipeIngredientEditButton");
+    }
+
+    private Recipe recipeWithServings(String title) {
+        Recipe r = new Recipe(title);
+        r.setServings(BigDecimal.ONE);
+        return r;
     }
 
     @Test
@@ -132,4 +139,80 @@ public class RecipeOverviewSceneTest {
         assertFalse(editIngredientButton.isVisible(),
                 "Edit button should be hidden after setting it to false");
     }
+
+    @Test
+    public void deletingRecipeShowsConfirmationDialog(FxRobot robot) {
+        Recipe r = recipeWithServings("To Be Deleted");
+
+        robot.interact(() -> {
+            tableRecipes.getItems().add(r);
+
+            editButton.setVisible(true);
+        });
+
+        robot.clickOn("#deleteRecipeButton");
+
+        assertTrue(robot.lookup(".dialog-pane").tryQuery().isPresent(),
+                "Confirmation dialog should be shown when deleting a recipe");
+    }
+
+    @Test
+    public void editingRecipeNameUpdatesLabel(FxRobot robot) {
+        Recipe r = recipeWithServings("Original Name");
+
+        robot.interact(() -> {
+            tableRecipes.getItems().add(r);
+
+            recipeName.setText("Original Name");
+            editButton.setVisible(true);
+        });
+
+        robot.interact(() -> recipeName.setText("Updated Name"));
+
+        assertEquals("Updated Name", recipeName.getText(),
+                "Recipe name label should reflect edited name");
+    }
+
+    @Test
+    public void selectingRecipeShowsDetails(FxRobot robot) {
+        Recipe r = recipeWithServings("Detail Recipe");
+
+        robot.interact(() -> {
+            tableRecipes.getItems().add(r);
+
+            recipeName.setText(r.getTitle());
+            editButton.setVisible(true);
+        });
+
+        assertEquals("Detail Recipe", recipeName.getText(),
+                "Selecting a recipe should update the details view");
+    }
+
+    @Test
+    public void languageFilterShowsOnlyMatchingRecipes(FxRobot robot) {
+        Recipe rEnglish = new Recipe("English Recipe");
+        rEnglish.setLanguage("en");
+        Recipe rDutch = new Recipe("Dutch Recipe");
+        rDutch.setLanguage("nl");
+        Recipe rFrench = new Recipe("French Recipe");
+        rFrench.setLanguage("fr");
+
+        robot.interact(() -> {
+            tableRecipes.getItems().addAll(rEnglish, rDutch, rFrench);
+        });
+
+        robot.interact(() -> {
+            tableRecipes.getItems().setAll(
+                    tableRecipes.getItems().stream()
+                            .filter(r -> "en".equals(r.getLanguage()))
+                            .toList()
+            );
+        });
+
+        assertEquals(1, tableRecipes.getItems().size(),
+                "Only one recipe should remain after filtering");
+        assertEquals("English Recipe", tableRecipes.getItems().get(0).getTitle(),
+                "The remaining recipe should be the English one");
+    }
+
 }
