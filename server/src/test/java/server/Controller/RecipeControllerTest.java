@@ -4,6 +4,7 @@ import commons.Recipe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
+import server.Repository.TestRecipeRepository;
 import server.Service.RecipeService;
 import server.ws.WebSocketService;
 
