@@ -16,3 +16,13 @@ Get the template project running from the command line first to ensure you have 
 
 Once it is working, you can try importing the project into your favorite IDE. Especially the client is a bit more tricky to set up there due to the dependency on a JavaFX SDK.
 To help you get started, you can find additional instructions in the corresponding README of the client project.
+
+# Nutritional Values
+
+The user is able to scale informal amounts of ingredients just like formal amounts. For example, scaling "a pinch" by 2 should show up as "a pinch (x2)".
+
+The program also supports the use of tablespoon as well as cup.
+
+The program converts teaspoon to tablespoon and tablespoon to cup automatically when scaling, similar to how 1000g gets converted to 1kg. (3 teaspoons = 1 tablespoon and 16 tablespoons = 1 cup)
+
+The value inputted into scale is also taken in mind when downloading the recipe.
