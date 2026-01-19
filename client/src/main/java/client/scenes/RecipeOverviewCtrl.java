@@ -978,6 +978,10 @@ public class RecipeOverviewCtrl implements Initializable {
             factor = 1.0;
         }
 
+        if (factor <= 0.0) {
+            factor = 1.0;
+        }
+
         servingsLabel.setText("Servings: " + (newSel.getServings().intValue() * factor));
     }
 
