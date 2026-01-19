@@ -25,3 +25,14 @@ Users can now navigate from the Ingredients Overview directly to recipes that us
 - Display a clean view (no recipe selected) similar to when first opening the Recipe Overview
 
 This feature makes it easy to discover which recipes use a particular ingredient without manually searching for it. The search uses the existing search functionality, which checks recipe titles, ingredients, and preparation steps with AND semantics.
+
+# Nutritional Values
+
+The user is able to scale informal amounts of ingredients just like formal amounts. For example, scaling "a pinch" by 2 should show up as "a pinch (x2)".
+
+The program also supports the use of tablespoon as well as cup.
+
+The program converts teaspoon to tablespoon and tablespoon to cup automatically when scaling, similar to how 1000g gets converted to 1kg. (3 teaspoons = 1 tablespoon and 16 tablespoons = 1 cup)
+
+The value inputted into scale is also taken in mind when downloading the recipe.
+

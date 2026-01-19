@@ -204,6 +204,12 @@ public class RecipeOverviewCtrl implements Initializable {
         tableRecipes.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
+
+                    // Cancel any active title editing when switching recipes
+                    if (editingName) {
+                        cancelTitleEditing();
+                    }
+                    
                     if (newSel != null) {
                         if (newSel.getIngredients() != null) {
                             tableIngredients.setItems(
@@ -334,8 +340,14 @@ public class RecipeOverviewCtrl implements Initializable {
                 }
             }
             return new SimpleStringProperty(scaledAmount + " " + displayUnit);
+        } else {
+            String informalAmount = ri.getInformalAmount();
+
+            if (factor > 1.0) {
+                return new SimpleStringProperty(informalAmount + " (x" + factor + ")");
+            }
+            return new SimpleStringProperty(informalAmount);
         }
-        return new SimpleStringProperty(ri.getInformalAmount());
     }
 
     /**
@@ -699,6 +711,28 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
+     * Cancels the current title editing session without saving changes.
+     * Closes the edit box and restores the label display.
+     */
+    private void cancelTitleEditing() {
+        if (!editingName) {
+            return;
+        }
+        
+        editingName = false;
+        recipeEditButton.setText(resources.getString("button.edit"));
+
+        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            recipeName.setText(selected.getTitle());
+        }
+        
+        recipeEditBox.setDisable(true);
+        recipeEditBox.setVisible(false);
+        recipeName.setVisible(true);
+    }
+
+    /**
      * Handles the Edit/Save button click for a recipe name.
      *
      * <p>When not in edit mode, switches to an editable {@link TextField}.
@@ -1001,8 +1035,12 @@ public class RecipeOverviewCtrl implements Initializable {
             factor = 1.0;
         }
 
+        if (factor <= 0.0) {
+            factor = 1.0;
+        }
+
         servingsLabel.setText(resources.getString("recipeOverview.label.servingsValue")
-                .replace("{0}", String.valueOf(newSel.getServings().intValue() * factor)));
+                .replace("{0}", String.valueOf(newSel.getServings().doubleValue() * factor)));
     }
 
     /**
@@ -1207,7 +1245,19 @@ public class RecipeOverviewCtrl implements Initializable {
             return;
         }
 
-        String content = RecipeFormatter.format(selected);
+        double factor = 1.0;
+
+        try {
+            factor = Double.parseDouble(scaleFactorField.getText());
+        } catch (NumberFormatException e) {
+            factor = 1.0;
+        }
+
+        if (factor <= 0.0) {
+            factor = 1.0;
+        }
+
+        String content = RecipeFormatter.format(selected, factor);
 
         FileChooser chooser = new FileChooser();
         chooser.setTitle(resources.getString("recipeOverview.dialog.saveRecipe"));
