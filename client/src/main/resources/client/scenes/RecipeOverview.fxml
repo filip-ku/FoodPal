@@ -119,6 +119,11 @@
    <top>
       <HBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
+            <TextField fx:id="searchField" promptText="Search" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="15.0" />
+               </HBox.margin>
+            </TextField>
             <MenuButton fx:id="languageMenu" mnemonicParsing="false" prefWidth="120.0" text="Language" />
             <Button fx:id="refreshButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#refresh" text="Refresh" />
          </children>
