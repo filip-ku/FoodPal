@@ -16,3 +16,12 @@ Get the template project running from the command line first to ensure you have 
 
 Once it is working, you can try importing the project into your favorite IDE. Especially the client is a bit more tricky to set up there due to the dependency on a JavaFX SDK.
 To help you get started, you can find additional instructions in the corresponding README of the client project.
+
+# See Recipes Using Ingredient
+Users can now navigate from the Ingredients Overview directly to recipes that use a specific ingredient. When viewing the list of all ingredients, selecting an ingredient and clicking the "See Recipes" button will:
+- Automatically navigate to the Recipe Overview screen
+- Pre-fill the search field with the selected ingredient's name
+- Execute the search automatically to show only recipes containing that ingredient
+- Display a clean view (no recipe selected) similar to when first opening the Recipe Overview
+
+This feature makes it easy to discover which recipes use a particular ingredient without manually searching for it. The search uses the existing search functionality, which checks recipe titles, ingredients, and preparation steps with AND semantics.
