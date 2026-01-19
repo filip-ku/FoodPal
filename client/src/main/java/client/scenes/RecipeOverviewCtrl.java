@@ -982,7 +982,7 @@ public class RecipeOverviewCtrl implements Initializable {
             factor = 1.0;
         }
 
-        servingsLabel.setText("Servings: " + (newSel.getServings().intValue() * factor));
+        servingsLabel.setText("Servings: " + (newSel.getServings().doubleValue() * factor));
     }
 
     /**
