@@ -334,8 +334,14 @@ public class RecipeOverviewCtrl implements Initializable {
                 }
             }
             return new SimpleStringProperty(scaledAmount + " " + displayUnit);
+        } else {
+            String informalAmount = ri.getInformalAmount();
+
+            if (factor > 1.0) {
+                return new SimpleStringProperty(informalAmount + " (x" + factor + ")");
+            }
+            return new SimpleStringProperty(informalAmount);
         }
-        return new SimpleStringProperty(ri.getInformalAmount());
     }
 
     /**
@@ -1001,8 +1007,12 @@ public class RecipeOverviewCtrl implements Initializable {
             factor = 1.0;
         }
 
+        if (factor <= 0.0) {
+            factor = 1.0;
+        }
+
         servingsLabel.setText(resources.getString("recipeOverview.label.servingsValue")
-                .replace("{0}", String.valueOf(newSel.getServings().intValue() * factor)));
+                .replace("{0}", String.valueOf(newSel.getServings().doubleValue() * factor)));
     }
 
     /**
@@ -1207,7 +1217,19 @@ public class RecipeOverviewCtrl implements Initializable {
             return;
         }
 
-        String content = RecipeFormatter.format(selected);
+        double factor = 1.0;
+
+        try {
+            factor = Double.parseDouble(scaleFactorField.getText());
+        } catch (NumberFormatException e) {
+            factor = 1.0;
+        }
+
+        if (factor <= 0.0) {
+            factor = 1.0;
+        }
+
+        String content = RecipeFormatter.format(selected, factor);
 
         FileChooser chooser = new FileChooser();
         chooser.setTitle(resources.getString("recipeOverview.dialog.saveRecipe"));

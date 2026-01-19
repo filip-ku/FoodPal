@@ -93,8 +93,13 @@ public class AddRecipeCtrl implements Initializable {
         String selectedLanguageName = languageComboBox.getSelectionModel().getSelectedItem();
 
         try {
-            int servingsValue = Integer.parseInt(servings.getText());
+            double servingsValue = Double.parseDouble(servings.getText());
             recipe.setServings(BigDecimal.valueOf(servingsValue));
+
+            if (servingsValue <= 0) {
+                mainCtrl.showError("Servings must be greater than 0.");
+                return null;
+            }
         }  catch (NumberFormatException e) {
             if (servings.getText().isBlank()) {
                 mainCtrl.showError("Servings cannot be blank.");
@@ -133,6 +138,7 @@ public class AddRecipeCtrl implements Initializable {
     private void clearFields() {
         title.clear();
         languageComboBox.getSelectionModel().selectFirst();
+        servings.clear();
     }
 
     /**
