@@ -127,6 +127,8 @@ public class RecipeOverviewCtrl implements Initializable {
     private CheckBox filterDutch;
     @FXML
     private CheckBox filterSpanish;
+    @FXML
+    private CheckBox filterFrench;
 
     /**
      * Constructs a {@code RecipeOverviewCtrl}.
@@ -407,11 +409,12 @@ public class RecipeOverviewCtrl implements Initializable {
         }
 
         Recipe clone;
+        String copySuffix = " " + resources.getString("recipeOverview.label.copySuffix");
         if(original.getServings() != null){
-            clone = new Recipe(original.getTitle() + " (copy)", original.getServings());
+            clone = new Recipe(original.getTitle() + copySuffix, original.getServings());
         }
         else{
-            clone = new Recipe(original.getTitle() + " (copy)");
+            clone = new Recipe(original.getTitle() + copySuffix);
         }
 
         // Preserve the language from the original recipe
@@ -619,7 +622,7 @@ public class RecipeOverviewCtrl implements Initializable {
         }
 
         // Check if filter checkboxes are initialized
-        if (filterEnglish == null || filterDutch == null || filterSpanish == null) {
+        if (filterEnglish == null || filterDutch == null || filterSpanish == null || filterFrench == null) {
             return; // UI not fully initialized yet
         }
 
@@ -633,6 +636,9 @@ public class RecipeOverviewCtrl implements Initializable {
         }
         if (filterSpanish.isSelected()) {
             selectedLanguages.add("es");
+        }
+        if (filterFrench.isSelected()) {
+            selectedLanguages.add("fr");
         }
 
         boolean filterByFavorites = filterFavorites != null && filterFavorites.isSelected();
@@ -665,7 +671,7 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     private void loadRecipeLanguageFilter() {
         // Check if filter checkboxes are initialized
-        if (filterEnglish == null || filterDutch == null || filterSpanish == null) {
+        if (filterEnglish == null || filterDutch == null || filterSpanish == null || filterFrench == null) {
             return; // UI not fully initialized yet
         }
 
@@ -675,6 +681,7 @@ public class RecipeOverviewCtrl implements Initializable {
         filterEnglish.setSelected(savedFilter.contains("en"));
         filterDutch.setSelected(savedFilter.contains("nl"));
         filterSpanish.setSelected(savedFilter.contains("es"));
+        filterFrench.setSelected(savedFilter.contains("fr"));
 
         // Apply the filter if recipes are already loaded
         if (allRecipes != null) {
@@ -1242,7 +1249,8 @@ public class RecipeOverviewCtrl implements Initializable {
     private final List<LanguageOption> supportedLanguages = List.of(
             new LanguageOption("en", "English", "Icons/english-flag.png"),
             new LanguageOption("nl", "Nederlands", "Icons/dutch-flag.png"),
-            new LanguageOption("es", "Español", "Icons/spanish-flag.png")
+            new LanguageOption("es", "Español", "Icons/spanish-flag.png"),
+            new LanguageOption("fr", "Français", "Icons/french-flag.png")
     );
 
     @SuppressWarnings("unused")
