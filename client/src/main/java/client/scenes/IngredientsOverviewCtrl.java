@@ -44,7 +44,8 @@ public class IngredientsOverviewCtrl implements Initializable {
     private TableColumn<Ingredient, Double> colCalories;
     @FXML
     private TableColumn<Ingredient, Integer> colNumOfRecipes;
-
+    @FXML
+    private Button seeRecipesButton;
     @FXML
     private Button editIngredientButton;
 
@@ -103,6 +104,14 @@ public class IngredientsOverviewCtrl implements Initializable {
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
                     editIngredientButton.setDisable(newSel == null);
+                });
+
+        seeRecipesButton.setDisable(true);
+        tableIngredients.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldSel, newSel) -> {
+                    editIngredientButton.setDisable(newSel == null);
+                    seeRecipesButton.setDisable(newSel == null);  // Add this line
                 });
     }
 
@@ -226,5 +235,23 @@ public class IngredientsOverviewCtrl implements Initializable {
 
             ingredientUsageCount.put(ingredient.getId(), count);
         }
+    }
+
+    /**
+     * AI generated javadoc.
+     * Shows the Recipe Overview screen with a search pre-filled for the selected ingredient.
+     * The search is automatically executed to filter recipes containing this ingredient.
+     */
+    @FXML
+    public void showRecipesUsingIngredient() {
+        Ingredient selected = tableIngredients.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            mainCtrl.showError("No ingredient selected.");
+            return;
+        }
+
+        String ingredientName = selected.getName();
+        mainCtrl.showRecipeOverviewWithSearch(ingredientName);
     }
 }
