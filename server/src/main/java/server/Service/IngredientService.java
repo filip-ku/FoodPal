@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.server.ResponseStatusException;
 import server.Repository.IngredientRepository;
 import server.Repository.RecipeRepository;
@@ -140,9 +142,30 @@ public class IngredientService {
         existing.setProteinPer100g(ingredient.getProteinPer100g());
         existing.setFatPer100g(ingredient.getFatPer100g());
         Ingredient updatedIngredient = ingredientRepository.save(existing);
-        webSocketService.publishIngredientListChanged(updatedIngredient.getId());
+        runAfterCommit(() -> webSocketService.
+                publishIngredientListChanged(updatedIngredient.getId()));
         return updatedIngredient;
 
+    }
+
+    /**
+     * Executes the given action after the current transaction commits.
+     * If no transaction is active, executes immediately.
+     *
+     * @param action the action to run after commit
+     */
+    private void runAfterCommit(Runnable action) {
+        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+            action.run();
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                action.run();
+            }
+        });
     }
 
     /**
