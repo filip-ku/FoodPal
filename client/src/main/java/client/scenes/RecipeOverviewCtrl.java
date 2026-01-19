@@ -316,8 +316,14 @@ public class RecipeOverviewCtrl implements Initializable {
                 }
             }
             return new SimpleStringProperty(scaledAmount + " " + displayUnit);
+        } else {
+            String informalAmount = ri.getInformalAmount();
+
+            if (factor > 1.0) {
+                return new SimpleStringProperty(informalAmount + " (x" + factor + ")");
+            }
+            return new SimpleStringProperty(informalAmount);
         }
-        return new SimpleStringProperty(ri.getInformalAmount());
     }
 
     /**
