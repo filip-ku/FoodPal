@@ -27,8 +27,8 @@
                         <Label fx:id="recipeName" text="Welcome to FoodPal!" />
                      </children>
                   </StackPane>
-                  <Button fx:id="recipeEditButton" mnemonicParsing="false" onAction="#editNameClicked" text="Edit" visible="false" />
-                  <Button fx:id="favButton" mnemonicParsing="false" onAction="#favouriteRecipe" prefHeight="22.0" prefWidth="28.0" style="-fx-text-fill: gold;" text="☆" />
+                  <Button fx:id="recipeEditButton" mnemonicParsing="false" onAction="#editNameClicked" text="%button.edit" visible="false" />
+                   <Button fx:id="favButton" mnemonicParsing="false" onAction="#favouriteRecipe" prefHeight="22.0" prefWidth="28.0" style="-fx-text-fill: gold;" text="☆" />
                </children>
             </HBox>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" VBox.vgrow="ALWAYS">
@@ -117,7 +117,7 @@
       </VBox>
    </center>
    <top>
-      <HBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" prefWidth="670.0" spacing="10.0" BorderPane.alignment="CENTER">
+      <HBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
             <MenuButton fx:id="languageMenu" mnemonicParsing="false" prefWidth="120.0" text="Language" />
             <Button fx:id="refreshButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#refresh" text="Refresh" />
