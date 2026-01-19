@@ -33,6 +33,9 @@ public class AddRecipeCtrl implements Initializable {
     @FXML
     private TextField servings;
 
+    @FXML
+    private ResourceBundle resources;
+
     /**
      * Creates a controller with injected dependencies.
      *
@@ -49,12 +52,16 @@ public class AddRecipeCtrl implements Initializable {
      * Initializes the language dropdown with supported languages.
      *
      * @param location location of the FXML file (unused)
-     * @param resources resource bundle (unused)
+     * @param resources resource bundle
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.resources = resources;
         ObservableList<String> languageOptions = FXCollections.observableArrayList(
-                "English", "Nederlands", "Español"
+                resources.getString("addRecipe.language.english"),
+                resources.getString("addRecipe.language.dutch"),
+                resources.getString("addRecipe.language.spanish"),
+                resources.getString("addRecipe.language.french")
         );
         languageComboBox.setItems(languageOptions);
         languageComboBox.getSelectionModel().selectFirst(); // Default to first language
@@ -97,9 +104,9 @@ public class AddRecipeCtrl implements Initializable {
             recipe.setServings(BigDecimal.valueOf(servingsValue));
         }  catch (NumberFormatException e) {
             if (servings.getText().isBlank()) {
-                mainCtrl.showError("Servings cannot be blank.");
+                mainCtrl.showError(resources.getString("addRecipe.error.servingsBlank"));
             } else {
-                mainCtrl.showError("Servings must be a number.");
+                mainCtrl.showError(resources.getString("addRecipe.error.servingsNumber"));
             }
             return null;
         }
@@ -115,16 +122,20 @@ public class AddRecipeCtrl implements Initializable {
     /**
      * Maps language display name to language code.
      *
-     * @param languageName the display name (e.g., "English", "Nederlands", "Español")
+     * @param languageName the display name
      * @return the language code (e.g., "en", "nl", "es")
      */
     private String mapLanguageNameToCode(String languageName) {
-        return switch (languageName) {
-            case "English" -> "en";
-            case "Nederlands" -> "nl";
-            case "Español" -> "es";
-            default -> "en"; // Default to English
-        };
+        if (languageName.equals(resources.getString("addRecipe.language.english"))) {
+            return "en";
+        } else if (languageName.equals(resources.getString("addRecipe.language.dutch"))) {
+            return "nl";
+        } else if (languageName.equals(resources.getString("addRecipe.language.spanish"))) {
+            return "es";
+        } else if (languageName.equals(resources.getString("addRecipe.language.french"))) {
+            return "fr";
+        }
+        return "en"; // Default to English
     }
 
     /**

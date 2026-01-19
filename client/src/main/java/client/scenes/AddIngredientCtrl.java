@@ -30,6 +30,9 @@ public class AddIngredientCtrl implements Initializable {
     @FXML
     private Label kcalLabel;
 
+    @FXML
+    private ResourceBundle resources;
+
     private Ingredient ingredientToEdit;
 
     /**
@@ -48,10 +51,11 @@ public class AddIngredientCtrl implements Initializable {
      * Initializer method for AddIngredient.fxml.
      *
      * @param location  location of the FXML file (unused)
-     * @param resources resource bundle for internationalization (unused)
+     * @param resources resource bundle for internationalization
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.resources = resources;
         proteinInput.textProperty().addListener((obs, old, nw) -> updateKcalLabel());
         fatInput.textProperty().addListener((obs, old, nw) -> updateKcalLabel());
         carbsInput.textProperty().addListener((obs, old, nw) -> updateKcalLabel());
@@ -83,8 +87,8 @@ public class AddIngredientCtrl implements Initializable {
 
                 if (nameExists) {
                     mainCtrl.showError(
-                            "An ingredient with the name '" +
-                                    newIngredient.getName() + "' already exists.");
+                            resources.getString("addIngredient.error.nameExists")
+                                    .replace("{0}", newIngredient.getName()));
                     return;
                 }
 
@@ -115,7 +119,7 @@ public class AddIngredientCtrl implements Initializable {
         String ingredientName = ingredientNameInput.getText().trim();
 
         if (ingredientName.isEmpty()) {
-            mainCtrl.showError("Name cannot be empty.");
+            mainCtrl.showError(resources.getString("addIngredient.error.nameEmpty"));
             return null;
         }
 
@@ -126,7 +130,7 @@ public class AddIngredientCtrl implements Initializable {
 
             return new Ingredient(ingredientName, protein, fat, carbs);
         } catch (NumberFormatException e) {
-            mainCtrl.showError("Please input a valid number for nutrition values.");
+            mainCtrl.showError(resources.getString("addIngredient.error.invalidNumber"));
         }
 
         return null;
@@ -144,9 +148,10 @@ public class AddIngredientCtrl implements Initializable {
 
             double kcal = (protein * 4) + (carbs * 4) + (fat * 9);
 
-            kcalLabel.setText("Inferred kcal: " + kcal);
+            kcalLabel.setText(resources.getString("addIngredient.label.inferredKcalValue")
+                    .replace("{0}", String.valueOf(kcal)));
         } catch (NumberFormatException e) {
-            kcalLabel.setText("Inferred kcal: 0.0");
+            kcalLabel.setText(resources.getString("addIngredient.label.inferredKcal"));
         }
     }
 

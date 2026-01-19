@@ -25,6 +25,7 @@ public class AddRecipeStepCtrl {
 
     @FXML private TextField positionInput;   // optional; leave empty to append
     @FXML private TextArea instructionInput;
+    @FXML private java.util.ResourceBundle resources;
 
     @Inject
     public AddRecipeStepCtrl(ServerUtils server, MainCtrl mainCtrl) {
@@ -54,7 +55,11 @@ public class AddRecipeStepCtrl {
             // Compute and display next available step number
             if (recipe == null || recipe.getId() == null) {
                 positionInput.setText(""); // cannot compute without recipe id
-                positionInput.setPromptText("Auto");
+                if (resources != null) {
+                    positionInput.setPromptText(resources.getString("addRecipeStep.prompt.auto"));
+                } else {
+                    positionInput.setPromptText("Auto");
+                }
                 return;
             }
 
@@ -65,7 +70,11 @@ public class AddRecipeStepCtrl {
             } catch (WebApplicationException e) {
                 // If backend fails, still show something sensible
                 positionInput.setText("");
-                positionInput.setPromptText("Auto");
+                if (resources != null) {
+                    positionInput.setPromptText(resources.getString("addRecipeStep.prompt.auto"));
+                } else {
+                    positionInput.setPromptText("Auto");
+                }
                 mainCtrl.showExceptionErrorPopUp(e);
             }
         }
@@ -172,7 +181,7 @@ public class AddRecipeStepCtrl {
             // EDIT MODE: keep the existing number
             Integer current = editingStep.getPosition();
             if (current == null || current < 1) {
-                mainCtrl.showError("Invalid step number on selected step.");
+                mainCtrl.showError(resources.getString("addRecipeStep.error.invalidPosition"));
                 return;
             }
             position = current;
@@ -199,7 +208,7 @@ public class AddRecipeStepCtrl {
      */
     private boolean validateRecipeSelected() {
         if (recipe == null) {
-            mainCtrl.showError("No recipe selected.");
+            mainCtrl.showError(resources.getString("addRecipeStep.error.noRecipe"));
             return false;
         }
         return true;
@@ -214,7 +223,7 @@ public class AddRecipeStepCtrl {
     private String readAndValidateInstruction() {
         String instructionRaw = instructionInput.getText();
         if (instructionRaw == null || instructionRaw.trim().isEmpty()) {
-            mainCtrl.showError("Instruction cannot be empty.");
+            mainCtrl.showError(resources.getString("addRecipeStep.error.instructionEmpty"));
             return null;
         }
         return instructionRaw.trim();
@@ -263,7 +272,8 @@ public class AddRecipeStepCtrl {
                 }
             }
 
-            mainCtrl.showError("A step with number " + position + " already exists.");
+            mainCtrl.showError(resources.getString("addRecipeStep.error.positionExists")
+                    .replace("{0}", String.valueOf(position)));
             return false;
         }
 
