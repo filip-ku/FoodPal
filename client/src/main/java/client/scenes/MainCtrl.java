@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.MyFXML;
 import commons.*;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -11,6 +12,7 @@ import javafx.util.Pair;
 public class MainCtrl {
 
     private Stage primaryStage;
+    private MyFXML fxml;
 
     private RecipeOverviewCtrl recipeOverviewCtrl;
     private Scene recipeOverview;
@@ -34,9 +36,10 @@ public class MainCtrl {
     private Scene addRecipeStepScene;
 
     /**
-     * Initializes the application’s primary stage and loads all scenes.
+     * Initializes the application's primary stage and loads all scenes.
      *
      * @param primaryStage           the main application window
+     * @param fxml                   MyFXML instance for loading scenes
      * @param overview               Recipe overview pair
      * @param add                    Add-recipe pair
      * @param addIngredient          Add-ingredient pair
@@ -46,6 +49,7 @@ public class MainCtrl {
      * @param addRecipeStep          AddRecipeStep pair
      */
     public void initialize(Stage primaryStage,
+                           MyFXML fxml,
                            Pair<RecipeOverviewCtrl, Parent> overview,
                            Pair<AddRecipeCtrl, Parent> add,
                            Pair<AddIngredientCtrl, Parent> addIngredient,
@@ -54,6 +58,7 @@ public class MainCtrl {
                            Pair<AddRecipeIngredientCtrl, Parent> addRecipeIngredient,
                            Pair<AddRecipeStepCtrl, Parent> addRecipeStep) {
         this.primaryStage = primaryStage;
+        this.fxml = fxml;
         this.recipeOverviewCtrl = overview.getKey();
         this.recipeOverview = new Scene(overview.getValue());
 
@@ -100,6 +105,32 @@ public class MainCtrl {
             recipeOverviewCtrl.refresh();
         }
 
+    }
+
+    /**
+     * Reloads the recipe overview scene with the current language settings.
+     * This is used when the UI language is changed at runtime.
+     */
+    public void reloadRecipeOverview() {
+        // Remember the currently selected recipe
+        Recipe selectedRecipe = null;
+        if (recipeOverviewCtrl != null) {
+            selectedRecipe = recipeOverviewCtrl.getSelectedRecipe();
+        }
+
+        // Reload the scene with new language bundle
+        var overview = fxml
+                .load(RecipeOverviewCtrl.class, "client", "scenes", "RecipeOverview.fxml");
+        this.recipeOverviewCtrl = overview.getKey();
+        this.recipeOverview = new Scene(overview.getValue());
+
+        // Show the reloaded scene
+        showRecipeOverview();
+
+        // Restore selection if there was one
+        if (selectedRecipe != null) {
+            recipeOverviewCtrl.selectRecipe(selectedRecipe);
+        }
     }
 
     /**
@@ -250,5 +281,16 @@ public class MainCtrl {
         primaryStage.setTitle("FoodPal: Editing Ingredient");
         addIngredientCtrl.setIngredientToEdit(ingredient);
         primaryStage.setScene(addIngredient);
+    }
+
+    /**
+     * Shows the Recipe Overview screen with a pre-filled search query.
+     * The search is automatically executed to filter recipes.
+     * AI generated javadoc
+     * @param searchQuery the text to search for (typically an ingredient name)
+     */
+    public void showRecipeOverviewWithSearch(String searchQuery) {
+        showRecipeOverview();
+        recipeOverviewCtrl.setSearchQuery(searchQuery);
     }
 }

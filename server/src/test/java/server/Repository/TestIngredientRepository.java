@@ -1,4 +1,4 @@
-package server.Controller;
+package server.Repository;
 
 import commons.Ingredient;
 import org.springframework.data.domain.Example;
@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
-import server.Repository.IngredientRepository;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

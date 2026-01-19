@@ -4,6 +4,7 @@ import commons.Ingredient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
+import server.Repository.TestIngredientRepository;
 import server.Service.IngredientService;
 import server.Repository.RecipeRepository;
 import server.ws.WebSocketService;
