@@ -227,7 +227,8 @@ public class AddRecipeIngredientCtrl implements Initializable {
                         .anyMatch(existingRi -> existingRi.getIngredient().equals(ingredient));
 
                 if (riAlreadyExists) {
-                    mainCtrl.showError(resources.getString("addRecipeIngredient.error.alreadyExists"));
+                    mainCtrl.showError(resources
+                            .getString("addRecipeIngredient.error.alreadyExists"));
                     return;
                 }
 

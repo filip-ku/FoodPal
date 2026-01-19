@@ -14,13 +14,13 @@
          <children>
             <AnchorPane maxHeight="200.0" maxWidth="470.0" minHeight="200.0" minWidth="470.0" prefHeight="200.0" prefWidth="470.0">
                <children>
-                  <Button layoutX="419.0" layoutY="159.0" mnemonicParsing="false" onAction="#okButton" text="Ok" />
-                  <Button layoutX="350.0" layoutY="159.0" mnemonicParsing="false" onAction="#cancelButton" text="Cancel" />
+                  <Button layoutX="419.0" layoutY="159.0" mnemonicParsing="false" onAction="#okButton" text="%addRecipe.button.ok" />
+                  <Button layoutX="350.0" layoutY="159.0" mnemonicParsing="false" onAction="#cancelButton" text="%button.cancel" />
                   <TextField fx:id="title" layoutX="175.0" layoutY="29.0" prefHeight="26.0" prefWidth="164.0" />
-                  <Label layoutX="90.0" layoutY="34.0" text="Recipe Name" />
+                  <Label layoutX="90.0" layoutY="34.0" text="%addRecipe.label.recipeName" />
                   <ComboBox fx:id="languageComboBox" layoutX="175.0" layoutY="75.0" prefHeight="26.0" prefWidth="164.0" />
-                  <Label layoutX="99.0" layoutY="79.0" text="Language" />
-                  <Label layoutX="100.0" layoutY="122.0" text="Servings: " />
+                  <Label layoutX="99.0" layoutY="79.0" text="%addRecipe.label.language" />
+                  <Label layoutX="100.0" layoutY="122.0" text="%addRecipe.label.servings" />
                   <TextField fx:id="servings" layoutX="175.0" layoutY="117.0" prefHeight="26.0" prefWidth="164.0" />
                </children>
             </AnchorPane>
