@@ -60,7 +60,7 @@ public class IngredientService {
 
         log.debug("Adding ingredient with id {}",ingredient.getId());
         Ingredient saved = ingredientRepository.save(ingredient);
-        webSocketService.publishIngredientListChanged(saved.getId());
+        runAfterCommit(() -> webSocketService.publishIngredientListChanged(saved.getId()));
         return saved;
     }
 
@@ -91,9 +91,8 @@ public class IngredientService {
         log.info("Removing ingredient with id {}",id);
         if (ingredientRepository.existsById(id)) {
             ingredientRepository.deleteById(id);
-            webSocketService.publishIngredientListChanged(id);
-        }
-        else {
+            runAfterCommit(() -> webSocketService.publishIngredientListChanged(id));
+        } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
