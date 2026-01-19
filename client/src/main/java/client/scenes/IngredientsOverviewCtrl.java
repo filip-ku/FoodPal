@@ -111,7 +111,7 @@ public class IngredientsOverviewCtrl implements Initializable {
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
                     editIngredientButton.setDisable(newSel == null);
-                    seeRecipesButton.setDisable(newSel == null);  // Add this line
+                    seeRecipesButton.setDisable(newSel == null);
                 });
     }
 
