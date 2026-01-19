@@ -342,7 +342,6 @@ public class RecipeOverviewCtrl implements Initializable {
             }
             return new SimpleStringProperty(informalAmount);
         }
-        return new SimpleStringProperty(ri.getInformalAmount());
     }
 
     /**
