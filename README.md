@@ -26,3 +26,10 @@ The program also supports the use of tablespoon as well as cup.
 The program converts teaspoon to tablespoon and tablespoon to cup automatically when scaling, similar to how 1000g gets converted to 1kg. (3 teaspoons = 1 tablespoon and 16 tablespoons = 1 cup)
 
 The value inputted into scale is also taken in mind when downloading the recipe.
+
+# Live Language Switch 
+
+The meaningful addition is the addition of a fourth language(French).
+
+The only thing that wasn't translated are the tables containing recipes, ingredients, and recipe steps when they are empty. This is because Scene Builder automatically assigns the text in english without the ability to change it to another language. 
+
