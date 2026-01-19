@@ -1323,4 +1323,15 @@ public class RecipeOverviewCtrl implements Initializable {
             favButton.setStyle("-fx-font-size: 20px;");
         }
     }
+
+    /**
+     * Sets the search field to the given query and executes the search automatically.
+     * Clears any previously selected recipe.
+     *AI generated javadoc
+     * @param searchQuery the text to search for (typically an ingredient name)
+     */
+    public void setSearchQuery(String searchQuery) {
+        tableRecipes.getSelectionModel().clearSelection();
+        searchField.setText(searchQuery);
+    }
 }
