@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import client.utils.FavoritesManager;
 import client.utils.RecipeFormatter;
 import com.google.inject.Inject;
 
@@ -28,11 +30,14 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import org.springframework.messaging.simp.stomp.StompSession;
 import javafx.stage.FileChooser;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RecipeOverviewCtrl implements Initializable {
@@ -40,6 +45,7 @@ public class RecipeOverviewCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final WebSocketService webSocketService;
+    private final FavoritesManager favoritesManager;
 
     private ObservableList<Recipe> data;
     private ObservableList<Recipe> allRecipes; // Unfiltered list of all recipes
@@ -62,6 +68,10 @@ public class RecipeOverviewCtrl implements Initializable {
     private TableView<RecipeStep> tablePreparation;
     @FXML
     private TableColumn<RecipeStep, String> colPreparation;
+    @FXML
+    private Button favButton;
+    @FXML
+    private CheckBox filterFavorites;
 
     /**
      * Language indicator showing current choice and opening the language menu.
@@ -95,6 +105,9 @@ public class RecipeOverviewCtrl implements Initializable {
     private Button downloadRecipeButton;
 
     @FXML
+    private TextField searchField;
+
+    @FXML
     private HBox scaleHBox;
     @FXML
     private TextField scaleFactorField;
@@ -122,13 +135,15 @@ public class RecipeOverviewCtrl implements Initializable {
      * @param server  injected {@link ServerUtils}
      * @param mainCtrl injected {@link MainCtrl}
      * @param webSocketService injected {@link WebSocketService}
+     * @param favoritesManager injected {@link FavoritesManager}
      */
     @Inject
     public RecipeOverviewCtrl(ServerUtils server, MainCtrl mainCtrl,
-                              WebSocketService webSocketService) {
+                              WebSocketService webSocketService, FavoritesManager favoritesManager){
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.webSocketService = webSocketService;
+        this.favoritesManager = favoritesManager;
     }
 
     /**
@@ -145,6 +160,27 @@ public class RecipeOverviewCtrl implements Initializable {
         showMainMenu();
         setupLanguageMenu();
         loadRecipeLanguageFilter();
+
+        colRecipes.setCellFactory(column -> new TableCell<Recipe, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    Recipe recipe = getTableView().getItems().get(getIndex());
+                    setText(item);
+
+                    if (favoritesManager.isFavorite(recipe.getId())) {
+                        setStyle("-fx-font-weight: bold; -fx-text-fill: #DAA520;");
+                    } else {
+                        setStyle("");
+                    }
+                }
+            }
+        });
 
         colRecipes.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getTitle()));
@@ -178,6 +214,16 @@ public class RecipeOverviewCtrl implements Initializable {
                         reloadSelectedRecipeDetails(newSel);
                     }
                 });
+
+        searchField.textProperty().addListener((obs, old, query) -> {
+            filterRecipes(query);
+        });
+
+        searchField.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ESCAPE) {
+                searchField.clear();
+            }
+        });
 
         recipeIngredientEditButton.setDisable(true);
         editStepsButton.setDisable(true);
@@ -415,6 +461,23 @@ public class RecipeOverviewCtrl implements Initializable {
             }
 
             var recipes = server.getRecipes();
+
+            Set<Long> currentRecipeIds = new HashSet<>();
+            for (Recipe recipe : recipes) {
+                currentRecipeIds.add(recipe.getId());
+                // Mark favorites
+                recipe.setFavorite(favoritesManager.isFavorite(recipe.getId()));
+            }
+
+            // Check for deleted favorites and warn user
+            Set<Long> favoriteIds = new HashSet<>(favoritesManager.getFavoriteIds());
+            favoriteIds.removeAll(currentRecipeIds);
+            if (!favoriteIds.isEmpty()) {
+                favoritesManager.cleanupDeletedRecipes(favoriteIds);
+                mainCtrl.showError("Warning: " + favoriteIds.size() +
+                        " favorite recipe(s) were deleted from the server.");
+            }
+
             allRecipes = FXCollections.observableList(recipes);
             applyLanguageFilter(); // Apply current filter state
 
@@ -433,6 +496,89 @@ public class RecipeOverviewCtrl implements Initializable {
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
         }
+    }
+
+    /**
+     * Filters the currently loaded recipes based on the given search query.
+     * <p>The following recipe fields are searched:</p>
+     * <ul>
+     *     <li>Recipe title</li>
+     *     <li>Ingredient names</li>
+     *     <li>Preparation step instructions</li>
+     * </ul>
+     * @param query the search string entered by the user
+     */
+    private void filterRecipes(String query) {
+        if (data == null) {
+            return;
+        }
+
+        if (query == null || query.isBlank()) {
+            tableRecipes.setItems(data);
+            return;
+        }
+
+        List<Recipe> filtered = data.stream()
+                .filter(recipe -> matchesSearch(recipe, query))
+                .collect(Collectors.toList());
+
+        tableRecipes.setItems(FXCollections.observableArrayList(filtered));
+    }
+
+    /**
+     * Determines whether a recipe matches the given search query.
+     * The query is evaluated using AND semantics.
+     * @param recipe the recipe to test
+     * @param query the search query entered by the user
+     * @return true if the recipe matches the query, false otherwise.
+     */
+    private boolean matchesSearch(Recipe recipe, String query) {
+        if (recipe == null) {
+            return false;
+        }
+
+        if (query == null || query.isBlank()) {
+            return true;
+        }
+
+        String[] tokens = query.toLowerCase().trim().split("\\s+");
+
+        StringBuilder searchable = new StringBuilder();
+
+        // Recipe title
+        if (recipe.getTitle() != null) {
+            searchable.append(recipe.getTitle()).append(" ");
+        }
+
+        // Ingredient names
+        if (recipe.getIngredients() != null) {
+            for (RecipeIngredient ri : recipe.getIngredients()) {
+                if (ri != null && ri.getIngredient() != null
+                        && ri.getIngredient().getName() != null) {
+                    searchable.append(ri.getIngredient().getName()).append(" ");
+                }
+            }
+        }
+
+        // Preparation steps
+        if (recipe.getSteps() != null) {
+            for (RecipeStep step : recipe.getSteps()) {
+                if (step != null && step.getInstruction() != null) {
+                    searchable.append(step.getInstruction()).append(" ");
+                }
+            }
+        }
+
+        String searchableText = searchable.toString().toLowerCase();
+
+        // AND semantics: all tokens must match
+        for (String token : tokens) {
+            if (!searchableText.contains(token)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -463,26 +609,28 @@ public class RecipeOverviewCtrl implements Initializable {
             selectedLanguages.add("es");
         }
 
+        boolean filterByFavorites = filterFavorites != null && filterFavorites.isSelected();
         // Persist recipe language filter selection
         ConfigUtils.setRecipeLanguageFilter(new ArrayList<>(selectedLanguages));
 
-        // If no languages are selected, show all recipes
-        if (selectedLanguages.isEmpty()) {
-            data = FXCollections.observableList(allRecipes);
-        } else {
-            // Filter recipes by selected languages
-            List<Recipe> filtered = allRecipes.stream()
-                    .filter(recipe -> {
-                        String recipeLanguage = recipe.getLanguage();
-                        // Include recipe if its language matches any selected language
-                        // Also include recipes with no language set (null) when no filter is active
-                        return recipeLanguage != null && selectedLanguages.contains(recipeLanguage);
-                    })
-                    .collect(Collectors.toList());
-            data = FXCollections.observableList(filtered);
-        }
+        // Filter recipes by selected languages
+        List<Recipe> filtered = allRecipes.stream()
+                .filter(recipe -> {
+                    // Apply language filter
+                    boolean languageMatch = selectedLanguages.isEmpty() ||
+                            (recipe.getLanguage() != null &&
+                                    selectedLanguages.contains(recipe.getLanguage()));
 
+                    // Apply favorites filter
+                    boolean favoriteMatch = !filterByFavorites ||
+                            favoritesManager.isFavorite(recipe.getId());
+
+                    return languageMatch && favoriteMatch;
+                })
+                .collect(Collectors.toList());
+        data = FXCollections.observableList(filtered);
         tableRecipes.setItems(data);
+        filterRecipes(searchField.getText());
     }
 
     /**
@@ -496,12 +644,12 @@ public class RecipeOverviewCtrl implements Initializable {
         }
 
         List<String> savedFilter = ConfigUtils.getRecipeLanguageFilter();
-        
+
         // Set checkboxes based on saved filter
         filterEnglish.setSelected(savedFilter.contains("en"));
         filterDutch.setSelected(savedFilter.contains("nl"));
         filterSpanish.setSelected(savedFilter.contains("es"));
-        
+
         // Apply the filter if recipes are already loaded
         if (allRecipes != null) {
             applyLanguageFilter();
@@ -771,6 +919,8 @@ public class RecipeOverviewCtrl implements Initializable {
         removeStepButton.setVisible(false);
         addRecipeStep.setVisible(false);
         recipeIngredientEditButton.setVisible(false);
+        favButton.setVisible(false);
+
         scaleHBox.setVisible(false);
         estimatedKcalLabel.setVisible(false);
         servingsLabel.setVisible(false);
@@ -790,6 +940,7 @@ public class RecipeOverviewCtrl implements Initializable {
 
         recipeEditButton.setVisible(true);
         recipeName.setVisible(true);
+        updateFavoriteButton(newSel);
 
         recipeIngredientAdd.setVisible(true);
         recipeIngredientDelete.setVisible(true);
@@ -799,6 +950,7 @@ public class RecipeOverviewCtrl implements Initializable {
         removeStepButton.setVisible(true);
         addRecipeStep.setVisible(true);
         recipeIngredientEditButton.setVisible(true);
+        favButton.setVisible(true);
         scaleHBox.setVisible(true);
         estimatedKcalLabel.setVisible(true);
 
@@ -884,8 +1036,8 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
-     * Deletes the selected step.
-     * The server is responsible for renumbering remaining steps.
+     * Deletes the selected step, then renumbers the remaining steps (1..n),
+     * then reloads the steps table.
      */
     @FXML
     public void removeStep() {
@@ -901,6 +1053,15 @@ public class RecipeOverviewCtrl implements Initializable {
             return;
         }
 
+        if (selectedRecipe.getId() == null) {
+            mainCtrl.showError("Selected recipe has no id.");
+            return;
+        }
+        if (selectedStep.getId() == null) {
+            mainCtrl.showError("Selected step has no id.");
+            return;
+        }
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Delete");
         confirm.setHeaderText("Delete Step");
@@ -913,10 +1074,70 @@ public class RecipeOverviewCtrl implements Initializable {
         }
 
         try {
+            // 1) Delete
             server.deleteRecipeStep(selectedRecipe.getId(), selectedStep.getId());
+
+            // 2) Renumber on client, persist to server
+            renumberAndPersistSteps(selectedRecipe.getId());
+
+            // 3) Reload UI from server
             loadStepsForRecipe(selectedRecipe);
+
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
+        }
+    }
+
+    //AI-generated code
+    /**
+     * Renumbers steps to be 1 through n with no gaps and persists changes to the backend.
+     */
+    private void renumberAndPersistSteps(Long recipeId) {
+        List<RecipeStep> steps = server.getStepsForRecipe(recipeId);
+        if (steps == null || steps.isEmpty()) {
+            return;
+        }
+
+        steps.sort((a, b) -> {
+            int pa = (a == null) ? Integer.MAX_VALUE : a.getPosition();
+            int pb = (b == null) ? Integer.MAX_VALUE : b.getPosition();
+
+            // push <=0 to the end
+            if (pa <= 0) pa = Integer.MAX_VALUE;
+            if (pb <= 0) pb = Integer.MAX_VALUE;
+
+            // by id if available, otherwise keep as-is
+            if (pa != pb) return Integer.compare(pa, pb);
+
+            Long ida = (a == null) ? null : a.getId();
+            Long idb = (b == null) ? null : b.getId();
+            if (ida == null && idb == null) return 0;
+            if (ida == null) return 1;
+            if (idb == null) return -1;
+            return ida.compareTo(idb);
+        });
+
+        int expected = 1;
+
+        for (RecipeStep s : steps) {
+            if (s == null) continue;
+            if (s.getId() == null) continue; // cannot persist without id
+
+            // If the server requires instruction for updates, ensure it's present.
+            String instr = s.getInstruction();
+            if (instr == null) instr = "";
+
+            if (s.getPosition() != expected) {
+                RecipeStep updated = new RecipeStep();
+                updated.setId(s.getId());
+                updated.setInstruction(instr);
+                updated.setPosition(expected);
+
+                // Persist
+                server.updateRecipeStep(recipeId, updated);
+            }
+
+            expected++;
         }
     }
 
@@ -1025,5 +1246,47 @@ public class RecipeOverviewCtrl implements Initializable {
         view.setPreserveRatio(true);
         view.setFitHeight(height);
         return view;
+    }
+
+    /**
+     * Toggles the favorite status of the currently selected recipe.
+     * Updates the button appearance and refreshes the table to show highlighting.
+     */
+    @FXML
+    private void favouriteRecipe() {
+        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            mainCtrl.showError("Select a recipe first.");
+            return;
+        }
+
+        boolean isFavorite = favoritesManager.toggleFavorite(selected.getId());
+        selected.setFavorite(isFavorite);
+        updateFavoriteButton(selected);
+
+        // Refresh the table to update highlighting
+        tableRecipes.refresh();
+    }
+
+    /**
+     * Updates the favorite button appearance based on the recipe's favorite status.
+     *
+     * @param recipe the currently selected recipe, or null to reset the button
+     */
+    private void updateFavoriteButton(Recipe recipe) {
+        if (recipe == null) {
+            favButton.setText("☆");
+            favButton.setStyle("");
+            return;
+        }
+
+        if (favoritesManager.isFavorite(recipe.getId())) {
+            favButton.setText("★");
+            favButton.setStyle("-fx-text-fill: gold; -fx-font-size: 20px;");
+        } else {
+            favButton.setText("☆");
+            favButton.setStyle("-fx-font-size: 20px;");
+        }
     }
 }

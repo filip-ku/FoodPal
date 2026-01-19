@@ -19,9 +19,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ResourceBundle;
 
 import com.google.inject.Injector;
 
+import client.utils.I18nService;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.util.Builder;
@@ -36,6 +38,7 @@ import javafx.util.Pair;
 public class MyFXML {
 
     private Injector injector;
+    private I18nService i18nService;
 
     /**
      * Creates a new {@code MyFXML} instance.
@@ -44,6 +47,7 @@ public class MyFXML {
      */
     public MyFXML(Injector injector) {
         this.injector = injector;
+        this.i18nService = new I18nService();
     }
 
     /**
@@ -61,7 +65,8 @@ public class MyFXML {
      */
     public <T> Pair<T, Parent> load(Class<T> c, String... parts) {
         try {
-            var loader = new FXMLLoader(getLocation(parts), null, null,
+            ResourceBundle bundle = i18nService.getBundle();
+            var loader = new FXMLLoader(getLocation(parts), bundle, null,
                     new MyFactory(), StandardCharsets.UTF_8);
             Parent parent = loader.load();
             T ctrl = loader.getController();
