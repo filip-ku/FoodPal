@@ -61,6 +61,7 @@ public class IngredientsOverviewCtrl implements Initializable {
      *
      * @param server  injected {@link ServerUtils}
      * @param mainCtrl injected {@link MainCtrl}
+     * @param webSocketService injected {@link WebSocketService}
      */
     @Inject
     public IngredientsOverviewCtrl(ServerUtils server,
