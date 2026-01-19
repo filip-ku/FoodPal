@@ -138,6 +138,7 @@ public class AddRecipeCtrl implements Initializable {
     private void clearFields() {
         title.clear();
         languageComboBox.getSelectionModel().selectFirst();
+        servings.clear();
     }
 
     /**
