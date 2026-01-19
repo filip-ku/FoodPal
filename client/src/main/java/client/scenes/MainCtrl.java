@@ -251,4 +251,15 @@ public class MainCtrl {
         addIngredientCtrl.setIngredientToEdit(ingredient);
         primaryStage.setScene(addIngredient);
     }
+
+    /**
+     * Shows the Recipe Overview screen with a pre-filled search query.
+     * The search is automatically executed to filter recipes.
+     * AI generated javadoc
+     * @param searchQuery the text to search for (typically an ingredient name)
+     */
+    public void showRecipeOverviewWithSearch(String searchQuery) {
+        showRecipeOverview();
+        recipeOverviewCtrl.setSearchQuery(searchQuery);
+    }
 }
