@@ -1,11 +1,13 @@
 package server.Service;
 
 import commons.Ingredient;
+import commons.Recipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -83,18 +85,29 @@ public class IngredientService {
     }
 
     /**
-     * Deletes an ingredient by the ID
+     * Deletes an {@link commons.Ingredient} by the ID
+     * and also automatically deletes the {@link commons.RecipeIngredient}
+     * related to the ingredient.
+     *
      * @param id the ID of the ingredient
      */
     @Transactional
     public void removeIngredient(Long id){
         log.info("Removing ingredient with id {}",id);
-        if (ingredientRepository.existsById(id)) {
-            ingredientRepository.deleteById(id);
-            runAfterCommit(() -> webSocketService.publishIngredientListChanged(id));
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+        Ingredient ingredient = ingredientRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        List<Recipe> recipes = recipeRepository.findAll();
+
+        for (Recipe recipe : recipes) {
+            recipe.getIngredients().removeIf(
+                    ri -> ri.getIngredient().equals(ingredient)
+            );
         }
+        recipeRepository.flush();
+        ingredientRepository.deleteById(id);
+        runAfterCommit(() -> webSocketService.publishIngredientListChanged(id));
     }
 
     /**
@@ -106,6 +119,12 @@ public class IngredientService {
         return ingredientRepository.count();
     }
 
+    /**
+     * Counts how many times a specific ingredient is used across all recipes.
+     *
+     * @param id of the ingredient to count usage for
+     * @return the number of times the ingredient appears in all recipes
+     */
     public long countUsageOfIngredient(long id){
         Ingredient ingredient = findIngredient(id);
 

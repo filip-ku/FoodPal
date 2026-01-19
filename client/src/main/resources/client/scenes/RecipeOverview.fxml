@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.TableColumn?>
@@ -16,9 +17,9 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.RecipeOverviewCtrl">
    <center>
-      <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
+      <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="700.0" spacing="10.0">
          <children>
-            <HBox prefHeight="22.0" prefWidth="452.0" style="-fx-spacing: 10;" VBox.vgrow="NEVER">
+            <HBox alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="452.0" style="-fx-spacing: 10;" VBox.vgrow="NEVER">
                <children>
                   <StackPane alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="179.0">
                      <children>
@@ -26,7 +27,8 @@
                         <Label fx:id="recipeName" text="Welcome to FoodPal!" />
                      </children>
                   </StackPane>
-                  <Button fx:id="recipeEditButton" mnemonicParsing="false" onAction="#editNameClicked" text="Edit" visible="false" />
+                  <Button fx:id="recipeEditButton" mnemonicParsing="false" onAction="#editNameClicked" text="%button.edit" visible="false" />
+                   <Button fx:id="favButton" mnemonicParsing="false" onAction="#favouriteRecipe" prefHeight="22.0" prefWidth="28.0" style="-fx-text-fill: gold;" text="☆" />
                </children>
             </HBox>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" VBox.vgrow="ALWAYS">
@@ -46,7 +48,7 @@
                            <children>
                               <Button fx:id="recipeIngredientAdd" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeIngredient" text="+" />
                               <Button fx:id="recipeIngredientDelete" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#deleteIngredient" text="-" />
-                              <Button fx:id="recipeIngredientEditButton" alignment="CENTER" contentDisplay="CENTER" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#editIngredientAmount">
+                              <Button fx:id="recipeIngredientEditButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="26.0" maxWidth="26.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#editIngredientAmount">
                                  <graphic>
                                     <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -73,6 +75,15 @@
                            <children>
                                <Button fx:id="addRecipeStep" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#openAddRecipeStep" text="+" />
                                <Button fx:id="removeStepButton" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#removeStep" text="-" />
+                              <Button fx:id="editStepsButton" maxHeight="26.0" maxWidth="26.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#editSteps">
+                                 <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@/Icons/edit-icon.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
                            </children>
                         </VBox>
                      </children>
@@ -81,8 +92,15 @@
             </VBox>
             <HBox alignment="CENTER_RIGHT" spacing="10.0">
                <children>
+                  <Label fx:id="servingsLabel" text="Servings: 0" />
+                  <Label fx:id="estimatedKcalLabel" text="Estimated kcal: 0.0" />
+                  <HBox fx:id="scaleHBox" alignment="CENTER">
+                     <children>
+                        <Label alignment="CENTER" text="Recipe Scale: " />
+                        <TextField fx:id="scaleFactorField" prefHeight="26.0" prefWidth="42.0" promptText="1.0" />
+                     </children>
+                  </HBox>
                   <Button fx:id="downloadRecipeButton" mnemonicParsing="false" onAction="#downloadRecipe" text="Download" />
-                  <Button fx:id="editStepsButton" mnemonicParsing="false" onAction="#editSteps" text="Edit Step" />
                   <Button mnemonicParsing="false" onAction="#showIngredients" text="Show Ingredients" />
                </children>
                <opaqueInsets>
@@ -101,6 +119,11 @@
    <top>
       <HBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
+            <TextField fx:id="searchField" promptText="Search" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="15.0" />
+               </HBox.margin>
+            </TextField>
             <MenuButton fx:id="languageMenu" mnemonicParsing="false" prefWidth="120.0" text="Language" />
             <Button fx:id="refreshButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#refresh" text="Refresh" />
          </children>
@@ -115,6 +138,19 @@
             <Insets bottom="10.0" left="15.0" />
          </BorderPane.margin>
          <children>
+            <VBox spacing="5.0" VBox.vgrow="NEVER">
+               <children>
+                  <Label text="Filter by Language:" />
+                  <CheckBox fx:id="filterEnglish" mnemonicParsing="false" onAction="#applyLanguageFilter" text="English" />
+                  <CheckBox fx:id="filterDutch" mnemonicParsing="false" onAction="#applyLanguageFilter" text="Dutch" />
+                  <CheckBox fx:id="filterSpanish" mnemonicParsing="false" onAction="#applyLanguageFilter" text="Spanish" />
+                   <CheckBox fx:id="filterFavorites" text="Favorites" onAction="#applyLanguageFilter" />
+
+               </children>
+               <padding>
+                  <Insets bottom="10.0" />
+               </padding>
+            </VBox>
             <TableView fx:id="tableRecipes" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="198.0" prefWidth="150.0" VBox.vgrow="ALWAYS">
               <columns>
                 <TableColumn fx:id="colRecipes" minWidth="0.0" prefWidth="113.59999980926514" text="Recipes" />
@@ -127,6 +163,15 @@
                <children>
                   <Button fx:id="addRecipeButton" maxHeight="26.0" maxWidth="26.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#addRecipe" prefHeight="26.0" prefWidth="26.0" text="+" />
                   <Button fx:id="deleteRecipeButton" maxHeight="26.0" maxWidth="26.0" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#deleteRecipe" prefHeight="26.0" prefWidth="26.0" text="-" />
+                   <Button alignment="CENTER" contentDisplay="CENTER" minHeight="26.0" minWidth="26.0" mnemonicParsing="false" onAction="#cloneRecipe">
+                       <graphic>
+                           <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                               <image>
+                                   <Image url="@/Icons/duplicate-icon.png" />
+                               </image>
+                           </ImageView>
+                       </graphic>
+                   </Button>
                </children>
                <padding>
                   <Insets top="10.0" />

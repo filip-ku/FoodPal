@@ -175,6 +175,8 @@ public class IngredientsOverviewCtrl implements Initializable {
      */
     public void deleteGlobalIngredient() {
         Ingredient selected = tableIngredients.getSelectionModel().getSelectedItem();
+        refresh();
+        int usageCount = ingredientUsageCount.getOrDefault(selected.getId(), 0);
 
         if (selected == null) {
             mainCtrl.showError("No ingredient selected.");
@@ -184,7 +186,14 @@ public class IngredientsOverviewCtrl implements Initializable {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Delete");
         confirm.setHeaderText("Delete Ingredient?");
-        confirm.setContentText("Are you sure you want to delete this ingredient?");
+
+        if (usageCount > 0) {
+            confirm.setContentText("This ingredient is being used in " + usageCount
+                    + " recipe" + (usageCount == 1 ? "" : "s") + ".\n"
+                    + "Are you sure you want to delete this ingredient?");
+        } else {
+            confirm.setContentText("Are you sure you want to delete this ingredient?");
+        }
 
         var result = confirm.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
