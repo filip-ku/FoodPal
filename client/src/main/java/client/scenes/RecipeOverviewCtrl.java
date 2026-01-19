@@ -53,6 +53,9 @@ public class RecipeOverviewCtrl implements Initializable {
     private StompSession.Subscription recipeContentSubscription;
 
     @FXML
+    private ResourceBundle resources;
+
+    @FXML
     private TableView<Recipe> tableRecipes;
     @FXML
     private TableColumn<Recipe, String> colRecipes;
@@ -150,13 +153,14 @@ public class RecipeOverviewCtrl implements Initializable {
      * Called by the JavaFX framework after the FXML elements have been injected.
      *
      * <p>Initialises UI bindings and listeners, then shows the default
-     * “main menu” view.</p>
+     * "main menu" view.</p>
      *
      * @param location  location of the FXML file (unused)
-     * @param resources resource bundle for internationalisation (unused)
+     * @param resources resource bundle for internationalisation
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.resources = resources;
         showMainMenu();
         setupLanguageMenu();
         loadRecipeLanguageFilter();
@@ -344,7 +348,7 @@ public class RecipeOverviewCtrl implements Initializable {
         for (LanguageOption option : supportedLanguages) {
             MenuItem item = new MenuItem(option.name);
             item.setGraphic(createFlagGraphic(option.iconPath, 16));
-            item.setOnAction(e -> setCurrentLanguage(option));
+            item.setOnAction(e -> setCurrentLanguage(option, true));
             languageMenu.getItems().add(item);
         }
 
@@ -356,25 +360,31 @@ public class RecipeOverviewCtrl implements Initializable {
                 .orElse(null);
 
         if (savedLanguage != null) {
-            setCurrentLanguage(savedLanguage);
+            setCurrentLanguage(savedLanguage, false);
         } else if (!supportedLanguages.isEmpty()) {
             // Fallback to first language if saved language code is invalid
-            setCurrentLanguage(supportedLanguages.get(0));
+            setCurrentLanguage(supportedLanguages.get(0), false);
         }
     }
 
     /**
      * Updates the indicator text and flag to the chosen language.
-     * Persists the selection to the config file.
+     * Persists the selection to the config file and optionally reloads the scene.
      *
      * @param option selected language option
+     * @param shouldReload whether to reload the
+     *                     scene (true for user-initiated changes, false for initial setup)
      */
-    private void setCurrentLanguage(LanguageOption option) {
+    private void setCurrentLanguage(LanguageOption option, boolean shouldReload) {
         this.currentLanguage = option;
         languageMenu.setText(option.name);
         languageMenu.setGraphic(createFlagGraphic(option.iconPath, 16));
         // Persist UI language choice
         ConfigUtils.setUILanguage(option.code);
+        // Reload the scene with the new language (only if user changed it)
+        if (shouldReload) {
+            mainCtrl.reloadRecipeOverview();
+        }
     }
 
     /**
@@ -392,7 +402,7 @@ public class RecipeOverviewCtrl implements Initializable {
 
         Recipe original = tableRecipes.getSelectionModel().getSelectedItem();
         if(original == null){
-            mainCtrl.showError("Select recipe first!");
+            mainCtrl.showError(resources.getString("recipeOverview.error.selectRecipeFirst"));
             return;
         }
 
@@ -437,14 +447,30 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
-     * Selects the given recipe in the table.
+     * Gets the currently selected recipe.
+     *
+     * @return the selected recipe, or null if none is selected
+     */
+    public Recipe getSelectedRecipe() {
+        return tableRecipes.getSelectionModel().getSelectedItem();
+    }
+
+    /**
+     * Selects the given recipe in the table by matching ID.
      *
      * @param recipe the recipe to select
      */
     public void selectRecipe(Recipe recipe) {
-        if (recipe == null) return;
-        tableRecipes.getSelectionModel().select(recipe);
-        loadStepsForRecipe(recipe);
+        if (recipe == null || recipe.getId() == null) return;
+
+        // Find the recipe in the current data by ID
+        for (Recipe r : data) {
+            if (r.getId().equals(recipe.getId())) {
+                tableRecipes.getSelectionModel().select(r);
+                loadStepsForRecipe(r);
+                break;
+            }
+        }
     }
 
     /**
@@ -474,8 +500,8 @@ public class RecipeOverviewCtrl implements Initializable {
             favoriteIds.removeAll(currentRecipeIds);
             if (!favoriteIds.isEmpty()) {
                 favoritesManager.cleanupDeletedRecipes(favoriteIds);
-                mainCtrl.showError("Warning: " + favoriteIds.size() +
-                        " favorite recipe(s) were deleted from the server.");
+                mainCtrl.showError(resources.getString("recipeOverview.warning.favoritesDeleted")
+                        .replace("{0}", String.valueOf(favoriteIds.size())));
             }
 
             allRecipes = FXCollections.observableList(recipes);
@@ -681,7 +707,7 @@ public class RecipeOverviewCtrl implements Initializable {
     public void editNameClicked() {
         if (!editingName) {
             editingName = true;
-            recipeEditButton.setText("Save");
+            recipeEditButton.setText(resources.getString("button.save"));
 
             recipeEditBox.setText(recipeName.getText());
             recipeEditBox.setDisable(false);
@@ -692,13 +718,13 @@ public class RecipeOverviewCtrl implements Initializable {
             String newName = recipeEditBox.getText();
 
             if (newName == null || newName.trim().isEmpty()) {
-                mainCtrl.showError("Name cannot be empty.");
+                mainCtrl.showError(resources.getString("recipeOverview.error.nameEmpty"));
                 return;
             }
             recipeName.setText(newName);
 
             editingName = false;
-            recipeEditButton.setText("Edit");
+            recipeEditButton.setText(resources.getString("button.edit"));
 
             Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
             if (selected != null) {
@@ -731,14 +757,14 @@ public class RecipeOverviewCtrl implements Initializable {
         Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
-            mainCtrl.showError("No recipe selected.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.noRecipeSelected"));
             return;
         }
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirm Delete");
-        confirm.setHeaderText("Delete Recipe?");
-        confirm.setContentText("You sure you wanna delete this recipe?");
+        confirm.setTitle(resources.getString("recipeOverview.dialog.confirmDelete"));
+        confirm.setHeaderText(resources.getString("recipeOverview.dialog.deleteRecipe"));
+        confirm.setContentText(resources.getString("recipeOverview.dialog.deleteRecipeConfirm"));
 
         var result = confirm.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
@@ -764,13 +790,13 @@ public class RecipeOverviewCtrl implements Initializable {
     private void editSteps() {
         Recipe selectedRecipe = tableRecipes.getSelectionModel().getSelectedItem();
         if (selectedRecipe == null) {
-            mainCtrl.showError("Select a recipe first.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.selectRecipeFirst"));
             return;
         }
 
         RecipeStep selectedStep = tablePreparation.getSelectionModel().getSelectedItem();
         if (selectedStep == null) {
-            mainCtrl.showError("Select a step to edit.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.selectStepToEdit"));
             return;
         }
         mainCtrl.showEditRecipeStep(selectedRecipe, selectedStep);
@@ -788,14 +814,16 @@ public class RecipeOverviewCtrl implements Initializable {
         RecipeIngredient selectedRecipeIngredient =
                 tableIngredients.getSelectionModel().getSelectedItem();
         if (selectedRecipeIngredient == null) {
-            mainCtrl.showError("Select an ingredient to delete.");
+            mainCtrl.showError(resources
+                    .getString("recipeOverview.error.selectIngredientToDelete"));
             return;
         }
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirm Delete");
-        confirm.setHeaderText("Delete Ingredient?");
-        confirm.setContentText("Are you sure you want to remove this ingredient?");
+        confirm.setTitle(resources.getString("recipeOverview.dialog.confirmDelete"));
+        confirm.setHeaderText(resources.getString("recipeOverview.dialog.deleteIngredient"));
+        confirm.setContentText(resources
+                .getString("recipeOverview.dialog.deleteIngredientConfirm"));
 
         var result = confirm.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
@@ -909,7 +937,7 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     public void showMainMenu() {
         recipeEditButton.setVisible(false);
-        recipeName.setText("Welcome to FoodPal!");
+        recipeName.setText(resources.getString("recipeOverview.welcome"));
         tableIngredients.setVisible(false);
         tablePreparation.setVisible(false);
         recipeIngredientAdd.setVisible(false);
@@ -960,7 +988,8 @@ public class RecipeOverviewCtrl implements Initializable {
             totalKcal += ri.getIngredient().getCalories();
         }
 
-        estimatedKcalLabel.setText("Estimated kcal: " + totalKcal + "kcal/100g");
+        estimatedKcalLabel.setText(resources.getString("recipeOverview.label.estimatedKcalValue")
+                .replace("{0}", String.valueOf(totalKcal)));
 
         servingsLabel.setVisible(true);
 
@@ -972,7 +1001,8 @@ public class RecipeOverviewCtrl implements Initializable {
             factor = 1.0;
         }
 
-        servingsLabel.setText("Servings: " + (newSel.getServings().intValue() * factor));
+        servingsLabel.setText(resources.getString("recipeOverview.label.servingsValue")
+                .replace("{0}", String.valueOf(newSel.getServings().intValue() * factor)));
     }
 
     /**
@@ -989,7 +1019,10 @@ public class RecipeOverviewCtrl implements Initializable {
     @FXML
     private void openAddRecipeIngredient() {
         var selected = tableRecipes.getSelectionModel().getSelectedItem();
-        if (selected == null) { mainCtrl.showError("Select a recipe first."); return; }
+        if (selected == null) {
+            mainCtrl.showError(resources.getString("recipeOverview.error.selectRecipeFirst"));
+            return;
+        }
         mainCtrl.showChooseRecipeIngredient(selected);
     }
 
@@ -1001,7 +1034,7 @@ public class RecipeOverviewCtrl implements Initializable {
     private void openAddRecipeStep() {
         var selected = tableRecipes.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            mainCtrl.showError("Select a recipe first.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.selectRecipeFirst"));
             return;
         }
         mainCtrl.showAddRecipeStep(selected);
@@ -1043,30 +1076,30 @@ public class RecipeOverviewCtrl implements Initializable {
     public void removeStep() {
         Recipe selectedRecipe = tableRecipes.getSelectionModel().getSelectedItem();
         if (selectedRecipe == null) {
-            mainCtrl.showError("Select a recipe first.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.selectRecipeFirst"));
             return;
         }
 
         RecipeStep selectedStep = tablePreparation.getSelectionModel().getSelectedItem();
         if (selectedStep == null) {
-            mainCtrl.showError("Select a step to delete.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.selectStepToDelete"));
             return;
         }
 
         if (selectedRecipe.getId() == null) {
-            mainCtrl.showError("Selected recipe has no id.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.recipeNoId"));
             return;
         }
         if (selectedStep.getId() == null) {
-            mainCtrl.showError("Selected step has no id.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.stepNoId"));
             return;
         }
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirm Delete");
-        confirm.setHeaderText("Delete Step");
-        confirm.setContentText("Are you sure you want to delete step "
-                + selectedStep.getPosition() + "?");
+        confirm.setTitle(resources.getString("recipeOverview.dialog.confirmDelete"));
+        confirm.setHeaderText(resources.getString("recipeOverview.dialog.deleteStep"));
+        confirm.setContentText(resources.getString("recipeOverview.dialog.deleteStepConfirm")
+                .replace("{0}", String.valueOf(selectedStep.getPosition())));
 
         var result = confirm.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
@@ -1148,12 +1181,12 @@ public class RecipeOverviewCtrl implements Initializable {
                 tableIngredients.getSelectionModel().getSelectedItem();
 
         if (selectedRecipe == null) {
-            mainCtrl.showError("Select a recipe first.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.selectRecipeFirst"));
             return;
         }
 
         if (selectedIngredient == null) {
-            mainCtrl.showError("Select an ingredient to edit.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.selectIngredientToEdit"));
             return;
         }
 
@@ -1170,17 +1203,18 @@ public class RecipeOverviewCtrl implements Initializable {
         Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
-            mainCtrl.showError("Select a recipe first.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.selectRecipeFirst"));
             return;
         }
 
         String content = RecipeFormatter.format(selected);
 
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Save Recipe");
+        chooser.setTitle(resources.getString("recipeOverview.dialog.saveRecipe"));
 
         chooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Markdown file (*.md)", "*.md")
+                new FileChooser.ExtensionFilter(resources
+                        .getString("recipeOverview.dialog.markdownFile"), "*.md")
         );
 
         chooser.setInitialFileName(
@@ -1198,7 +1232,7 @@ public class RecipeOverviewCtrl implements Initializable {
         try {
             Files.writeString(file.toPath(), content);
         } catch (IOException e) {
-            mainCtrl.showError("Failed to save recipe.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.failedToSave"));
         }
     }
 
@@ -1257,7 +1291,7 @@ public class RecipeOverviewCtrl implements Initializable {
         Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
-            mainCtrl.showError("Select a recipe first.");
+            mainCtrl.showError(resources.getString("recipeOverview.error.selectRecipeFirst"));
             return;
         }
 
