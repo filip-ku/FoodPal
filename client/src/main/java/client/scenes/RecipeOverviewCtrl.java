@@ -622,7 +622,8 @@ public class RecipeOverviewCtrl implements Initializable {
         }
 
         // Check if filter checkboxes are initialized
-        if (filterEnglish == null || filterDutch == null || filterSpanish == null || filterFrench == null) {
+        if (filterEnglish == null || filterDutch == null
+                || filterSpanish == null || filterFrench == null) {
             return; // UI not fully initialized yet
         }
 
@@ -671,7 +672,8 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     private void loadRecipeLanguageFilter() {
         // Check if filter checkboxes are initialized
-        if (filterEnglish == null || filterDutch == null || filterSpanish == null || filterFrench == null) {
+        if (filterEnglish == null || filterDutch == null
+                || filterSpanish == null || filterFrench == null) {
             return; // UI not fully initialized yet
         }
 
