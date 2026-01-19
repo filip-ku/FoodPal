@@ -30,6 +30,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import org.springframework.messaging.simp.stomp.StompSession;
 import javafx.stage.FileChooser;
@@ -105,6 +106,9 @@ public class RecipeOverviewCtrl implements Initializable {
 
     @FXML
     private Button downloadRecipeButton;
+
+    @FXML
+    private TextField searchField;
 
     @FXML
     private HBox scaleHBox;
@@ -214,6 +218,16 @@ public class RecipeOverviewCtrl implements Initializable {
                         reloadSelectedRecipeDetails(newSel);
                     }
                 });
+
+        searchField.textProperty().addListener((obs, old, query) -> {
+            filterRecipes(query);
+        });
+
+        searchField.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ESCAPE) {
+                searchField.clear();
+            }
+        });
 
         recipeIngredientEditButton.setDisable(true);
         editStepsButton.setDisable(true);
@@ -511,6 +525,89 @@ public class RecipeOverviewCtrl implements Initializable {
     }
 
     /**
+     * Filters the currently loaded recipes based on the given search query.
+     * <p>The following recipe fields are searched:</p>
+     * <ul>
+     *     <li>Recipe title</li>
+     *     <li>Ingredient names</li>
+     *     <li>Preparation step instructions</li>
+     * </ul>
+     * @param query the search string entered by the user
+     */
+    private void filterRecipes(String query) {
+        if (data == null) {
+            return;
+        }
+
+        if (query == null || query.isBlank()) {
+            tableRecipes.setItems(data);
+            return;
+        }
+
+        List<Recipe> filtered = data.stream()
+                .filter(recipe -> matchesSearch(recipe, query))
+                .collect(Collectors.toList());
+
+        tableRecipes.setItems(FXCollections.observableArrayList(filtered));
+    }
+
+    /**
+     * Determines whether a recipe matches the given search query.
+     * The query is evaluated using AND semantics.
+     * @param recipe the recipe to test
+     * @param query the search query entered by the user
+     * @return true if the recipe matches the query, false otherwise.
+     */
+    private boolean matchesSearch(Recipe recipe, String query) {
+        if (recipe == null) {
+            return false;
+        }
+
+        if (query == null || query.isBlank()) {
+            return true;
+        }
+
+        String[] tokens = query.toLowerCase().trim().split("\\s+");
+
+        StringBuilder searchable = new StringBuilder();
+
+        // Recipe title
+        if (recipe.getTitle() != null) {
+            searchable.append(recipe.getTitle()).append(" ");
+        }
+
+        // Ingredient names
+        if (recipe.getIngredients() != null) {
+            for (RecipeIngredient ri : recipe.getIngredients()) {
+                if (ri != null && ri.getIngredient() != null
+                        && ri.getIngredient().getName() != null) {
+                    searchable.append(ri.getIngredient().getName()).append(" ");
+                }
+            }
+        }
+
+        // Preparation steps
+        if (recipe.getSteps() != null) {
+            for (RecipeStep step : recipe.getSteps()) {
+                if (step != null && step.getInstruction() != null) {
+                    searchable.append(step.getInstruction()).append(" ");
+                }
+            }
+        }
+
+        String searchableText = searchable.toString().toLowerCase();
+
+        // AND semantics: all tokens must match
+        for (String token : tokens) {
+            if (!searchableText.contains(token)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Filters recipes based on selected language checkboxes.
      * If no languages are selected, all recipes are shown.
      * Persists the filter selection to the config file.
@@ -559,6 +656,7 @@ public class RecipeOverviewCtrl implements Initializable {
                 .collect(Collectors.toList());
         data = FXCollections.observableList(filtered);
         tableRecipes.setItems(data);
+        filterRecipes(searchField.getText());
     }
 
     /**
