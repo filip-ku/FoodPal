@@ -68,6 +68,7 @@ public class IngredientsOverviewCtrl implements Initializable {
                                    WebSocketService webSocketService) {
         this.server = server;
         this.mainCtrl = mainCtrl;
+        this.webSocketService = webSocketService;
     }
 
     /**
