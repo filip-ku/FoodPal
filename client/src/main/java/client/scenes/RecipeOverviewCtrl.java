@@ -1184,7 +1184,19 @@ public class RecipeOverviewCtrl implements Initializable {
             return;
         }
 
-        String content = RecipeFormatter.format(selected);
+        double factor = 1.0;
+
+        try {
+            factor = Double.parseDouble(scaleFactorField.getText());
+        } catch (NumberFormatException e) {
+            factor = 1.0;
+        }
+
+        if (factor <= 0.0) {
+            factor = 1.0;
+        }
+
+        String content = RecipeFormatter.format(selected, factor);
 
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Save Recipe");
