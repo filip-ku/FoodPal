@@ -119,7 +119,7 @@ public final class RecipeFormatter {
                     }
                 }
             }
-            return scaledAmount + " " + displayUnit;
+            return String.format("%.2f %s", scaledAmount, displayUnit);
         } else {
             String informalAmount = ri.getInformalAmount();
 
