@@ -204,6 +204,12 @@ public class RecipeOverviewCtrl implements Initializable {
         tableRecipes.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldSel, newSel) -> {
+
+                    // Cancel any active title editing when switching recipes
+                    if (editingName) {
+                        cancelTitleEditing();
+                    }
+                    
                     if (newSel != null) {
                         if (newSel.getIngredients() != null) {
                             tableIngredients.setItems(
@@ -696,6 +702,28 @@ public class RecipeOverviewCtrl implements Initializable {
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
         }
+    }
+
+    /**
+     * Cancels the current title editing session without saving changes.
+     * Closes the edit box and restores the label display.
+     */
+    private void cancelTitleEditing() {
+        if (!editingName) {
+            return;
+        }
+        
+        editingName = false;
+        recipeEditButton.setText(resources.getString("button.edit"));
+
+        Recipe selected = tableRecipes.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            recipeName.setText(selected.getTitle());
+        }
+        
+        recipeEditBox.setDisable(true);
+        recipeEditBox.setVisible(false);
+        recipeName.setVisible(true);
     }
 
     /**
