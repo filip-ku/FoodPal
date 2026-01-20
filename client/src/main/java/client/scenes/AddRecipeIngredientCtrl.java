@@ -176,10 +176,7 @@ public class AddRecipeIngredientCtrl implements Initializable {
     }
 
     /**
-     * Validates input and saves changes:
-     *  - ADD: creates a new RecipeIngredient via POST.
-     *  - EDIT: updates the existing RecipeIngredient via PUT.
-     * On success, returns to the recipe overview.
+     * Validates user input and, if valid, delegates persistence/navigation.
      */
     public void ok() {
         final Double amount;
@@ -210,7 +207,19 @@ public class AddRecipeIngredientCtrl implements Initializable {
             mainCtrl.showError("Please fill in either amount and unit OR informal amount.");
             return;
         }
-        try{
+
+        persistAndReturn(amount, unit, informal);
+    }
+
+    /**
+     * Persists the ingredient changes (ADD or EDIT),
+     * refreshes the overview, and returns to the recipe overview.
+     * @param amount the parsed amount
+     * @param unit the unit value
+     * @param informal the informal amount text
+     */
+    private void persistAndReturn(Double amount, String unit, String informal) {
+        try {
             if (mode == Mode.ADD) {
                 RecipeIngredient ri = new RecipeIngredient();
                 ri.setRecipe(recipe);

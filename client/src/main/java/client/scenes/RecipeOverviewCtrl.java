@@ -1162,6 +1162,8 @@ public class RecipeOverviewCtrl implements Initializable {
     //AI-generated code
     /**
      * Renumbers steps to be 1 through n with no gaps and persists changes to the backend.
+     *
+     * @param recipeId recipe id whose steps should be renumbered
      */
     private void renumberAndPersistSteps(Long recipeId) {
         List<RecipeStep> steps = server.getStepsForRecipe(recipeId);
@@ -1169,32 +1171,62 @@ public class RecipeOverviewCtrl implements Initializable {
             return;
         }
 
-        steps.sort((a, b) -> {
-            int pa = (a == null) ? Integer.MAX_VALUE : a.getPosition();
-            int pb = (b == null) ? Integer.MAX_VALUE : b.getPosition();
+        sortStepsForRenumbering(steps);
+        persistRenumbering(recipeId, steps);
+    }
 
-            // push <=0 to the end
-            if (pa <= 0) pa = Integer.MAX_VALUE;
-            if (pb <= 0) pb = Integer.MAX_VALUE;
+    //AI-generated code
+    /**
+     * Sorts steps
+     * @param steps mutable list of steps to sort
+     */
+    private void sortStepsForRenumbering(List<RecipeStep> steps) {
+        steps.sort(this::compareStepsForRenumbering);
+    }
 
-            // by id if available, otherwise keep as-is
-            if (pa != pb) return Integer.compare(pa, pb);
+    //AI-generated code
+    /**
+     * Comparator for renumbering order (position first, then id).
+     * Method has high cyclomatic complexity since it requires many explicit branches.
+     * @param a first step
+     * @param b second step
+     * @return comparison result
+     */
+    private int compareStepsForRenumbering(RecipeStep a, RecipeStep b) {
+        int pa = (a == null) ? Integer.MAX_VALUE : a.getPosition();
+        int pb = (b == null) ? Integer.MAX_VALUE : b.getPosition();
 
-            Long ida = (a == null) ? null : a.getId();
-            Long idb = (b == null) ? null : b.getId();
-            if (ida == null && idb == null) return 0;
-            if (ida == null) return 1;
-            if (idb == null) return -1;
-            return ida.compareTo(idb);
-        });
+        if (pa <= 0) pa = Integer.MAX_VALUE;
+        if (pb <= 0) pb = Integer.MAX_VALUE;
 
+        if (pa != pb) {
+            return Integer.compare(pa, pb);
+        }
+
+        Long ida = (a == null) ? null : a.getId();
+        Long idb = (b == null) ? null : b.getId();
+
+        if (ida == null && idb == null) return 0;
+        if (ida == null) return 1;
+        if (idb == null) return -1;
+        return ida.compareTo(idb);
+    }
+
+    //AI-generated code
+    /**
+     * Renumbers steps sequentially and persists any changes.
+     *
+     * @param recipeId recipe id
+     * @param steps sorted steps
+     */
+    private void persistRenumbering(Long recipeId, List<RecipeStep> steps) {
         int expected = 1;
 
         for (RecipeStep s : steps) {
-            if (s == null) continue;
-            if (s.getId() == null) continue; // cannot persist without id
+            if (s == null || s.getId() == null) {
+                continue;
+            }
 
-            // If the server requires instruction for updates, ensure it's present.
             String instr = s.getInstruction();
             if (instr == null) instr = "";
 
@@ -1204,7 +1236,6 @@ public class RecipeOverviewCtrl implements Initializable {
                 updated.setInstruction(instr);
                 updated.setPosition(expected);
 
-                // Persist
                 server.updateRecipeStep(recipeId, updated);
             }
 
