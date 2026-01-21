@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import client.ws.WebSocketService;
 import com.google.inject.Inject;
 
 import client.utils.ServerUtils;
 import commons.Ingredient;
 import commons.Recipe;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -25,6 +27,7 @@ public class IngredientsOverviewCtrl implements Initializable {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private final WebSocketService webSocketService;
 
     private Map<Long, Integer> ingredientUsageCount = new HashMap<>();
 
@@ -58,11 +61,15 @@ public class IngredientsOverviewCtrl implements Initializable {
      *
      * @param server  injected {@link ServerUtils}
      * @param mainCtrl injected {@link MainCtrl}
+     * @param webSocketService injected {@link WebSocketService}
      */
     @Inject
-    public IngredientsOverviewCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public IngredientsOverviewCtrl(ServerUtils server,
+                                   MainCtrl mainCtrl,
+                                   WebSocketService webSocketService) {
         this.server = server;
         this.mainCtrl = mainCtrl;
+        this.webSocketService = webSocketService;
     }
 
     /**
@@ -113,6 +120,8 @@ public class IngredientsOverviewCtrl implements Initializable {
                     editIngredientButton.setDisable(newSel == null);
                     seeRecipesButton.setDisable(newSel == null);
                 });
+
+        setupWebSocketSubscriptions();
     }
 
     /**
@@ -253,5 +262,19 @@ public class IngredientsOverviewCtrl implements Initializable {
 
         String ingredientName = selected.getName();
         mainCtrl.showRecipeOverviewWithSearch(ingredientName);
+    }
+
+    /**
+     * Subscribes to global ingredient list topic so the UI can refresh automatically.
+     * Retries are not implemented here; failures are logged to stderr.
+     */
+    private void setupWebSocketSubscriptions() {
+        try {
+            webSocketService.subscribeIngredientList(
+                    event -> Platform.runLater(this::refresh)
+            );
+        } catch (RuntimeException e) {
+            System.err.println("Ingredient WebSocket subscription failed: " + e.getMessage());
+        }
     }
 }

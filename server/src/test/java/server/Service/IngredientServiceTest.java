@@ -7,22 +7,26 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 import server.Repository.TestIngredientRepository;
 import server.Repository.TestRecipeRepository;
+import server.ws.WebSocketService;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class IngredientServiceTest {
 
     private TestIngredientRepository ingredientRepo;
     private TestRecipeRepository recipeRepo;
+    private WebSocketService webSocketService;
     private IngredientService ingredientService;
 
     @BeforeEach
     void setup() {
         ingredientRepo = new TestIngredientRepository();
         recipeRepo = new TestRecipeRepository();
-        ingredientService = new IngredientService(ingredientRepo, recipeRepo);
+        webSocketService = mock(WebSocketService.class);
+        ingredientService = new IngredientService(ingredientRepo, recipeRepo, webSocketService);
     }
 
     @Test
