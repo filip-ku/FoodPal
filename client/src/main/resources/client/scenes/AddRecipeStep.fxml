@@ -10,20 +10,20 @@
          <children>
             <AnchorPane maxHeight="260.0" maxWidth="480.0" minHeight="260.0" minWidth="480.0" prefHeight="260" prefWidth="480">
                 <children>
-                    <Label layoutX="20" layoutY="20" text="Recipe Step">
+                    <Label layoutX="20" layoutY="20" text="%addRecipeStep.label.title">
                         <font>
                         <Font size="16" />
                      </font>
                     </Label>
             
-                    <Label layoutX="20" layoutY="66" text="Position:" />
-                    <TextField fx:id="positionInput" layoutX="90" layoutY="62" prefWidth="80" promptText="auto" />
+                    <Label layoutX="20" layoutY="66" text="%addRecipeStep.label.position" />
+                    <TextField fx:id="positionInput" layoutX="90" layoutY="62" prefWidth="80" promptText="%addRecipeStep.prompt.auto" />
             
-                    <Label layoutX="20" layoutY="102" text="Instruction:" />
-                    <TextArea fx:id="instructionInput" layoutX="90" layoutY="98" prefHeight="100" prefWidth="360" promptText="Describe what to do in this step..." />
+                    <Label layoutX="20" layoutY="102" text="%addRecipeStep.label.instruction" />
+                    <TextArea fx:id="instructionInput" layoutX="90" layoutY="98" prefHeight="100" prefWidth="360" promptText="%addRecipeStep.prompt.instruction" />
             
-                    <Button defaultButton="true" layoutX="415.0" layoutY="210.0" onAction="#ok" text="OK" />
-                    <Button cancelButton="true" layoutX="352.0" layoutY="210.0" onAction="#cancel" text="Cancel" />
+                    <Button defaultButton="true" layoutX="415.0" layoutY="210.0" onAction="#ok" text="%addRecipeStep.button.ok" />
+                    <Button cancelButton="true" layoutX="352.0" layoutY="210.0" onAction="#cancel" text="%button.cancel" />
                 </children>
             </AnchorPane>
          </children>

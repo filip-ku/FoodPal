@@ -21,6 +21,9 @@ public class ChooseRecipeIngredientCtrl {
     private final MainCtrl mainCtrl;
     private Recipe recipe;
 
+    @FXML
+    private java.util.ResourceBundle resources;
+
     /**
      * Constructs the controller with required dependencies.
      *
@@ -89,7 +92,7 @@ public class ChooseRecipeIngredientCtrl {
     public void inputRecipeSpecificData() {
         var selected = ingredientSelect.getValue();
         if (selected == null) {
-            mainCtrl.showError("Select an ingredient first.");
+            mainCtrl.showError(resources.getString("chooseRecipeIngredient.error.noSelection"));
             return;
         }
         mainCtrl.showAddRecipeIngredientForAdd(recipe, selected);

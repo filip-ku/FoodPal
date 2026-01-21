@@ -52,6 +52,9 @@ public class IngredientsOverviewCtrl implements Initializable {
     @FXML
     private Button editIngredientButton;
 
+    @FXML
+    private ResourceBundle resources;
+
     /**
      * Constructs a {@code IngredientsOverviewCtrl}.
      *
@@ -76,13 +79,14 @@ public class IngredientsOverviewCtrl implements Initializable {
      * Called by the JavaFX framework after the FXML elements have been injected.
      *
      * <p>Initialises UI bindings and listeners, then shows the default
-     * “main menu” view.</p>
+     * "main menu" view.</p>
      *
      * @param location  location of the FXML file (unused)
-     * @param resources resource bundle for internationalisation (unused)
+     * @param resources resource bundle for internationalisation
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.resources = resources;
         colName.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getName()));
 
@@ -162,7 +166,7 @@ public class IngredientsOverviewCtrl implements Initializable {
         Ingredient selected = tableIngredients.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
-            mainCtrl.showError("No ingredient selected for editing.");
+            mainCtrl.showError(resources.getString("ingredientOverview.error.noSelection"));
             return;
         }
 
@@ -188,20 +192,24 @@ public class IngredientsOverviewCtrl implements Initializable {
         int usageCount = ingredientUsageCount.getOrDefault(selected.getId(), 0);
 
         if (selected == null) {
-            mainCtrl.showError("No ingredient selected.");
+            mainCtrl.showError(resources.getString("ingredientOverview.error.noSelection"));
             return;
         }
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirm Delete");
-        confirm.setHeaderText("Delete Ingredient?");
+        confirm.setTitle(resources.getString("ingredientOverview.dialog.confirmDelete"));
+        confirm.setHeaderText(resources.getString("ingredientOverview.dialog.deleteIngredient"));
 
         if (usageCount > 0) {
-            confirm.setContentText("This ingredient is being used in " + usageCount
-                    + " recipe" + (usageCount == 1 ? "" : "s") + ".\n"
-                    + "Are you sure you want to delete this ingredient?");
+            String recipeWord = (usageCount == 1) 
+                    ? resources.getString("ingredientOverview.dialog.recipe") 
+                    : resources.getString("ingredientOverview.dialog.recipes");
+            confirm.setContentText(
+                    resources.getString("ingredientOverview.dialog.deleteUsedIngredient")
+                            .replace("{0}", String.valueOf(usageCount))
+                            .replace("{1}", recipeWord));
         } else {
-            confirm.setContentText("Are you sure you want to delete this ingredient?");
+            confirm.setContentText(resources.getString("ingredientOverview.dialog.deleteConfirm"));
         }
 
         var result = confirm.showAndWait();
@@ -256,7 +264,7 @@ public class IngredientsOverviewCtrl implements Initializable {
         Ingredient selected = tableIngredients.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
-            mainCtrl.showError("No ingredient selected.");
+            mainCtrl.showError(resources.getString("ingredientOverview.error.noSelection"));
             return;
         }
 

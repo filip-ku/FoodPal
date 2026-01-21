@@ -43,6 +43,8 @@ public class I18nService {
                 return new Locale("nl");
             case "es":
                 return new Locale("es");
+            case "fr":
+                return new Locale("fr");
             case "en":
             default:
                 return new Locale("en");
