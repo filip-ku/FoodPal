@@ -32,6 +32,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.TextAlignment;
 import org.springframework.messaging.simp.stomp.StompSession;
 import javafx.stage.FileChooser;
 import javafx.scene.image.Image;
@@ -166,6 +167,7 @@ public class RecipeOverviewCtrl implements Initializable {
         showMainMenu();
         setupLanguageMenu();
         loadRecipeLanguageFilter();
+        updatePlaceholders();
 
         colRecipes.setCellFactory(column -> new TableCell<Recipe, String>() {
             @Override
@@ -257,6 +259,23 @@ public class RecipeOverviewCtrl implements Initializable {
         });
 
         setupWebSocketSubscriptions();
+    }
+
+    /**
+     * Configures placeholder labels for empty tables using i18n resources.
+     */
+    private void updatePlaceholders() {
+
+        Label label = new Label(resources.getString("recipeOverview.table.emptyRecipes"));
+        label.setWrapText(true);    // In some languages the text gets cut off,
+                                    // as the table is too narrow.
+        label.setTextAlignment(TextAlignment.CENTER);
+        tableRecipes.setPlaceholder(label);
+
+        tableIngredients.setPlaceholder(
+                new Label(resources.getString("recipeOverview.table.emptyIngredients")));
+        tablePreparation.setPlaceholder(
+                new Label(resources.getString("recipeOverview.table.emptySteps")));
     }
 
     /**
