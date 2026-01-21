@@ -1423,6 +1423,7 @@ public class RecipeOverviewCtrl implements Initializable {
      */
     public void setSearchQuery(String searchQuery) {
         tableRecipes.getSelectionModel().clearSelection();
+        showMainMenu();
         searchField.setText(searchQuery);
     }
 }
