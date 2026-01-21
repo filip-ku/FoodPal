@@ -122,7 +122,8 @@ public class RecipeStepsTest {
         assertEquals(1, afterRemoval.getSteps().size());
         assertEquals(20L, afterRemoval.getSteps().get(0).getId());
 
-        verify(webSocketService, times(1)).publishRecipeContentChanged(recipe.getId());
+        verify(webSocketService, times(1)).
+                publishRecipeContentChanged(recipe.getId());
     }
 
     @Test
@@ -156,7 +157,8 @@ public class RecipeStepsTest {
         assertEquals(2, saved.getPosition());
         assertEquals("Cook rice", saved.getInstruction());
 
-        verify(webSocketService, times(1)).publishRecipeContentChanged(recipe.getId());
+        verify(webSocketService, times(1)).
+                publishRecipeContentChanged(recipe.getId());
         assertTrue(recipeRepo.calledMethods.contains("save"));
     }
 
@@ -228,5 +230,160 @@ public class RecipeStepsTest {
 
         assertEquals(404, ex.getStatusCode().value());
         verify(webSocketService, never()).publishRecipeContentChanged(anyLong());
+    }
+
+    @Test
+    void removeStepFromRecipe_throws404_whenRecipeNotFound() {
+        // Arrange
+        clearInvocations(webSocketService);
+
+        // Act + Assert
+        ResponseStatusException ex = assertThrows(
+                ResponseStatusException.class,
+                () -> recipeService.removeStepFromRecipe(999L, 1L)
+        );
+
+        assertEquals(404, ex.getStatusCode().value());
+        verify(webSocketService, never()).publishRecipeContentChanged(anyLong());
+    }
+
+    @Test
+    void updateStepInRecipe_keepsIdAndRecipeAssociation() {
+        // Arrange
+        Recipe recipe = recipeRepo.save(new Recipe("Pizza"));
+
+        RecipeStep original = new RecipeStep();
+        original.setPosition(1);
+        original.setInstruction("Stretch dough");
+
+        Recipe updated = recipeService.addStepToRecipe(recipe.getId(), original);
+        RecipeStep persisted = updated.getSteps().get(0);
+        persisted.setId(42L);
+        recipeRepo.save(updated);
+
+        RecipeStep patch = new RecipeStep();
+        patch.setPosition(3);
+        patch.setInstruction("Bake");
+
+        clearInvocations(webSocketService);
+
+        // Act
+        RecipeStep result = recipeService.updateStepInRecipe(recipe.getId(), 42L, patch);
+
+        // Assert
+        assertEquals(42L, result.getId());
+        assertNotNull(result.getRecipe());
+        assertEquals(recipe.getId(), result.getRecipe().getId());
+        verify(webSocketService).publishRecipeContentChanged(recipe.getId());
+    }
+
+    @Test
+    void addStepToRecipe_allowsDuplicatePositions_ifServiceDoesNotValidate() {
+        // Arrange
+        Recipe recipe = recipeRepo.save(new Recipe("Sandwich"));
+
+        RecipeStep s1 = new RecipeStep();
+        s1.setPosition(1);
+        s1.setInstruction("Add bread");
+
+        RecipeStep s2 = new RecipeStep();
+        s2.setPosition(1);
+        s2.setInstruction("Add filling");
+
+        // Act
+        Recipe updated = recipeService.addStepToRecipe(recipe.getId(), s1);
+        updated = recipeService.addStepToRecipe(recipe.getId(), s2);
+
+        // Assert (this test documents current behavior; change it if you later enforce uniqueness)
+        assertEquals(2, updated.getSteps().size());
+        assertEquals(1, updated.getSteps().get(0).getPosition());
+        assertEquals(1, updated.getSteps().get(1).getPosition());
+    }
+
+    @Test
+    void getStepsForRecipe_returnsEmptyList_whenRecipeHasNoSteps() {
+        // Arrange
+        Recipe recipe = recipeRepo.save(new Recipe("Empty"));
+
+        // Act
+        List<RecipeStep> steps = recipeService.getStepsForRecipe(recipe.getId());
+
+        // Assert
+        assertNotNull(steps);
+        assertTrue(steps.isEmpty());
+    }
+
+    @Test
+    void updateStepInRecipe_sameValues_stillPublishesContentChanged() {
+        // Arrange
+        Recipe recipe = recipeRepo.save(new Recipe("Toast"));
+
+        RecipeStep original = new RecipeStep();
+        original.setPosition(1);
+        original.setInstruction("Toast bread");
+
+        Recipe updated = recipeService.addStepToRecipe(recipe.getId(), original);
+        RecipeStep persisted = updated.getSteps().get(0);
+        persisted.setId(11L);
+        recipeRepo.save(updated);
+
+        RecipeStep patch = new RecipeStep();
+        patch.setPosition(1);
+        patch.setInstruction("Toast bread");
+
+        clearInvocations(webSocketService);
+
+        // Act
+        RecipeStep result = recipeService.updateStepInRecipe(recipe.getId(), 11L, patch);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(11L, result.getId());
+        assertEquals(1, result.getPosition());
+        assertEquals("Toast bread", result.getInstruction());
+        verify(webSocketService, times(1)).publishRecipeContentChanged(recipe.getId());
+    }
+
+    @Test
+    void removeStepFromRecipe_removesLastRemainingStep_andLeavesEmptyList() {
+        // Arrange
+        Recipe recipe = recipeRepo.save(new Recipe("Tea"));
+
+        RecipeStep s1 = new RecipeStep();
+        s1.setPosition(1);
+        s1.setInstruction("Boil water");
+
+        Recipe updated = recipeService.addStepToRecipe(recipe.getId(), s1);
+        updated.getSteps().get(0).setId(100L);
+        recipeRepo.save(updated);
+
+        clearInvocations(webSocketService);
+
+        // Act
+        Recipe afterRemoval = recipeService.removeStepFromRecipe(recipe.getId(), 100L);
+
+        // Assert
+        assertNotNull(afterRemoval);
+        assertTrue(afterRemoval.getSteps().isEmpty());
+        verify(webSocketService, times(1)).publishRecipeContentChanged(recipe.getId());
+    }
+
+    @Test
+    void removeStepFromRecipe_whenStepNotFound_doesNothing() {
+        // Arrange
+        Recipe recipe = recipeRepo.save(new Recipe("Pizza"));
+
+        RecipeStep step = new RecipeStep();
+        step.setPosition(1);
+        step.setInstruction("Prepare dough");
+
+        Recipe updated = recipeService.addStepToRecipe(recipe.getId(), step);
+        int beforeSize = updated.getSteps().size();
+
+        // Act (no exception expected)
+        Recipe after = recipeService.removeStepFromRecipe(recipe.getId(), 999L);
+
+        // Assert
+        assertEquals(beforeSize, after.getSteps().size());
     }
 }
