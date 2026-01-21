@@ -27,6 +27,8 @@ Users can now navigate from the Ingredients Overview directly to recipes that us
 
 This feature makes it easy to discover which recipes use a particular ingredient without manually searching for it. The search uses the existing search functionality, which checks recipe titles, ingredients, and preparation steps with AND semantics.
 
+The recipe search supports ingredient exclusion using a - prefix (e.g. -nuts). This is especially useful for allergies and dietary preferences, allowing users to quickly find safe recipes by including and excluding ingredients in a single search. To use this feature, simply type the ingredient to exclude with a minus sign in the search bar.
+
 # Nutritional Values
 
 The user is able to scale informal amounts of ingredients just like formal amounts. For example, scaling "a pinch" by 2 should show up as "a pinch (x2)".
