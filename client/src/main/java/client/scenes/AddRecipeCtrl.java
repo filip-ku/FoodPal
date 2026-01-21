@@ -80,7 +80,9 @@ public class AddRecipeCtrl implements Initializable {
      */
     public void okButton() {
         try {
-            server.addRecipe(getRecipe());
+            Recipe recipe = getRecipe();
+            if (recipe == null) return;
+            server.addRecipe(recipe);
         } catch (WebApplicationException e) {
             mainCtrl.showExceptionErrorPopUp(e);
             return;
@@ -98,6 +100,11 @@ public class AddRecipeCtrl implements Initializable {
     private Recipe getRecipe() {
         Recipe recipe = new Recipe(title.getText());
         String selectedLanguageName = languageComboBox.getSelectionModel().getSelectedItem();
+
+        if (recipe.getTitle().isEmpty()) {
+            mainCtrl.showError(resources.getString("addRecipe.error.nameBlank"));
+            return null;
+        }
 
         try {
             double servingsValue = Double.parseDouble(servings.getText());
