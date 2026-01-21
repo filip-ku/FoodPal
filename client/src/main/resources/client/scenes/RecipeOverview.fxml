@@ -119,7 +119,7 @@
    <top>
       <HBox alignment="TOP_RIGHT" maxWidth="1.7976931348623157E308" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
-            <TextField fx:id="searchField" promptText="Search" HBox.hgrow="ALWAYS">
+            <TextField fx:id="searchField" promptText="%recipeOverview.prompt.search" HBox.hgrow="ALWAYS">
                <HBox.margin>
                   <Insets left="15.0" />
                </HBox.margin>
@@ -144,6 +144,7 @@
                   <CheckBox fx:id="filterEnglish" mnemonicParsing="false" onAction="#applyLanguageFilter" text="%recipeOverview.filter.english" />
                   <CheckBox fx:id="filterDutch" mnemonicParsing="false" onAction="#applyLanguageFilter" text="%recipeOverview.filter.dutch" />
                   <CheckBox fx:id="filterSpanish" mnemonicParsing="false" onAction="#applyLanguageFilter" text="%recipeOverview.filter.spanish" />
+                  <CheckBox fx:id="filterFrench" mnemonicParsing="false" onAction="#applyLanguageFilter" text="%recipeOverview.filter.french" />
                    <CheckBox fx:id="filterFavorites" text="%recipeOverview.filter.favorites" onAction="#applyLanguageFilter" />
 
                </children>

@@ -3,6 +3,8 @@
         "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 <suppressions>
-    <!-- Relax Javadoc rules only for tests -->
+    <!-- Relaxing Javadoc rules only for tests. Our team
+         decided that tests should not require Javadoc, because
+         their value is in readable assertions and scenario names -->
     <suppress files=".*Test\.java$" checks="MissingJavadocMethod,JavadocMethod"/>
 </suppressions>

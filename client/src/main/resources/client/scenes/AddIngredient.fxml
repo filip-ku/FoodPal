@@ -15,38 +15,38 @@
          <children>
             <AnchorPane maxHeight="259.0" maxWidth="470.0" minHeight="259.0" minWidth="470.0" prefHeight="259.0" prefWidth="470.0">
                <children>
-                  <Button layoutX="424.0" layoutY="207.0" mnemonicParsing="false" onAction="#okButton" text="Ok" />
-                  <Button layoutX="358.0" layoutY="207.0" mnemonicParsing="false" onAction="#cancelButton" text="Cancel" />
+                  <Button layoutX="424.0" layoutY="207.0" mnemonicParsing="false" onAction="#okButton" text="%addIngredient.button.ok" />
+                  <Button layoutX="358.0" layoutY="207.0" mnemonicParsing="false" onAction="#cancelButton" text="%button.cancel" />
                   <VBox layoutX="91.0" layoutY="56.0" spacing="10.0">
                      <children>
                         <HBox prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
                            <children>
-                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Ingredient Name: " textAlignment="RIGHT" />
+                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="%addIngredient.label.ingredientName" textAlignment="RIGHT" />
                               <TextField fx:id="ingredientNameInput" prefHeight="22.0" prefWidth="163.0" />
                            </children>
                         </HBox>
                         <HBox prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
                            <children>
-                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Protein:" textAlignment="RIGHT" />
-                              <TextField fx:id="proteinInput" prefHeight="22.0" prefWidth="163.0" promptText="in grams" />
+                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="%addIngredient.label.protein" textAlignment="RIGHT" />
+                              <TextField fx:id="proteinInput" prefHeight="22.0" prefWidth="163.0" promptText="%addIngredient.prompt.inGrams" />
                            </children>
                         </HBox>
                         <HBox prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
                            <children>
-                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Fat:" textAlignment="RIGHT" />
-                              <TextField fx:id="fatInput" prefHeight="22.0" prefWidth="163.0" promptText="in grams" />
+                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="%addIngredient.label.fat" textAlignment="RIGHT" />
+                              <TextField fx:id="fatInput" prefHeight="22.0" prefWidth="163.0" promptText="%addIngredient.prompt.inGrams" />
                            </children>
                         </HBox>
                         <HBox prefHeight="22.0" prefWidth="287.0" style="-fx-spacing: 10;">
                            <children>
-                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="Carbohyrates:" textAlignment="RIGHT" />
-                              <TextField fx:id="carbsInput" prefHeight="22.0" prefWidth="163.0" promptText="in grams" />
+                              <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="114.0" text="%addIngredient.label.carbs" textAlignment="RIGHT" />
+                              <TextField fx:id="carbsInput" prefHeight="22.0" prefWidth="163.0" promptText="%addIngredient.prompt.inGrams" />
                            </children>
                         </HBox>
                      </children>
                   </VBox>
-                  <Label layoutX="398.0" layoutY="14.0" prefWidth="49.0" text="per 100g" />
-                  <Label fx:id="kcalLabel" layoutX="11.0" layoutY="232.0" text="Inferred kcal: 0.0" />
+                  <Label layoutX="398.0" layoutY="14.0" prefWidth="49.0" text="%addIngredient.label.per100g" />
+                  <Label fx:id="kcalLabel" layoutX="11.0" layoutY="232.0" text="%addIngredient.label.inferredKcal" />
                </children>
             </AnchorPane>
          </children>

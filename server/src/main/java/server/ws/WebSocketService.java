@@ -1,8 +1,6 @@
 package server.ws;
 
-import commons.ws.RecipeChangedEvent;
-import commons.ws.RecipeContentChangedEvent;
-import commons.ws.RecipeListEvent;
+import commons.ws.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +50,16 @@ public class WebSocketService {
     public void publishRecipeContentChanged(Long recipeId) {
         messagingTemplate.convertAndSend("/topic/recipe-content/" + recipeId,
                 new RecipeContentChangedEvent(recipeId));
+    }
+
+    /**
+     * Publishes an ingredient list change event.
+     *
+     * @param ingredientId the ID of the ingredient that was added deleted or edited.
+     */
+    public void publishIngredientListChanged(Long ingredientId) {
+        messagingTemplate.convertAndSend("/topic/ingredient-list",
+                new IngredientListEvent(ingredientId));
     }
 }
 

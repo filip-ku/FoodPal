@@ -8,9 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.server.ResponseStatusException;
 import server.Repository.IngredientRepository;
 import server.Repository.RecipeRepository;
+import server.ws.WebSocketService;
 
 import java.util.List;
 
@@ -20,17 +24,20 @@ public class IngredientService {
     private final IngredientRepository ingredientRepository;
     private static final Logger log = LoggerFactory.getLogger(IngredientService.class);
     private final RecipeRepository recipeRepository;
+    private final WebSocketService webSocketService;
 
     /**
      * Constructs the service with the required repository
      * @param ingredientRepository the required repository
      * @param recipeRepository the repository of recipe
+     * @param webSocketService the WebSocket service for publishing events
      */
     @Autowired
     public IngredientService(IngredientRepository ingredientRepository,
-                             RecipeRepository recipeRepository){
+                             RecipeRepository recipeRepository, WebSocketService webSocketService){
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
+        this.webSocketService = webSocketService;
     }
 
     /**
@@ -38,6 +45,7 @@ public class IngredientService {
      * @param ingredient the ingredient to be added
      * @return the ingredient with an assigned ID
      */
+    @Transactional
     public Ingredient addIngredient(Ingredient ingredient){
         log.info("Adding ingredient {}",ingredient);
         if (ingredient == null){
@@ -53,7 +61,9 @@ public class IngredientService {
         }
 
         log.debug("Adding ingredient with id {}",ingredient.getId());
-        return ingredientRepository.save(ingredient);
+        Ingredient saved = ingredientRepository.save(ingredient);
+        runAfterCommit(() -> webSocketService.publishIngredientListChanged(saved.getId()));
+        return saved;
     }
 
     /**
@@ -97,6 +107,7 @@ public class IngredientService {
         }
         recipeRepository.flush();
         ingredientRepository.deleteById(id);
+        runAfterCommit(() -> webSocketService.publishIngredientListChanged(id));
     }
 
     /**
@@ -132,6 +143,7 @@ public class IngredientService {
      * @param ingredient data that will be updated to
      * @return the updated ingredient
      */
+    @Transactional
     public Ingredient updateIngredient(long id, Ingredient ingredient){
         log.info("Updating ingredient with id {}", id);
 
@@ -147,16 +159,41 @@ public class IngredientService {
         existing.setCarbsPer100g(ingredient.getCarbsPer100g());
         existing.setProteinPer100g(ingredient.getProteinPer100g());
         existing.setFatPer100g(ingredient.getFatPer100g());
-        return ingredientRepository.save(existing);
+        Ingredient updatedIngredient = ingredientRepository.save(existing);
+        runAfterCommit(() -> webSocketService.
+                publishIngredientListChanged(updatedIngredient.getId()));
+        return updatedIngredient;
 
+    }
+
+    /**
+     * Executes the given action after the current transaction commits.
+     * If no transaction is active, executes immediately.
+     *
+     * @param action the action to run after commit
+     */
+    private void runAfterCommit(Runnable action) {
+        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+            action.run();
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                action.run();
+            }
+        });
     }
 
     /**
      * Deletes all ingredients
      */
+    @Transactional
     public void deleteAllIngredients(){
         log.info("Deleting all ingredients");
         ingredientRepository.deleteAll();
+        webSocketService.publishIngredientListChanged(null);
     }
 
     /**

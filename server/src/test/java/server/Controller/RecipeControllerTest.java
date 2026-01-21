@@ -43,7 +43,8 @@ public class RecipeControllerTest {
         assertTrue(recipeRepo.calledMethods.contains("save"));
         assertEquals(1, recipeRepo.recipes.size());
         verify(webSocketService).publishRecipeListChange(savedRecipe.getId());
-        verify(webSocketService).publishRecipeChanged("Create", savedRecipe.getId(), savedRecipe.getTitle());
+        verify(webSocketService).
+                publishRecipeChanged("Create", savedRecipe.getId(), savedRecipe.getTitle());
     }
 
     @Test
