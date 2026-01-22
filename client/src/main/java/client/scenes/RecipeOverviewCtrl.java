@@ -568,7 +568,9 @@ public class RecipeOverviewCtrl implements Initializable {
 
     /**
      * Determines whether a recipe matches the given search query.
-     * The query is evaluated using AND semantics.
+     * The query is evaluated using AND semantics, with optional exclusion tokens:
+     * tokens starting with '-' must NOT match.
+     *
      * @param recipe the recipe to test
      * @param query the search query entered by the user
      * @return true if the recipe matches the query, false otherwise.
@@ -583,7 +585,44 @@ public class RecipeOverviewCtrl implements Initializable {
         }
 
         String[] tokens = query.toLowerCase().trim().split("\\s+");
+        String searchableText = buildSearchableText(recipe);
 
+        for (String rawToken : tokens) {
+            if (rawToken == null || rawToken.isBlank()) {
+                continue;
+            }
+
+            boolean isExclude = rawToken.startsWith("-");
+            String token = isExclude ? rawToken.substring(1) : rawToken;
+
+            // Ignore a lone "-" (or "-   ")
+            if (token.isBlank()) {
+                continue;
+            }
+
+            boolean contains = searchableText.contains(token);
+
+            // Exclude token present => reject
+            if (isExclude && contains) {
+                return false;
+            }
+
+            // Include token missing => reject
+            if (!isExclude && !contains) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Builds a single lowercased string containing all searchable fields of the recipe.
+     *
+     * @param recipe the recipe to index into searchable text
+     * @return lowercased searchable text, never null
+     */
+    private String buildSearchableText(Recipe recipe) {
         StringBuilder searchable = new StringBuilder();
 
         // Recipe title
@@ -610,16 +649,7 @@ public class RecipeOverviewCtrl implements Initializable {
             }
         }
 
-        String searchableText = searchable.toString().toLowerCase();
-
-        // AND semantics: all tokens must match
-        for (String token : tokens) {
-            if (!searchableText.contains(token)) {
-                return false;
-            }
-        }
-
-        return true;
+        return searchable.toString().toLowerCase();
     }
 
     /**
@@ -1418,7 +1448,7 @@ public class RecipeOverviewCtrl implements Initializable {
     /**
      * Sets the search field to the given query and executes the search automatically.
      * Clears any previously selected recipe.
-     *AI generated javadoc
+     * AI generated javadoc
      * @param searchQuery the text to search for (typically an ingredient name)
      */
     public void setSearchQuery(String searchQuery) {
