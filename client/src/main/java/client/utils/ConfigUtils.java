@@ -17,13 +17,27 @@ import java.util.Properties;
  */
 public class ConfigUtils {
 
-    private static final String CONFIG_DIR = System.getProperty("user.home")
+    private static final String DEFAULT_CONFIG_DIR = System.getProperty("user.home")
             + File.separator + ".foodpal";
-    private static final String CONFIG_FILE = CONFIG_DIR + File.separator
+    private static final String DEFAULT_CONFIG_FILE = DEFAULT_CONFIG_DIR + File.separator
             + "config.properties";
-    
+
     private static final String KEY_UI_LANGUAGE = "ui.language";
     private static final String KEY_RECIPES_LANGUAGE_FILTER = "recipes.languageFilter";
+
+    private static String customConfigPath = null;
+
+    /**
+     * Sets a custom path for the configuration file.
+     * @param path The absolute path to the .properties file
+     */
+    public static void setCustomConfigPath(String path) {
+        customConfigPath = path;
+    }
+
+    private static String getActualConfigPath() {
+        return (customConfigPath != null) ? customConfigPath : DEFAULT_CONFIG_FILE;
+    }
 
     /**
      * Ensures the config directory exists.
@@ -31,9 +45,10 @@ public class ConfigUtils {
      * @throws IOException if the directory cannot be created
      */
     private static void ensureConfigDirectory() throws IOException {
-        Path configPath = Paths.get(CONFIG_DIR);
-        if (!Files.exists(configPath)) {
-            Files.createDirectories(configPath);
+        Path path = Paths.get(getActualConfigPath());
+        Path parent = path.getParent();
+        if (parent != null && !Files.exists(parent)) {
+            Files.createDirectories(parent);
         }
     }
 
@@ -47,7 +62,7 @@ public class ConfigUtils {
         Properties props = new Properties();
         try {
             ensureConfigDirectory();
-            File configFile = new File(CONFIG_FILE);
+            File configFile = new File(getActualConfigPath());
             if (configFile.exists()) {
                 try (FileInputStream fis = new FileInputStream(configFile)) {
                     props.load(fis);
@@ -67,7 +82,7 @@ public class ConfigUtils {
     private static void saveProperties(Properties props) {
         try {
             ensureConfigDirectory();
-            File configFile = new File(CONFIG_FILE);
+            File configFile = new File(getActualConfigPath());
             try (FileOutputStream fos = new FileOutputStream(configFile)) {
                 props.store(fos, "FoodPal Configuration");
             }

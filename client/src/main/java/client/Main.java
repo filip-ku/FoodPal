@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import client.scenes.*;
+import client.utils.ConfigUtils;
 import com.google.inject.Injector;
 
 import client.utils.ServerUtils;
@@ -46,7 +47,14 @@ public class Main extends Application {
      * @throws IOException        if an FXML file cannot be read
      */
     public static void main(String[] args) throws URISyntaxException, IOException {
-        launch();
+        for (int i = 0; i < args.length; i++) {
+            if ("--cfg".equals(args[i]) && i + 1 < args.length) {
+                String path = args[i + 1];
+                ConfigUtils.setCustomConfigPath(path);
+                break;
+            }
+        }
+        launch(args);
     }
 
     /**
