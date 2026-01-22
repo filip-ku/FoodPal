@@ -3,6 +3,7 @@ package client.scenes;
 import client.ClientModule;
 import client.MyFXML;
 import client.MyModule;
+import client.utils.ConfigUtils;
 import commons.Recipe;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -45,6 +46,8 @@ public class RecipeOverviewSceneTest {
         recipeName = (Label) scene.lookup("#recipeName");
         editButton = (Button) scene.lookup("#recipeEditButton");
         editIngredientButton = (Button) scene.lookup("#recipeIngredientEditButton");
+
+        ConfigUtils.setUILanguage("en");
     }
 
     private Recipe recipeWithServings(String title) {

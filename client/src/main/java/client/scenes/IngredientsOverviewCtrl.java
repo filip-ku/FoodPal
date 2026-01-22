@@ -20,6 +20,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 
@@ -87,6 +88,7 @@ public class IngredientsOverviewCtrl implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
+        updatePlaceholders();
         colName.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getName()));
 
@@ -126,6 +128,17 @@ public class IngredientsOverviewCtrl implements Initializable {
                 });
 
         setupWebSocketSubscriptions();
+    }
+
+    /**
+     * Configures placeholder label for the empty ingredients table using i18n resources.
+     */
+    private void updatePlaceholders() {
+        Label label = new Label(resources.getString("ingredientOverview.table.emptyIngredients"));
+        label.setWrapText(true);
+        label.setMaxWidth(Double.MAX_VALUE);
+        label.setAlignment(Pos.CENTER);
+        tableIngredients.setPlaceholder(label);
     }
 
     /**
