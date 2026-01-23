@@ -17,6 +17,10 @@ Get the template project running from the command line first to ensure you have 
 Once it is working, you can try importing the project into your favorite IDE. Especially the client is a bit more tricky to set up there due to the dependency on a JavaFX SDK.
 To help you get started, you can find additional instructions in the corresponding README of the client project.
 
+# Shopping List 
+
+Shopping list was NOT implemented at all. All the other additional features ARE implemented. 
+
 # Searching for Recipes
 
 Users can now navigate from the Ingredients Overview directly to recipes that use a specific ingredient. When viewing the list of all ingredients, selecting an ingredient and clicking the "See Recipes" button will:
@@ -49,3 +53,6 @@ The only thing that wasn't translated are the tables containing recipes, ingredi
 
 The meaningful addition is the implementation of websockets live updates to add, delete, and change an ingredient from the ingredient list. 
 
+# MAC specific issue 
+
+When creating a new ingredient, the title of the window says "per 10..." instead of "per 100g". On windows this issue doesn't exist.
