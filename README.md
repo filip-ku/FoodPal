@@ -45,3 +45,7 @@ The meaningful addition is the addition of a fourth language(French).
 
 The only thing that wasn't translated are the tables containing recipes, ingredients, and recipe steps when they are empty. This is because Scene Builder automatically assigns the text in english without the ability to change it to another language. 
 
+# Automated Change Synchronization
+
+The meaningful addition is the implementation of websockets live updates to add, delete, and change an ingredient from the ingredient list. 
+
