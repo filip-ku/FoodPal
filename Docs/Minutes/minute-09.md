@@ -2,7 +2,7 @@
 
 **Date:** 23/01/2026  
 **Time:** 14:45  
-**Chair:** Filip Kurantowicz 
+**Chair:** Filip Kurantowicz
 **Minute Taker:** Seymur Bastin Caglayan
 **Expected Attendees:** Ivan Gvardeitsev, Batuhan Özkara, Merlijn Koster, Filip Kurantowicz, Seymur Bastin Caglayan
 
@@ -14,7 +14,7 @@
 ### Check-in
 
 - How is everyone?
-Everyone is doing well.
+  Everyone is doing well.
 
 - Was everyone able to complete their assigned tasks for the week?
 - Batuhan added the meaningful addition for nutritional values and wrote his test lines for the backend.
@@ -27,18 +27,18 @@ Everyone is doing well.
 ### Knockout criteria check
 
 - Did everyone manage to do a review, approve an MR, and complete 100 lines of code?
-Merlijn is failing the weekly quota, but he is aware about it and using it as his one free fail.
+  Merlijn is failing the weekly quota, but he is aware about it and using it as his one free fail.
 
 ## Current Issues for Discussion (15–20 min)
 
 - Looking through the backlog, checking to make sure each criterion is met.
-Everything looks good.
+  Everything looks good.
 - Looking through the README.md to check if it fully captures how to reproduce our meaningful additions, and to check if they are explained well enough.
-We should update the readme to mention the addition for web sockets. Done by Ivan.
+  We should update the readme to mention the addition for web sockets. Done by Ivan.
 - If any work is left, splitting it up.
-fix some french characters.
-add a note to the readme about the "per 100g" issue on mac.
-add any other small addition to the readme.
+  fix some french characters.
+  add a note to the readme about the "per 100g" issue on mac.
+  add any other small addition to the readme.
 
 
 ## Demo (5-10 min)
@@ -51,5 +51,6 @@ add any other small addition to the readme.
 - Address remaining questions, if any.
 
 
-## Meeting End 
+## Meeting End
 15.21
+
