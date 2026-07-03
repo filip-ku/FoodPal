@@ -1,6 +1,6 @@
 # FoodPal
 
-FoodPal is a multilingual desktop recipe manager built by an eight-person team during an eight-week Collaborative Software Engineering project at TU Delft. It combines a JavaFX client with a Spring Boot REST API and real-time WebSocket updates.
+FoodPal is a multilingual desktop recipe manager that combines a JavaFX client with a Spring Boot REST API and real-time WebSocket updates.
 
 ## Features
 
@@ -58,10 +58,6 @@ Run the automated test suite from the repository root:
 ```bash
 ./mvnw test
 ```
-
-## Project context
-
-FoodPal was developed collaboratively for TU Delft's Collaborative Software Engineering Project. The complete Git history is retained to represent the team's original development process and individual contributions.
 
 ## License
 
