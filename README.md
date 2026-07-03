@@ -1,58 +1,68 @@
-# CSEP Template Project
+# FoodPal
 
-This repository contains the template for the CSE project. Please extend this README.md with sufficient instructions that will illustrate for your TA and the course staff how they can run your project.
+FoodPal is a multilingual desktop recipe manager built by an eight-person team during an eight-week Collaborative Software Engineering project at TU Delft. It combines a JavaFX client with a Spring Boot REST API and real-time WebSocket updates.
 
-To run the template project from the command line, you either need to have [Maven](https://maven.apache.org/install.html) installed on your local system (`mvn`) or you need to use the Maven wrapper (`mvnw`). You can then execute
+## Features
 
-	mvn -pl server -am spring-boot:run
+- Create, edit, browse, and delete recipes and ingredients
+- Search recipes by title, preparation step, or ingredient
+- Include or exclude ingredients from searches, helping with dietary preferences and allergies
+- Scale recipe quantities and convert between common units
+- Save favourite recipes locally
+- Export recipes with their currently selected serving scale
+- Switch live between English, Dutch, Spanish, and French
+- Synchronise ingredient and recipe changes between connected clients using WebSockets
 
-to run the server and
+## Technology
 
-	mvn -pl client -am javafx:run
+- Java and JavaFX
+- Spring Boot, Spring Data JPA, and REST
+- STOMP over WebSockets
+- H2 in-memory database
+- Maven multi-module architecture
+- JUnit, Mockito, and TestFX
 
-to run the client. Please note that the server needs to be running, before you can start the client.
+## Architecture
 
-Get the template project running from the command line first to ensure you have the required tools on your sytem.
+The project is divided into three Maven modules:
 
-Once it is working, you can try importing the project into your favorite IDE. Especially the client is a bit more tricky to set up there due to the dependency on a JavaFX SDK.
-To help you get started, you can find additional instructions in the corresponding README of the client project.
+- `client` — JavaFX interface, REST client, localisation, and WebSocket subscriptions
+- `server` — Spring Boot API, persistence layer, services, and WebSocket publishing
+- `commons` — domain models and shared WebSocket messages
 
-# Shopping List 
+## Running the application
 
-Shopping list was NOT implemented at all. All the other additional features ARE implemented. 
+### Prerequisites
 
-# Searching for Recipes
+- JDK 25
+- No separate Maven installation is required; the Maven wrapper is included
 
-Users can now navigate from the Ingredients Overview directly to recipes that use a specific ingredient. When viewing the list of all ingredients, selecting an ingredient and clicking the "See Recipes" button will:
-- Automatically navigate to the Recipe Overview screen
-- Pre-fill the search field with the selected ingredient's name
-- Execute the search automatically to show only recipes containing that ingredient
-- Display a clean view (no recipe selected) similar to when first opening the Recipe Overview
+Start the server from the repository root:
 
-This feature makes it easy to discover which recipes use a particular ingredient without manually searching for it. The search uses the existing search functionality, which checks recipe titles, ingredients, and preparation steps with AND semantics.
+```bash
+./mvnw -pl server -am spring-boot:run
+```
 
-The recipe search supports ingredient exclusion using a - prefix (e.g. -nuts). This is especially useful for allergies and dietary preferences, allowing users to quickly find safe recipes by including and excluding ingredients in a single search. To use this feature, simply type the ingredient to exclude with a minus sign in the search bar.
+In a second terminal, start the client:
 
-# Nutritional Values
+```bash
+./mvnw -pl client -am javafx:run
+```
 
-The user is able to scale informal amounts of ingredients just like formal amounts. For example, scaling "a pinch" by 2 should show up as "a pinch (x2)".
+On Windows, use `mvnw.cmd` instead of `./mvnw`.
 
-The program also supports the use of tablespoon as well as cup.
+## Testing
 
-The program converts teaspoon to tablespoon and tablespoon to cup automatically when scaling, similar to how 1000g gets converted to 1kg. (3 teaspoons = 1 tablespoon and 16 tablespoons = 1 cup)
+Run the automated test suite from the repository root:
 
-The value inputted into scale is also taken in mind when downloading the recipe.
+```bash
+./mvnw test
+```
 
-# Live Language Switch 
+## Project context
 
-The meaningful addition is the addition of a fourth language(French).
+FoodPal was developed collaboratively for TU Delft's Collaborative Software Engineering Project. The complete Git history is retained to represent the team's original development process and individual contributions.
 
-The only thing that wasn't translated are the tables containing recipes, ingredients, and recipe steps when they are empty. This is because Scene Builder automatically assigns the text in english without the ability to change it to another language. 
+## License
 
-# Automated Change Synchronization
-
-The meaningful addition is the implementation of websockets live updates to add, delete, and change an ingredient from the ingredient list. 
-
-# MAC specific issue 
-
-When creating a new ingredient, the title of the window says "per 10..." instead of "per 100g". On windows this issue doesn't exist.
+This project is available under the [Apache License 2.0](LICENSE.txt).
